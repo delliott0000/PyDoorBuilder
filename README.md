@@ -15,6 +15,6 @@ This project is split into a few different modules:
 
 # Features (Planned)
 
-- Built-in HTTPS API that manages user sessions and enforces rate limits.
-- Real-time communication of client states via WSS to prevent the loss of progress in the event of a crash.
+- Built-in HTTP API that manages user sessions and enforces rate limits.
+- Real-time communication of client states via WebSocket to prevent the loss of progress in the event of a crash.
 - Use of the `asyncio` framework to handle many IO-bound tasks concurrently.
