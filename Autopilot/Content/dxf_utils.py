@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from ezdxf import new
 
-from Common import DXF_VERSION
+from .constants import DXF_VERSION
 
 if TYPE_CHECKING:
     from typing import Any
