@@ -22,8 +22,11 @@ class BOMBase(ABC):
 
 
 class DynamicBOMItem(BOMBase, ABC):
-    # TODO: implement abstract methods for fields
-    ...
+    # TODO: implement abstract methods for other fields
+    @property
+    @abstractmethod
+    def description(self) -> str:
+        pass
 
 
 class ImplementsBOM(ABC):

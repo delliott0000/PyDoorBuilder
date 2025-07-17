@@ -19,5 +19,6 @@ class StaticBOMItem(BOMBase):
 
 
 class MyDynamicBOMItem(DynamicBOMItem):
+    @property
     def description(self) -> str:
         return str(self)
