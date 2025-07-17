@@ -8,10 +8,10 @@ The goal of PyDoorBuilder is to automatically generate quotation documents, BOMs
 
 This project is split into a few different modules:
 
-- [Client]() - The front-end program that the user interacts with directly.
-- [Server]() - This module communicates user sessions and specification states with the client.
-- [Autopilot]() - The server will offload certain tasks to the autopilot module, such as generating documents.
-- [Common]() - Models that are used across more than one module are defined here.
+- [Client](https://github.com/delliott0000/PyDoorBuilder/tree/master/Client) - The front-end program that the user interacts with directly.
+- [Server](https://github.com/delliott0000/PyDoorBuilder/tree/master/Server) - This module communicates user sessions and specification states with the client.
+- [Autopilot](https://github.com/delliott0000/PyDoorBuilder/tree/master/Autopilot) - The server will offload certain tasks to the autopilot module, such as generating documents.
+- [Common](https://github.com/delliott0000/PyDoorBuilder/tree/master/Common) - Models that are used across more than one module are defined here.
 
 # Features (Planned)
 
