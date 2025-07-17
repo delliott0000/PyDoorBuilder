@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .http import HTTPService
-from .websocket import WebSocketService
 from .postgre_sv import ServerPostgreSQLClient
+from .websocket import WebSocketService
 
 if TYPE_CHECKING:
     ...
