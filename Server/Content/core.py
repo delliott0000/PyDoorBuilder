@@ -17,5 +17,7 @@ class CoreService:
     def __init__(self):
         self.http = HTTPService(self)
         self.ws = WebSocketService(self)
-
         self.db = ServerPostgreSQLClient()
+
+    def run(self) -> None:
+        ...
