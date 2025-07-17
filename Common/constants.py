@@ -1,5 +1,0 @@
-__all__ = ("DXF_VERSION", "CUTOUT_INSET")
-
-# DXF Constants
-DXF_VERSION = "AC1027"
-CUTOUT_INSET = 10
