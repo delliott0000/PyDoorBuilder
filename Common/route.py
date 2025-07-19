@@ -9,7 +9,6 @@ from .config import global_config
 if TYPE_CHECKING:
     from typing import ClassVar
 
-
 __all__ = ("Route", "HTTPRoute", "WebSocketRoute")
 
 
@@ -35,9 +34,7 @@ class Route(ABC):
             raise ValueError("Route must have a base.")
 
         self.__path: str = path
-        self.__kwargs: dict[str, str] = {
-            k: quote(v, safe="") for k, v in kwargs.items()
-        }
+        self.__kwargs: dict[str, str] = {k: quote(v, safe="") for k, v in kwargs.items()}
 
     def __str__(self):
         return self.url
@@ -48,9 +45,7 @@ class Route(ABC):
 
 
 class HTTPRoute(Route):
-    BASE: ClassVar[str] = (
-        f"http{'s' if use_secure else ''}://{resolved_domain}"
-    )
+    BASE: ClassVar[str] = f"http{'s' if use_secure else ''}://{resolved_domain}"
 
 
 class WebSocketRoute(Route):

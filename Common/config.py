@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._types import ConfigData
 
-
 __all__ = ("global_config",)
 
 

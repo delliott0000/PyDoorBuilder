@@ -7,7 +7,6 @@ from .enums import DoorType
 if TYPE_CHECKING:
     from typing import Any
 
-
 __all__ = ("Door",)
 
 
@@ -102,9 +101,7 @@ class Door:
         if not self.is_double:
             self.frame_x = value - self.frame_to_leaf_x
         elif value >= self.leaf_sum_x:
-            raise ValueError(
-                f"Active leaf width of {value}mm is out of range."
-            )
+            raise ValueError(f"Active leaf width of {value}mm is out of range.")
         else:
             self.__leaf_split = (value, self.leaf_sum_x - value)
 
@@ -120,9 +117,7 @@ class Door:
         if not self.is_double:
             pass
         elif value >= self.leaf_sum_x:
-            raise ValueError(
-                f"Passive leaf width of {value}mm is out of range."
-            )
+            raise ValueError(f"Passive leaf width of {value}mm is out of range.")
         else:
             self.__leaf_split = (self.leaf_sum_x - value, value)
 

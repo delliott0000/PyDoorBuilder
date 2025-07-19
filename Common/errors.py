@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 
     from ._types import ResponseData
 
-
 __all__ = ("HTTPException",)
 
 

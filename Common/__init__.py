@@ -5,4 +5,5 @@ from .errors import *
 from .http_client import *
 from .postgre_client import *
 from .route import *
+from .utils import *
 from .websocket_client import *

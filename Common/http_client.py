@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from ._types import ConfigData, RDCoro, ResponseData
     from .route import Route
 
-
 __all__ = ("HTTPClient",)
 
 
@@ -44,16 +43,12 @@ class HTTPClient:
         if self.is_open is True:
             await self.__session.close()
 
-    async def make_request(
-        self, method: str, raw_url: str, /, **kwargs: Any
-    ) -> ResponseData:
+    async def make_request(self, method: str, raw_url: str, /, **kwargs: Any) -> ResponseData:
         if self.is_open is False:
             raise RuntimeError("HTTP session is closed.")
 
         pre_time = time()
-        async with self.__session.request(
-            method, raw_url, **kwargs
-        ) as response:
+        async with self.__session.request(method, raw_url, **kwargs) as response:
             _logger.debug(
                 "%s %s returned %s %s in %.3fs",
                 method.upper(),
@@ -69,9 +64,7 @@ class HTTPClient:
 
             raise HTTPException(response, data)
 
-    async def request(
-        self, method: str, url: str | Route, /, **kwargs: Any
-    ) -> ResponseData:
+    async def request(self, method: str, url: str | Route, /, **kwargs: Any) -> ResponseData:
         url = str(url)
         config = self.config
 
