@@ -4,7 +4,7 @@
 **Still in early development.**
 
 # PyDoorBuilder
-The goal of PyDoorBuilder is to automatically generate quotation documents, BOMs and DXFs for steel doors.
+The goal of PyDoorBuilder is to automatically generate quotation documents, BOMs and technical drawings for steel doors.
 
 This project is split into a few different modules:
 
