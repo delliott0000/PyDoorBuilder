@@ -1,5 +1,24 @@
-[Autopilot]
+[api]
+domain = ""
+secure = true
+local = true
 
-[Client]
+[database]
+host = ""
+port = 0
 
-[Server]
+[server.api]
+host = "localhost"
+port = 8080
+
+[server.database]
+username = ""
+password = ""
+
+[autopilot.api]
+username = ""
+password = ""
+
+[autopilot.database]
+username = ""
+password = ""
