@@ -3,6 +3,16 @@ domain = ""
 secure = true
 local = true
 
+[api.http]
+max_retries = 5
+max_sleep_time = 65.0
+handle_ratelimits = true
+max_retry_after = 60.0
+handle_backoffs = true
+backoff_factor = 1.5
+backoff_start = 1.0
+backoff_cap = 20
+
 [database]
 host = ""
 port = 0

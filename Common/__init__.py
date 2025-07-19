@@ -1,6 +1,7 @@
 from .config import *
 from .door import *
 from .enums import *
+from .errors import *
 from .http_client import *
 from .postgre_client import *
 from .route import *

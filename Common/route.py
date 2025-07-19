@@ -4,7 +4,7 @@ from abc import ABC
 from typing import TYPE_CHECKING
 from urllib.parse import quote
 
-from .config import config
+from .config import global_config
 
 if TYPE_CHECKING:
     from typing import ClassVar
@@ -13,15 +13,15 @@ if TYPE_CHECKING:
 __all__ = ("Route", "HTTPRoute", "WebSocketRoute")
 
 
-domain = config["api"]["domain"]
-secure = config["api"]["secure"]
-local = config["api"]["local"]
+domain = global_config["api"]["domain"]
+secure = global_config["api"]["secure"]
+local = global_config["api"]["local"]
 
 use_secure = secure and not local
 
 if local:
-    host = config["server"]["api"]["host"]
-    port = config["server"]["api"]["port"]
+    host = global_config["server"]["api"]["host"]
+    port = global_config["server"]["api"]["port"]
     resolved_domain = f"{host}:{port}"
 else:
     resolved_domain = domain
@@ -36,14 +36,11 @@ class Route(ABC):
 
         self.__path: str = path
         self.__kwargs: dict[str, str] = {
-            k: self.quote(v) for k, v in kwargs.items()
+            k: quote(v, safe="") for k, v in kwargs.items()
         }
 
     def __str__(self):
         return self.url
-
-    def quote(self, string: str, /) -> str:
-        return quote(string).replace("/", "%2F")
 
     @property
     def url(self) -> str:
