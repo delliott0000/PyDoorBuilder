@@ -4,9 +4,9 @@ from copy import deepcopy
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ._types import ResponseData
-
     from aiohttp import ClientResponse
+
+    from ._types import ResponseData
 
 
 __all__ = ("HTTPException",)

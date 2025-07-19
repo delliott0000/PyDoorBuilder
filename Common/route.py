@@ -48,7 +48,9 @@ class Route(ABC):
 
 
 class HTTPRoute(Route):
-    BASE: ClassVar[str] = f"http{'s' if use_secure else ''}://{resolved_domain}"
+    BASE: ClassVar[str] = (
+        f"http{'s' if use_secure else ''}://{resolved_domain}"
+    )
 
 
 class WebSocketRoute(Route):

@@ -13,8 +13,8 @@ from .errors import HTTPException
 if TYPE_CHECKING:
     from typing import Any
 
+    from ._types import ConfigData, RDCoro, ResponseData
     from .route import Route
-    from ._types import ConfigData, ResponseData, RDCoro
 
 
 __all__ = ("HTTPClient",)
@@ -33,7 +33,9 @@ class HTTPClient:
         return self.__session is not None and not self.__session.closed
 
     def get_retry_after(self, error: HTTPException, /) -> float | None:
-        ...
+        retry_after = error.response.headers.get("Retry-After")
+        if retry_after is not None:
+            return float(retry_after)
 
     async def create_connection(self) -> None:
         self.__session = ClientSession()
@@ -42,12 +44,16 @@ class HTTPClient:
         if self.is_open is True:
             await self.__session.close()
 
-    async def make_request(self, method: str, raw_url: str, /, **kwargs: Any) -> ResponseData:
+    async def make_request(
+        self, method: str, raw_url: str, /, **kwargs: Any
+    ) -> ResponseData:
         if self.is_open is False:
             raise RuntimeError("HTTP session is closed.")
 
         pre_time = time()
-        async with self.__session.request(method, raw_url, **kwargs) as response:
+        async with self.__session.request(
+            method, raw_url, **kwargs
+        ) as response:
             _logger.debug(
                 "%s %s returned %s %s in %.3fs",
                 method.upper(),
@@ -63,7 +69,9 @@ class HTTPClient:
 
             raise HTTPException(response, data)
 
-    async def request(self, method: str, url: str | Route, /, **kwargs: Any) -> ResponseData:
+    async def request(
+        self, method: str, url: str | Route, /, **kwargs: Any
+    ) -> ResponseData:
         url = str(url)
         config = self.config
 
@@ -86,11 +94,18 @@ class HTTPClient:
                     retry_after = self.get_retry_after(error)
 
                     if retry_after is not None:
-                        if config["handle_ratelimits"] is True and retry_after <= config["max_retry_after"]:
+                        if (
+                            config["handle_ratelimits"] is True
+                            and retry_after <= config["max_retry_after"]
+                        ):
                             sleep_time = retry_after
+
                     else:
                         backoff *= config["backoff_factor"]
-                        if config["handle_backoffs"] is True and backoff <= config["backoff_cap"]:
+                        if (
+                            config["handle_backoffs"] is True
+                            and backoff <= config["backoff_cap"]
+                        ):
                             sleep_time = backoff
 
                 elif error.response.status >= 500:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from tomllib import load
 from pathlib import Path
+from tomllib import load
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
