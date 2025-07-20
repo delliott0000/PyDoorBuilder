@@ -24,7 +24,8 @@ class BaseService(ABC):
         self.__task: Task | None = None
 
     async def __aenter__(self) -> Self:
-        self.__task = create_task(self.task_coro_loop(), name=f"{type(self).__name__}Task")
+        self.__task = create_task(self.task_coro_loop(), name=self.task_name)
+        _logger.debug(f"{self.task_name} started.")
         return self
 
     async def __aexit__(self, *_) -> None:
@@ -36,15 +37,19 @@ class BaseService(ABC):
         try:
             await self.__task
         except CancelledError:
-            _logger.debug(f"{self.__task.get_name()} was cancelled.")
+            _logger.debug(f"{self.task_name} cancelled.")
         except Exception as error:
-            _logger.exception(f"{self.__task.get_name()} raised {type(error).__name__}.")
+            _logger.exception(f"{self.task_name} raised {type(error).__name__}.")
 
         self.__task = None
 
     @property
     def task(self) -> Task | None:
         return self.__task
+
+    @property
+    def task_name(self) -> str:
+        return f"{type(self).__name__}Task"
 
     @abstractmethod
     def register_routes(self) -> None:
