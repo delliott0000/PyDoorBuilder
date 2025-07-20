@@ -32,9 +32,8 @@ class Server:
         async def _run_service():
             async with AsyncExitStack() as stack:
 
-                await stack.enter_async_context(self.db)
-                for service in self.services:
-                    await stack.enter_async_context(service)
+                for context in (*self.services, self.db):
+                    await stack.enter_async_context(context)
 
                 await gather(*(service.task for service in self.services))
 
