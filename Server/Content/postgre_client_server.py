@@ -11,4 +11,8 @@ __all__ = ("ServerPostgreSQLClient",)
 
 
 class ServerPostgreSQLClient(PostgreSQLClient):
-    pass
+    def __init__(self):
+        pass
+
+    async def start(self) -> None:
+        pass

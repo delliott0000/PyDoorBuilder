@@ -11,3 +11,6 @@ __all__ = ("HTTPService",)
 class HTTPService:
     def __init__(self, core: MainService, /):
         self.core: MainService = core
+
+    async def start(self) -> None:
+        pass
