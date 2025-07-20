@@ -2,15 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from .base_service import BaseService
+
 if TYPE_CHECKING:
-    from .server import MainService
+    ...
 
 __all__ = ("HTTPService",)
 
 
-class HTTPService:
-    def __init__(self, core: MainService, /):
-        self.core: MainService = core
+class HTTPService(BaseService):
+    async def task_coro(self) -> None:
+        pass
 
-    async def start(self) -> None:
+    def register_routes(self) -> None:
         pass

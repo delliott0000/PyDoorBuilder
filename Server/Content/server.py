@@ -1,45 +1,46 @@
 from __future__ import annotations
 
-from asyncio import Runner
+from asyncio import gather, run
+from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import TYPE_CHECKING
 
-from aiohttp.web import Application
+from aiohttp import web
 
 from .http_service import HTTPService
-from .postgre_client_server import ServerPostgreSQLClient
+from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import WebSocketService
 
 if TYPE_CHECKING:
     ...
 
-__all__ = ("MainService",)
+__all__ = ("Server",)
 
 
 _logger = getLogger()
 
 
-class MainService:
+class Server:
     def __init__(self):
-        self.app = Application()
-
-        self.http = HTTPService(self)
-        self.ws = WebSocketService(self)
         self.db = ServerPostgreSQLClient()
 
+        self.app = web.Application()
+
+        self.services = (HTTPService(self), WebSocketService(self))
+
     def run(self) -> None:
-        async def _services():
-            ...
+        async def _run_service():
+            async with AsyncExitStack() as stack:
 
-        async def _cleanup():
-            ...
+                await stack.enter_async_context(self.db)
+                for service in self.services:
+                    await stack.enter_async_context(service)
 
-        with Runner() as runner:
-            try:
-                runner.run(_services())
-            except (KeyboardInterrupt, SystemExit):
-                _logger.info("Received signal to terminate service.")
-            finally:
-                _logger.info("Cleaning up tasks and connections...")
-                runner.run(_cleanup())
-                _logger.info("Done. Have a nice day!")
+                await gather(*(service.task for service in self.services))
+
+        try:
+            run(_run_service())
+        except (KeyboardInterrupt, SystemExit):
+            _logger.info("Received signal to terminate service.")
+        finally:
+            _logger.info("Done. Have a nice day!")
