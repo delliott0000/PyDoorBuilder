@@ -40,6 +40,6 @@ class Server:
         try:
             run(_run_service())
         except (KeyboardInterrupt, SystemExit):
-            _logger.info("Received signal to terminate service.")
+            _logger.info("Received signal to terminate program.")
         finally:
             _logger.info("Done. Have a nice day!")
