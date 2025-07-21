@@ -13,6 +13,3 @@ __all__ = ("WebSocketService",)
 class WebSocketService(BaseService):
     async def task_coro(self) -> None:
         pass
-
-    def register_routes(self) -> None:
-        pass

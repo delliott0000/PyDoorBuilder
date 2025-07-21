@@ -2,19 +2,37 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from asyncio import CancelledError, create_task, sleep
+from inspect import getmembers
+from inspect import ismethod as isfunc
 from logging import getLogger
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from asyncio import Task
-    from typing import Self
+    from collections.abc import Callable
+    from typing import ParamSpec, Self, TypeVar
 
     from .server import Server
 
-__all__ = ("BaseService",)
+    P = ParamSpec("P")
+    T = TypeVar("T")
+    F = Callable[P, T]
+
+__all__ = (
+    "route",
+    "BaseService",
+)
 
 
 _logger = getLogger()
+
+
+def route(method: str, endpoint: str, /) -> Callable[[F], F]:
+    def decorator(f: F, /) -> F:
+        setattr(f, "__route__", (method, endpoint))
+        return f
+
+    return decorator
 
 
 class BaseService(ABC):
@@ -53,10 +71,6 @@ class BaseService(ABC):
         return f"{type(self).__name__}Task"
 
     @abstractmethod
-    def register_routes(self) -> None:
-        pass
-
-    @abstractmethod
     async def task_coro(self) -> None:
         pass
 
@@ -64,3 +78,16 @@ class BaseService(ABC):
         while True:
             await sleep(self.interval)
             await self.task_coro()
+
+    def register_routes(self) -> None:
+        for func_name, func in getmembers(self, predicate=isfunc):
+
+            route_info: tuple[str, str] | None = getattr(func, "__route__", None)
+            if route_info is not None:
+
+                method, endpoint = route_info
+                self.server.app.router.add_route(method, endpoint, func)
+
+                _logger.debug(
+                    f"Registered listener: [{method.upper()}] {endpoint} -> {type(self).__name__}.{func_name}()"
+                )
