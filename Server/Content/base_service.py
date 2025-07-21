@@ -44,7 +44,7 @@ class BaseService(ABC):
 
     async def __aenter__(self) -> Self:
         self.__task = create_task(self.task_coro_loop(), name=self.task_name)
-        _logger.debug(f"{self.task_name} started.")
+        _logger.info(f"{self.task_name} started.")
         return self
 
     async def __aexit__(self, *_) -> None:
@@ -56,7 +56,7 @@ class BaseService(ABC):
         try:
             await self.__task
         except CancelledError:
-            _logger.debug(f"{self.task_name} cancelled.")
+            _logger.info(f"{self.task_name} cancelled.")
         except Exception as error:
             _logger.exception(f"{self.task_name} raised {type(error).__name__}.")
 
@@ -88,6 +88,6 @@ class BaseService(ABC):
                 method, endpoint = route_info
                 self.server.app.router.add_route(method, endpoint, func)
 
-                _logger.debug(
+                _logger.info(
                     f"Registered listener: [{method.upper()}] {endpoint} -> {type(self).__name__}.{func_name}()"
                 )

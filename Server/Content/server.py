@@ -39,6 +39,8 @@ class Server:
 
     def run(self) -> None:
         async def _run_service():
+            _logger.info("Starting up service...")
+
             async with AsyncExitStack() as stack:
 
                 for context in (*self.services, self.db):

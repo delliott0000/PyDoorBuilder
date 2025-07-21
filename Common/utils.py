@@ -17,6 +17,6 @@ def setup_logging(file: str, /):
     logging.basicConfig(
         filename=log_destination / f"{timestamp}.txt",
         filemode="w",
-        level=logging.DEBUG,
+        level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )

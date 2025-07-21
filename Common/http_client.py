@@ -49,7 +49,7 @@ class HTTPClient:
 
         pre_time = time()
         async with self.__session.request(method, raw_url, **kwargs) as response:
-            _logger.debug(
+            _logger.info(
                 "%s %s returned %s %s in %.3fs",
                 method.upper(),
                 raw_url,
@@ -109,7 +109,7 @@ class HTTPClient:
                     if total_slept >= config["max_sleep_time"]:
                         raise error
 
-                    _logger.debug(
+                    _logger.info(
                         "Retrying %s %s in %.3fs...",
                         method.upper(),
                         url,
