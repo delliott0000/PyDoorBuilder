@@ -23,7 +23,8 @@ port = 8080
 
 [server.tasks]
 http_interval = 5
-ws_interval = 5
+client_ws_interval = 5
+autopilot_ws_interval = 5
 
 [server.database]
 username = ""

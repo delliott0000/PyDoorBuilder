@@ -11,7 +11,7 @@ from Common import global_config
 
 from .http_service import HTTPService
 from .postgre_client import ServerPostgreSQLClient
-from .websocket_service import WebSocketService
+from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
 
 if TYPE_CHECKING:
     ...
@@ -33,7 +33,8 @@ class Server:
 
         self.services = (
             HTTPService(self, task_config["http_interval"]),
-            WebSocketService(self, task_config["ws_interval"]),
+            ClientWebSocketService(self, task_config["client_ws_interval"]),
+            AutopilotWebSocketService(self, task_config["autopilot_ws_interval"]),
         )
 
     def run(self) -> None:
