@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from asyncio import CancelledError, create_task
+from asyncio import CancelledError, create_task, sleep
 from logging import getLogger
 from typing import TYPE_CHECKING
 
@@ -18,8 +18,9 @@ _logger = getLogger()
 
 
 class BaseService(ABC):
-    def __init__(self, server: Server, /):
+    def __init__(self, server: Server, interval: float, /):
         self.server: Server = server
+        self.interval: float = interval
         self.register_routes()
         self.__task: Task | None = None
 
@@ -61,4 +62,5 @@ class BaseService(ABC):
 
     async def task_coro_loop(self) -> None:
         while True:
+            await sleep(self.interval)
             await self.task_coro()

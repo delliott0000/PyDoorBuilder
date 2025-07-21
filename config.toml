@@ -21,6 +21,10 @@ port = 0
 host = "localhost"
 port = 8080
 
+[server.tasks]
+http_interval = 5
+ws_interval = 5
+
 [server.database]
 username = ""
 password = ""

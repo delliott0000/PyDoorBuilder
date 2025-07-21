@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 
 from aiohttp import web
 
+from Common import global_config
+
 from .http_service import HTTPService
 from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import WebSocketService
@@ -20,13 +22,19 @@ __all__ = ("Server",)
 _logger = getLogger()
 
 
+task_config = global_config["server"]["tasks"]
+
+
 class Server:
     def __init__(self):
         self.db = ServerPostgreSQLClient()
 
         self.app = web.Application()
 
-        self.services = (HTTPService(self), WebSocketService(self))
+        self.services = (
+            HTTPService(self, task_config["http_interval"]),
+            WebSocketService(self, task_config["ws_interval"]),
+        )
 
     def run(self) -> None:
         async def _run_service():
