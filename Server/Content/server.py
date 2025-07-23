@@ -43,7 +43,7 @@ class Server:
         async def _service():
             _logger.info("Starting up service...")
 
-            self.runner = web.AppRunner(self.app)
+            self.runner = web.AppRunner(self.app, access_log=None)
             await self.runner.setup()
 
             host = api_config["host"]
