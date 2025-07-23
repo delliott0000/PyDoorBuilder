@@ -5,7 +5,7 @@ from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import TYPE_CHECKING
 
-from aiohttp import web
+from aiohttp.web import Application, AppRunner, TCPSite
 
 from Common import global_config
 
@@ -30,8 +30,8 @@ class Server:
     def __init__(self):
         self.db: ServerPostgreSQLClient = ServerPostgreSQLClient()
 
-        self.app: web.Application = web.Application()
-        self.runner: web.AppRunner | None = None
+        self.app: Application = Application()
+        self.runner: AppRunner | None = None
 
         self.services: tuple[BaseService, ...] = (
             HTTPService(self, task_config["http_interval"]),
@@ -43,13 +43,13 @@ class Server:
         async def _service():
             _logger.info("Starting up service...")
 
-            self.runner = web.AppRunner(self.app, access_log=None)
+            self.runner = AppRunner(self.app, access_log=None)
             await self.runner.setup()
 
             host = api_config["host"]
             port = api_config["port"]
 
-            site = web.TCPSite(self.runner, host, port)
+            site = TCPSite(self.runner, host, port)
             await site.start()
 
             _logger.info("Service running.")
