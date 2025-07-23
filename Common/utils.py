@@ -6,7 +6,7 @@ import pathlib
 __all__ = ("setup_logging",)
 
 
-def setup_logging(file: str, /):
+def setup_logging(file: str, level: int = logging.DEBUG, /):
     current_module = pathlib.Path(file).parent
     log_destination = current_module.parent / "Logs" / current_module.name
 
@@ -17,6 +17,6 @@ def setup_logging(file: str, /):
     logging.basicConfig(
         filename=log_destination / f"{timestamp}.txt",
         filemode="w",
-        level=logging.INFO,
+        level=level,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
