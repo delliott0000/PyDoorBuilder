@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from asyncio import gather, run
+from asyncio import Runner, gather
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import TYPE_CHECKING
@@ -14,7 +14,7 @@ from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
 
 if TYPE_CHECKING:
-    ...
+    from .base_service import BaseService
 
 __all__ = ("Server",)
 
@@ -23,34 +23,54 @@ _logger = getLogger()
 
 
 task_config = global_config["server"]["tasks"]
+api_config = global_config["server"]["api"]
 
 
 class Server:
     def __init__(self):
-        self.db = ServerPostgreSQLClient()
+        self.db: ServerPostgreSQLClient = ServerPostgreSQLClient()
 
-        self.app = web.Application()
+        self.app: web.Application = web.Application()
+        self.runner: web.AppRunner | None = None
 
-        self.services = (
+        self.services: tuple[BaseService, ...] = (
             HTTPService(self, task_config["http_interval"]),
             ClientWebSocketService(self, task_config["client_ws_interval"]),
             AutopilotWebSocketService(self, task_config["autopilot_ws_interval"]),
         )
 
     def run(self) -> None:
-        async def _run_service():
+        async def _service():
             _logger.info("Starting up service...")
+
+            self.runner = web.AppRunner(self.app)
+            await self.runner.setup()
+
+            host = api_config["host"]
+            port = api_config["port"]
+
+            site = web.TCPSite(self.runner, host, port)
+            await site.start()
+
+            _logger.info("Service running.")
 
             async with AsyncExitStack() as stack:
 
                 for context in (*self.services, self.db):
                     await stack.enter_async_context(context)
 
-                await gather(*(service.task for service in self.services))
+                tasks = (service.task for service in self.services)
+                await gather(*tasks)
 
-        try:
-            run(_run_service())
-        except (KeyboardInterrupt, SystemExit):
-            _logger.info("Received signal to terminate program.")
-        finally:
-            _logger.info("Done. Have a nice day!")
+        async def _cleanup():
+            await self.runner.cleanup()
+
+        with Runner() as runner:
+            try:
+                runner.run(_service())
+            except (KeyboardInterrupt, SystemExit):
+                _logger.info("Received signal to terminate program.")
+            finally:
+                _logger.info("Cleaning up...")
+                runner.run(_cleanup())
+                _logger.info("Done. Have a nice day!")
