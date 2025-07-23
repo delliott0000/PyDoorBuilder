@@ -3,14 +3,18 @@ import logging
 import os
 import pathlib
 
-__all__ = ("setup_logging",)
+__all__ = ("now", "setup_logging")
+
+
+def now() -> datetime:
+    return datetime.datetime.now().astimezone()
 
 
 def setup_logging(file: str, level: int = logging.DEBUG, /):
     current_module = pathlib.Path(file).parent
     log_destination = current_module.parent / "Logs" / current_module.name
 
-    timestamp = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H-%M-%S")
+    timestamp = now().strftime("%Y-%m-%d_%H-%M-%S")
 
     os.makedirs(log_destination, exist_ok=True)
 
