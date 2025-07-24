@@ -6,11 +6,11 @@ import pathlib
 __all__ = ("now", "setup_logging")
 
 
-def now() -> datetime:
+def now() -> datetime.datetime:
     return datetime.datetime.now().astimezone()
 
 
-def setup_logging(file: str, level: int = logging.DEBUG, /):
+def setup_logging(file: str, level: int = logging.DEBUG, /) -> None:
     current_module = pathlib.Path(file).parent
     log_destination = current_module.parent / "Logs" / current_module.name
 
