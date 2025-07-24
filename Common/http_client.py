@@ -11,10 +11,13 @@ from .config import global_config
 from .errors import HTTPException
 
 if TYPE_CHECKING:
+    from collections.abc import Coroutine
     from typing import Any
 
-    from ._types import ConfigData, RDCoro, ResponseData
     from .route import Route
+
+    Json = dict[str, Any]
+    JsonCoro = Coroutine[Any, Any, Json]
 
 __all__ = ("HTTPClient",)
 
@@ -24,7 +27,7 @@ _logger = getLogger()
 
 class HTTPClient:
     def __init__(self):
-        self.config: ConfigData = global_config["api"]["http"]
+        self.config: dict[str, Any] = global_config["api"]["http"]
         self.__session: ClientSession | None = None
 
     @property
@@ -43,7 +46,7 @@ class HTTPClient:
         if self.is_open is True:
             await self.__session.close()
 
-    async def make_request(self, method: str, raw_url: str, /, **kwargs: Any) -> ResponseData:
+    async def make_request(self, method: str, raw_url: str, /, **kwargs: Any) -> Json:
         if self.is_open is False:
             raise RuntimeError("HTTP session is closed.")
 
@@ -64,7 +67,7 @@ class HTTPClient:
 
             raise HTTPException(response, data)
 
-    async def request(self, method: str, url: str | Route, /, **kwargs: Any) -> ResponseData:
+    async def request(self, method: str, url: str | Route, /, **kwargs: Any) -> Json:
         url = str(url)
         config = self.config
 
@@ -121,17 +124,17 @@ class HTTPClient:
 
                 raise error
 
-    def get(self, url: str | Route, /, **kwargs) -> RDCoro:
+    def get(self, url: str | Route, /, **kwargs) -> JsonCoro:
         return self.request("get", url, **kwargs)
 
-    def put(self, url: str | Route, /, **kwargs) -> RDCoro:
+    def put(self, url: str | Route, /, **kwargs) -> JsonCoro:
         return self.request("put", url, **kwargs)
 
-    def post(self, url: str | Route, /, **kwargs) -> RDCoro:
+    def post(self, url: str | Route, /, **kwargs) -> JsonCoro:
         return self.request("post", url, **kwargs)
 
-    def patch(self, url: str | Route, /, **kwargs) -> RDCoro:
+    def patch(self, url: str | Route, /, **kwargs) -> JsonCoro:
         return self.request("patch", url, **kwargs)
 
-    def delete(self, url: str | Route, /, **kwargs) -> RDCoro:
+    def delete(self, url: str | Route, /, **kwargs) -> JsonCoro:
         return self.request("delete", url, **kwargs)

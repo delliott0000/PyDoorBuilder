@@ -5,7 +5,7 @@ from tomllib import load
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ._types import ConfigData
+    from typing import Any
 
 __all__ = ("global_config",)
 
@@ -13,4 +13,4 @@ __all__ = ("global_config",)
 config_file = Path(__file__).parent.parent / "config.toml"
 
 with config_file.open("rb") as file:
-    global_config: ConfigData = load(file)
+    global_config: dict[str, Any] = load(file)
