@@ -16,12 +16,12 @@ __all__ = ("Session",)
 class Session:
     __slots__ = ("_user", "_token", "_expires", "_killed")
 
-    def __init__(self, user: User, token: str, lifespan: float, /, *, killed: bool = False):
+    def __init__(self, user: User, token: str, duration: float, /, *, killed: bool = False):
         self._user: User = user
         self._token: str = token
         self._expires: datetime
         self._killed: bool = killed
-        self.refresh(lifespan)
+        self.refresh(duration)
 
     @property
     def user(self) -> User:
@@ -50,6 +50,6 @@ class Session:
     def kill(self) -> None:
         self._killed = True
 
-    def refresh(self, lifespan: float, /) -> None:
+    def refresh(self, duration: float, /) -> None:
         if not self.killed:
-            self._expires = now() + timedelta(seconds=lifespan)
+            self._expires = now() + timedelta(seconds=duration)
