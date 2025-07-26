@@ -9,6 +9,7 @@ from aiohttp import ClientSession
 
 from .config import global_config
 from .errors import HTTPException
+from .utils import to_json
 
 if TYPE_CHECKING:
     from collections.abc import Coroutine
@@ -61,7 +62,7 @@ class HTTPClient:
                 response.reason,
                 time() - pre_time,
             )
-            data = await response.json()
+            data = await to_json(response)
 
             if 200 <= response.status < 300:
                 return data
