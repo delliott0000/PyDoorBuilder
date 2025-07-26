@@ -8,7 +8,7 @@ from aiohttp.web import json_response
 from Common import Session, global_config, to_json
 
 from .base_service import BaseService
-from .decorators import BucketType, ratelimit, route
+from .decorators import BucketType, ratelimit, route, validate_token
 
 if TYPE_CHECKING:
     from aiohttp.web import Request, Response
@@ -54,3 +54,14 @@ class HTTPService(BaseService):
             },
             status=200,
         )
+
+    @route("post", "/auth/renew")
+    @ratelimit(limit=10, interval=60, bucket_type=BucketType.Token)
+    @validate_token
+    async def renew(self, request: Request, /) -> Response: ...
+
+    @route("post", "/auth/logout")
+    @ratelimit(limit=1, interval=60, bucket_type=BucketType.Token)
+    @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
+    @validate_token
+    async def logout(self, request: Request, /) -> Response: ...

@@ -21,7 +21,7 @@ class Session:
         self._token: str = token
         self._expires: datetime
         self._killed: bool = killed
-        self.refresh(duration)
+        self.renew(duration)
 
     @property
     def user(self) -> User:
@@ -50,6 +50,6 @@ class Session:
     def kill(self) -> None:
         self._killed = True
 
-    def refresh(self, duration: float, /) -> None:
+    def renew(self, duration: float, /) -> None:
         if not self.killed:
             self._expires = now() + timedelta(seconds=duration)
