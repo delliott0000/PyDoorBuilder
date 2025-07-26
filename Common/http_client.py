@@ -35,9 +35,10 @@ class HTTPClient:
         return self.__session is not None and not self.__session.closed
 
     def get_retry_after(self, error: HTTPException, /) -> float | None:
-        retry_after = error.response.headers.get("Retry-After")
-        if retry_after is not None:
-            return float(retry_after)
+        try:
+            return float(error.response.headers.get("Retry-After"))
+        except (AttributeError, TypeError, ValueError):
+            return None
 
     async def create_connection(self) -> None:
         self.__session = ClientSession()
