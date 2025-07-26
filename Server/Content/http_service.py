@@ -58,10 +58,25 @@ class HTTPService(BaseService):
     @route("post", "/auth/renew")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.Token)
     @validate_token
-    async def renew(self, request: Request, /) -> Response: ...
+    async def renew(self, request: Request, /) -> Response:
+        session = self.session_from_request(request)
+        session.renew(duration)
+        return json_response(
+            {
+                "message": "Ok",
+                "token": session.token,
+                "duration": duration,
+                "user_id": session.user.id,
+                "username": session.user.name,
+            },
+            status=200,
+        )
 
     @route("post", "/auth/logout")
     @ratelimit(limit=1, interval=60, bucket_type=BucketType.Token)
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
     @validate_token
-    async def logout(self, request: Request, /) -> Response: ...
+    async def logout(self, request: Request, /) -> Response:
+        session = self.session_from_request(request)
+        session.kill()
+        return json_response({"message": "Ok"}, status=200)
