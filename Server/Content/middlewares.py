@@ -26,9 +26,7 @@ async def json_wrapper(request: Request, handler: Handler) -> Response:
     except HTTPException as error:
         return json_response({"message": error.reason or error.text}, status=error.status)
     except Exception as error:
-        _logger.exception(
-            f"An error occurred whilst processing a request - {type(error).__name__}"
-        )
+        _logger.exception(f"An error occurred whilst processing a request - {error}")
         return json_response({"message": "Internal server error"}, status=500)
 
 
