@@ -2,37 +2,26 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from asyncio import CancelledError, create_task, sleep
-from inspect import getmembers
-from inspect import ismethod as isfunc
+from inspect import getmembers, isfunction
 from logging import getLogger
 from typing import TYPE_CHECKING
 
+from .decorators import _ensure_meta
+
 if TYPE_CHECKING:
     from asyncio import Task
-    from collections.abc import Callable
-    from typing import ParamSpec, Self, TypeVar
+    from typing import Self
+
+    from aiohttp.web import Request
+
+    from Common import Session, User
 
     from .server import Server
 
-    P = ParamSpec("P")
-    T = TypeVar("T")
-    F = Callable[P, T]
-
-__all__ = (
-    "route",
-    "BaseService",
-)
+__all__ = ("BaseService",)
 
 
 _logger = getLogger()
-
-
-def route(method: str, endpoint: str, /) -> Callable[[F], F]:
-    def decorator(f: F, /) -> F:
-        setattr(f, "__route__", (method, endpoint))
-        return f
-
-    return decorator
 
 
 class BaseService(ABC):
@@ -79,15 +68,54 @@ class BaseService(ABC):
             await sleep(self.interval)
             await self.task_coro()
 
+    def token_exists(self, token: str, /) -> bool:
+        return token in self.server.sessions
+
+    def token_from_request(self, request: Request, /) -> str | None:
+        headers = request.headers
+        if not isinstance(headers, dict):
+            return None
+
+        authorization = headers.get("Authorization", "")
+        if not isinstance(authorization, str):
+            return None
+        elif not authorization.startswith("Bearer "):
+            return None
+        else:
+            return authorization.removeprefix("Bearer ")
+
+    def session_from_request(self, request: Request, /) -> Session | None:
+        token = self.token_from_request(request)
+        if token is not None:
+            return self.server.sessions.get(token)
+
+    def user_from_request(self, request: Request, /) -> User | None:
+        session = self.session_from_request(request)
+        if session is not None:
+            return session.user
+
+    def user_id_from_request(self, request: Request, /) -> str | None:
+        user = self.user_from_request(request)
+        if user is not None:
+            return user.id
+
     def register_routes(self) -> None:
-        for func_name, func in getmembers(self, predicate=isfunc):
+        for func_name, func in getmembers(type(self), predicate=isfunction):
 
-            route_info: tuple[str, str] | None = getattr(func, "__route__", None)
-            if route_info is not None:
+            routes = _ensure_meta(func).get("routes", ())
+            for route in routes:
+                try:
+                    method = route["method"]
+                    endpoint = route["endpoint"]
+                except KeyError:
+                    continue
 
-                method, endpoint = route_info
-                self.server.app.router.add_route(method, endpoint, func)
-
+                self.server.app.router.add_route(
+                    method,
+                    endpoint,
+                    func.__get__(self),
+                    name=f"{method}{endpoint}".replace("/", "_"),
+                )
                 _logger.info(
-                    f"Registered listener: [{method.upper()}] {endpoint} -> {type(self).__name__}.{func_name}()"
+                    f"Registered listener: {method.upper()} {endpoint} -> {type(self).__name__}.{func_name}()"
                 )
