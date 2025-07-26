@@ -49,5 +49,5 @@ async def to_json(r: Request | ClientResponse, /, *, strict: bool = False) -> Js
     except Exception as error:
         if strict:
             raise
-        _logger.exception(f"Failed to parse JSON payload: {error}.")
+        _logger.error(f"Failed to parse JSON payload - {type(error).__name__}.")
         return {}
