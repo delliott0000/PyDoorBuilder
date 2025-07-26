@@ -14,6 +14,8 @@ from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
 
 if TYPE_CHECKING:
+    from Common import Session
+
     from .base_service import BaseService
 
 __all__ = ("Server",)
@@ -38,6 +40,12 @@ class Server:
             ClientWebSocketService(self, task_config["client_ws_interval"]),
             AutopilotWebSocketService(self, task_config["autopilot_ws_interval"]),
         )
+
+        self.__sessions: dict[str, Session] = {}
+
+    @property
+    def sessions(self) -> dict[str, Session]:
+        return self.__sessions
 
     def run(self) -> None:
         async def _service():
