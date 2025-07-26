@@ -10,6 +10,7 @@ from aiohttp.web import Application, AppRunner, TCPSite
 from Common import global_config
 
 from .http_service import HTTPService
+from .middlewares import middlewares
 from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
 
@@ -32,7 +33,7 @@ class Server:
     def __init__(self):
         self.db: ServerPostgreSQLClient = ServerPostgreSQLClient()
 
-        self.app: Application = Application()
+        self.app: Application = Application(middlewares=middlewares)
         self.runner: AppRunner | None = None
 
         self.services: tuple[BaseService, ...] = (
