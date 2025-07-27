@@ -72,11 +72,7 @@ class BaseService(ABC):
         return token in self.server.sessions
 
     def token_from_request(self, request: Request, /) -> str | None:
-        headers = request.headers
-        if not isinstance(headers, dict):
-            return None
-
-        authorization = headers.get("Authorization", "")
+        authorization = request.headers.get("Authorization")
         if not isinstance(authorization, str):
             return None
         elif not authorization.startswith("Bearer "):
