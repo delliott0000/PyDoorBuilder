@@ -21,9 +21,8 @@ class Session:
     ):
         self._id: str = _id
         self._user: User = user
-        self._token: str = token
-        self._expires: datetime
         self._killed: bool = killed
+        self.set_token(token)
         self.renew(duration)
 
     def __hash__(self):
@@ -62,6 +61,9 @@ class Session:
 
     def kill(self) -> None:
         self._killed = True
+
+    def set_token(self, token: str, /) -> None:
+        self._token = token
 
     def renew(self, duration: float, /) -> None:
         if not self.killed:

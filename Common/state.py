@@ -12,6 +12,8 @@ class State:
     __slots__ = ()
 
     @classmethod
-    def from_json(cls, json: dict[str, Any], /) -> Self: ...
+    def from_json(cls, _: dict[str, Any], /) -> Self:
+        return cls()
 
-    def to_json(self) -> dict[str, Any]: ...
+    def to_json(self) -> dict[str, Any]:
+        return {}
