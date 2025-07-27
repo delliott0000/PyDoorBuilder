@@ -15,7 +15,7 @@ from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
 
 if TYPE_CHECKING:
-    from Common import Session
+    from Common import Session, State
 
     from .base_service import BaseService
 
@@ -44,6 +44,8 @@ class Server:
 
         self.token_to_session: dict[str, Session] = {}
         self.user_id_to_tokens: dict[str, set[str]] = {}
+        self.session_id_to_session: dict[str, Session] = {}
+        self.session_id_to_state: dict[str, State] = {}
 
     @property
     def services(self) -> tuple[BaseService, ...]:
