@@ -69,7 +69,7 @@ class BaseService(ABC):
             await self.task_coro()
 
     def token_exists(self, token: str, /) -> bool:
-        return token in self.server.sessions
+        return token in self.server.token_to_session
 
     def token_from_request(self, request: Request, /) -> str | None:
         authorization = request.headers.get("Authorization")
@@ -83,7 +83,7 @@ class BaseService(ABC):
     def session_from_request(self, request: Request, /) -> Session | None:
         token = self.token_from_request(request)
         if token is not None:
-            return self.server.sessions.get(token)
+            return self.server.token_to_session.get(token)
 
     def user_from_request(self, request: Request, /) -> User | None:
         session = self.session_from_request(request)

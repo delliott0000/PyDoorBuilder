@@ -41,7 +41,7 @@ class HTTPService(BaseService):
         if user is None:
             raise HTTPUnauthorized(reason="Incorrect username/password")
 
-        tokens = self.server.tokens.setdefault(user.id, set())
+        tokens = self.server.user_id_to_tokens.setdefault(user.id, set())
         if len(tokens) >= max_tokens:
             raise HTTPForbidden(reason="Too many active tokens")
 
@@ -49,7 +49,7 @@ class HTTPService(BaseService):
         tokens.add(token)
 
         session = Session(user, token, duration)
-        self.server.sessions[token] = session
+        self.server.token_to_session[token] = session
 
         return json_response(
             {

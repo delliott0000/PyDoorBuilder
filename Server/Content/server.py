@@ -42,16 +42,8 @@ class Server:
             AutopilotWebSocketService(self, task_config["autopilot_ws_interval"]),
         )
 
-        self.__sessions: dict[str, Session] = {}
-        self.__tokens: dict[str, set[str]] = {}
-
-    @property
-    def sessions(self) -> dict[str, Session]:
-        return self.__sessions
-
-    @property
-    def tokens(self) -> dict[str, set[str]]:
-        return self.__tokens
+        self.token_to_session: dict[str, Session] = {}
+        self.user_id_to_tokens: dict[str, set[str]] = {}
 
     def run(self) -> None:
         async def _service():
