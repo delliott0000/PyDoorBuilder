@@ -11,7 +11,7 @@ __all__ = ("ServerPostgreSQLClient",)
 
 
 class ServerPostgreSQLClient(PostgreSQLClient):
-    def get_user(
+    async def get_user(
         self,
         *,
         user_id: str | None = None,

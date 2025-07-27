@@ -37,7 +37,7 @@ class HTTPService(BaseService):
         except KeyError:
             raise HTTPBadRequest(reason="Missing username/password")
 
-        user = self.server.db.get_user(username=username, password=password)
+        user = await self.server.db.get_user(username=username, password=password)
         if user is None:
             raise HTTPUnauthorized(reason="Incorrect username/password")
 
