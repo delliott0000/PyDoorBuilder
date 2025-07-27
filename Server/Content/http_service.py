@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from logging import getLogger
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
@@ -14,6 +15,9 @@ if TYPE_CHECKING:
     from aiohttp.web import Request, Response
 
 __all__ = ("HTTPService",)
+
+
+_logger = getLogger()
 
 
 config = global_config["server"]["api"]
@@ -47,6 +51,7 @@ class HTTPService(BaseService):
 
         token = token_urlsafe(32)
         tokens.add(token)
+        _logger.info(f"Issued new token for user {user}.")
 
         session_id = token_urlsafe(16)
         session = Session(session_id, user, token, duration)
