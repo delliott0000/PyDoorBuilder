@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
+from .state import State
 from .utils import now
 
 if TYPE_CHECKING:
@@ -14,14 +15,23 @@ __all__ = ("Session",)
 
 
 class Session:
-    __slots__ = ("_id", "_user", "_token", "_expires", "_killed")
+    __slots__ = ("_id", "_user", "_token", "_expires", "_killed", "_state")
 
     def __init__(
-        self, _id: str, user: User, token: str, duration: float, /, *, killed: bool = False
+        self,
+        _id: str,
+        user: User,
+        token: str,
+        duration: float,
+        /,
+        *,
+        killed: bool = False,
+        state: State | None = None,
     ):
         self._id: str = _id
         self._user: User = user
         self._killed: bool = killed
+        self._state: State = state if state is not None else State()
         self.set_token(token)
         self.renew(duration)
 
@@ -42,6 +52,10 @@ class Session:
     @property
     def token(self) -> str:
         return self._token
+
+    @property
+    def state(self) -> State:
+        return self._state
 
     @property
     def expires(self) -> datetime:
