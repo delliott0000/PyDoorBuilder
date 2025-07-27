@@ -3,7 +3,7 @@ from __future__ import annotations
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
-from aiohttp.web import HTTPBadRequest, HTTPUnauthorized, json_response
+from aiohttp.web import HTTPBadRequest, HTTPForbidden, HTTPUnauthorized, json_response
 
 from Common import Session, global_config, to_json
 
@@ -16,7 +16,9 @@ if TYPE_CHECKING:
 __all__ = ("HTTPService",)
 
 
-duration = global_config["server"]["api"]["token_duration"]
+config = global_config["server"]["api"]
+duration = config["token_duration"]
+max_tokens = config["max_tokens_per_user"]
 
 
 class HTTPService(BaseService):
@@ -39,9 +41,14 @@ class HTTPService(BaseService):
         if user is None:
             raise HTTPUnauthorized(reason="Incorrect username/password")
 
-        token = token_urlsafe(32)
-        session = Session(user, token, duration)
+        tokens = self.server.tokens.setdefault(user.id, set())
+        if len(tokens) >= max_tokens:
+            raise HTTPForbidden(reason="Too many active tokens")
 
+        token = token_urlsafe(32)
+        tokens.add(token)
+
+        session = Session(user, token, duration)
         self.server.sessions[token] = session
 
         return json_response(

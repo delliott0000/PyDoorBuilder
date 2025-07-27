@@ -43,10 +43,15 @@ class Server:
         )
 
         self.__sessions: dict[str, Session] = {}
+        self.__tokens: dict[str, set[str]] = {}
 
     @property
     def sessions(self) -> dict[str, Session]:
         return self.__sessions
+
+    @property
+    def tokens(self) -> dict[str, set[str]]:
+        return self.__tokens
 
     def run(self) -> None:
         async def _service():
