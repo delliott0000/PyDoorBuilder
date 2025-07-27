@@ -9,4 +9,6 @@ __all__ = ("State",)
 
 
 class State:
+    __slots__ = ()
+
     def to_json(self) -> dict[str, Any]: ...

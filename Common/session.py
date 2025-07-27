@@ -14,14 +14,27 @@ __all__ = ("Session",)
 
 
 class Session:
-    __slots__ = ("_user", "_token", "_expires", "_killed")
+    __slots__ = ("_id", "_user", "_token", "_expires", "_killed")
 
-    def __init__(self, user: User, token: str, duration: float, /, *, killed: bool = False):
+    def __init__(
+        self, _id: str, user: User, token: str, duration: float, /, *, killed: bool = False
+    ):
+        self._id: str = _id
         self._user: User = user
         self._token: str = token
         self._expires: datetime
         self._killed: bool = killed
         self.renew(duration)
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return isinstance(other, Session) and self.id == other.id
+
+    @property
+    def id(self) -> str:
+        return self._id
 
     @property
     def user(self) -> User:

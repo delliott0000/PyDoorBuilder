@@ -48,7 +48,8 @@ class HTTPService(BaseService):
         token = token_urlsafe(32)
         tokens.add(token)
 
-        session = Session(user, token, duration)
+        session_id = token_urlsafe(16)
+        session = Session(session_id, user, token, duration)
         self.server.token_to_session[token] = session
 
         return json_response(
