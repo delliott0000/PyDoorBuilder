@@ -53,8 +53,23 @@ class HTTPService(BaseService):
         tokens.add(token)
         _logger.info(f"Issued new token for user {user}.")
 
-        session_id = token_urlsafe(16)
-        session = Session(session_id, user, token, duration)
+        try:
+            session_id = data["session_id"]
+            session = self.server.session_id_to_session[session_id]
+
+            if not session.active or session.user != user:
+                raise ValueError("Invalid session ID.")
+
+            session.set_token(token)
+            session.renew(duration)
+
+        except (KeyError, ValueError):
+            session_id = token_urlsafe(16)
+            session = Session(session_id, user, token, duration)
+
+            self.server.session_id_to_session[session_id] = session
+            _logger.info(f"Issued new session for user {user}. (Session ID: {session_id})")
+
         self.server.token_to_session[token] = session
 
         return json_response(
@@ -64,6 +79,8 @@ class HTTPService(BaseService):
                 "duration": duration,
                 "user_id": user.id,
                 "username": username,
+                "session_id": session_id,
+                "state": session.state.to_json(),
             },
             status=200,
         )
