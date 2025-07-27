@@ -36,14 +36,18 @@ class Server:
         self.app: Application = Application(middlewares=middlewares)
         self.runner: AppRunner | None = None
 
-        self.services: tuple[BaseService, ...] = (
-            HTTPService(self, task_config["http_interval"]),
-            ClientWebSocketService(self, task_config["client_ws_interval"]),
-            AutopilotWebSocketService(self, task_config["autopilot_ws_interval"]),
+        self.http = HTTPService(self, task_config["http_interval"])
+        self.client_ws = ClientWebSocketService(self, task_config["client_ws_interval"])
+        self.autopilot_ws = AutopilotWebSocketService(
+            self, task_config["autopilot_ws_interval"]
         )
 
         self.token_to_session: dict[str, Session] = {}
         self.user_id_to_tokens: dict[str, set[str]] = {}
+
+    @property
+    def services(self) -> tuple[BaseService, ...]:
+        return self.http, self.client_ws, self.autopilot_ws
 
     def run(self) -> None:
         async def _service():
