@@ -3,7 +3,7 @@ from __future__ import annotations
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
-from aiohttp.web import json_response
+from aiohttp.web import HTTPBadRequest, HTTPUnauthorized, json_response
 
 from Common import Session, global_config, to_json
 
@@ -33,11 +33,11 @@ class HTTPService(BaseService):
             username = data["username"]
             password = data["password"]
         except KeyError:
-            return json_response({"message": "Missing username/password"}, status=400)
+            raise HTTPBadRequest(reason="Missing username/password")
 
         user = self.server.db.get_user(username=username, password=password)
         if user is None:
-            return json_response({"message": "Incorrect username/password"}, status=401)
+            raise HTTPUnauthorized(reason="Incorrect username/password")
 
         token = token_urlsafe(32)
         session = Session(user, token, duration)

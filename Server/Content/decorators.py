@@ -4,7 +4,7 @@ from enum import Enum
 from time import time
 from typing import TYPE_CHECKING
 
-from aiohttp.web import json_response
+from aiohttp.web import HTTPBadRequest, HTTPTooManyRequests, HTTPUnauthorized
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
@@ -62,10 +62,8 @@ def ratelimit(
             hits = [hit for hit in hits if hit + interval > now]
 
             if len(hits) >= limit:
-                return json_response(
-                    {"message": "Too many requests"},
-                    headers={"Retry-After": str(interval)},
-                    status=429,
+                raise HTTPTooManyRequests(
+                    reason="Too many requests", headers={"Retry-After": str(interval)}
                 )
 
             hits.append(now)
@@ -98,9 +96,9 @@ def validate_token(func: RespFunc, /) -> RespFunc:
     async def wrapper(service: BaseService, request: Request, /) -> Response:
         token = service.token_from_request(request)
         if token is None:
-            return json_response({"message": "Missing token"}, status=400)
+            raise HTTPBadRequest(reason="Missing token")
         elif not service.token_exists(token):
-            return json_response({"message": "Invalid token"}, status=401)
+            raise HTTPUnauthorized(reason="Invalid token")
 
         return await func(service, request)
 
