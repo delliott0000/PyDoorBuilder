@@ -109,6 +109,7 @@ class HTTPService(BaseService):
         )
 
     @route("post", "/auth/renew")
+    @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.Token)
     @validate_token
     async def renew(self, request: Request, /) -> Response:
@@ -129,6 +130,7 @@ class HTTPService(BaseService):
         )
 
     @route("post", "/auth/logout")
+    @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
     @validate_token
     async def logout(self, request: Request, /) -> Response:
