@@ -95,6 +95,13 @@ class BaseService(ABC):
         if user is not None:
             return user.id
 
+    def encode_route_name(self, method: str, endpoint: str, /) -> str:
+        return f"{method}.{endpoint[1:]}".replace("/", "-")
+
+    def decode_route_name(self, name: str, /) -> tuple[str, str]:
+        method, endpoint = name.split(".", 1)
+        return method, "/" + endpoint.replace("-", "/")
+
     def register_routes(self) -> None:
         for func_name, func in getmembers(type(self), predicate=isfunction):
 
@@ -110,7 +117,7 @@ class BaseService(ABC):
                     method,
                     endpoint,
                     func.__get__(self),
-                    name=f"{method}{endpoint}".replace("/", "_"),
+                    name=self.encode_route_name(method, endpoint),
                 )
                 _logger.info(
                     f"Registered listener: {method.upper()} {endpoint} -> {type(self).__name__}.{func_name}()"

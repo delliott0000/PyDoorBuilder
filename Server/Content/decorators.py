@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from logging import getLogger
 from time import time
 from typing import TYPE_CHECKING
 
@@ -19,6 +20,9 @@ if TYPE_CHECKING:
     RespDeco = Callable[[RespFunc], RespFunc]
 
 __all__ = ("_ensure_meta", "BucketType", "ratelimit", "route", "validate_token")
+
+
+_logger = getLogger()
 
 
 def _ensure_meta(obj: Any, /) -> dict[str, Any]:
@@ -68,6 +72,12 @@ def ratelimit(
 
             hits.append(now)
             meta[k1][k2][source] = hits
+
+            if len(hits) >= limit:
+                method, endpoint = service.decode_route_name(request.match_info.route.name)
+                _logger.info(
+                    f"{method.upper()} {endpoint} " f"has hit the {bucket_type.name} ratelimit."
+                )
 
             return await func(service, request)
 
