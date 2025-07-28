@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 
 from aiohttp import ClientSession
 
-from .config import global_config
 from .errors import HTTPException
 from .utils import to_json
 
@@ -27,8 +26,8 @@ _logger = getLogger()
 
 
 class HTTPClient:
-    def __init__(self):
-        self.config: dict[str, Any] = global_config["api"]["http"]
+    def __init__(self, *, config: dict[str, Any]):
+        self.config: dict[str, Any] = config
         self.__session: ClientSession | None = None
 
     @property
