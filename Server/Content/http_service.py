@@ -84,12 +84,11 @@ class HTTPService(BaseService):
             if not session.active or session.user != user:
                 raise ValueError("Invalid session ID.")
 
-            session.set_token(token)
             session.renew(duration)
 
         except (KeyError, ValueError):
             session_id = token_urlsafe(16)
-            session = Session(session_id, user, token, duration)
+            session = Session(session_id, user, duration)
 
             self.server.session_id_to_session[session_id] = session
             _logger.info(f"Issued new session for user {user}. (Session ID: {session_id})")
@@ -113,12 +112,13 @@ class HTTPService(BaseService):
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.Token)
     @validate_token
     async def renew(self, request: Request, /) -> Response:
+        token = self.token_from_request(request)
         session = self.session_from_request(request)
         session.renew(duration)
         return json_response(
             {
                 "message": "Ok",
-                "token": session.token,
+                "token": token,
                 "duration": duration,
                 "user_id": session.user.id,
                 "username": session.user.name,

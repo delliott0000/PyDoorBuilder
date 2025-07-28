@@ -15,13 +15,12 @@ __all__ = ("Session",)
 
 
 class Session:
-    __slots__ = ("_id", "_user", "_token", "_expires", "_killed", "_state")
+    __slots__ = ("_id", "_user", "_expires", "_killed", "_state")
 
     def __init__(
         self,
         _id: str,
         user: User,
-        token: str,
         duration: float,
         /,
         *,
@@ -32,7 +31,6 @@ class Session:
         self._user: User = user
         self._killed: bool = killed
         self._state: State = state if state is not None else State()
-        self.set_token(token)
         self.renew(duration)
 
     def __hash__(self):
@@ -48,10 +46,6 @@ class Session:
     @property
     def user(self) -> User:
         return self._user
-
-    @property
-    def token(self) -> str:
-        return self._token
 
     @property
     def state(self) -> State:
@@ -75,9 +69,6 @@ class Session:
 
     def kill(self) -> None:
         self._killed = True
-
-    def set_token(self, token: str, /) -> None:
-        self._token = token
 
     def renew(self, duration: float, /) -> None:
         if not self.killed:

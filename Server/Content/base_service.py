@@ -75,28 +75,36 @@ class BaseService(ABC):
             return False
 
     def token_from_request(self, request: Request, /) -> str | None:
-        authorization = request.headers.get("Authorization")
-        if not isinstance(authorization, str):
-            return None
-        elif not authorization.startswith("Bearer "):
-            return None
-        else:
-            return authorization.removeprefix("Bearer ")
+        try:
+            return request["token"]
+        except KeyError:
+            authorization = request.headers.get("Authorization")
+
+            if isinstance(authorization, str) and authorization.startswith("Bearer "):
+                token = authorization.removeprefix("Bearer ")
+                request["token"] = token
+                return token
+
+            else:
+                return None
 
     def session_from_request(self, request: Request, /) -> Session | None:
-        token = self.token_from_request(request)
-        if token is not None:
-            return self.server.token_to_session.get(token)
+        try:
+            return self.server.token_to_session[self.token_from_request(request)]
+        except KeyError:
+            return None
 
     def user_from_request(self, request: Request, /) -> User | None:
-        session = self.session_from_request(request)
-        if session is not None:
-            return session.user
+        try:
+            return self.session_from_request(request).user
+        except AttributeError:
+            return None
 
     def user_id_from_request(self, request: Request, /) -> str | None:
-        user = self.user_from_request(request)
-        if user is not None:
-            return user.id
+        try:
+            return self.user_from_request(request).id
+        except AttributeError:
+            return None
 
     def encode_route_name(self, method: str, endpoint: str, /) -> str:
         return f"{method}.{endpoint[1:]}".replace("/", "-")
