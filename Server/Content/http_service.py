@@ -98,6 +98,8 @@ class HTTPService(BaseService):
                 "duration": duration,
                 "user_id": session.user.id,
                 "username": session.user.name,
+                "session_id": session.id,
+                "state": session.state.to_json(),
             },
             status=200,
         )
