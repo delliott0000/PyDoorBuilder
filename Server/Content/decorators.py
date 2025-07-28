@@ -107,7 +107,7 @@ def validate_token(func: RespFunc, /) -> RespFunc:
         token = service.token_from_request(request)
         if token is None:
             raise HTTPBadRequest(reason="Missing token")
-        elif not service.token_exists(token):
+        elif not service.token_is_valid(token):
             raise HTTPUnauthorized(reason="Invalid token")
 
         return await func(service, request)

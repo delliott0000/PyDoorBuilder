@@ -68,8 +68,11 @@ class BaseService(ABC):
             await sleep(self.interval)
             await self.task_coro()
 
-    def token_exists(self, token: str, /) -> bool:
-        return token in self.server.token_to_session
+    def token_is_valid(self, token: str, /) -> bool:
+        try:
+            return self.server.token_to_session[token].active
+        except KeyError:
+            return False
 
     def token_from_request(self, request: Request, /) -> str | None:
         authorization = request.headers.get("Authorization")
