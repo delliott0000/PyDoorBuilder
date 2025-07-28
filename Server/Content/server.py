@@ -65,12 +65,15 @@ class Server:
 
             _logger.info("Service running.")
 
+            services = self.services
+            contexts = services + (self.db,)
+            tasks = (service.task for service in services)
+
             async with AsyncExitStack() as stack:
 
-                for context in (*self.services, self.db):
+                for context in contexts:
                     await stack.enter_async_context(context)
 
-                tasks = (service.task for service in self.services)
                 await gather(*tasks)
 
         async def _cleanup():
