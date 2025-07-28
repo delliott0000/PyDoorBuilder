@@ -7,6 +7,7 @@ from .postgre_client import *
 from .route import *
 from .session import *
 from .state import *
+from .token import *
 from .user import *
 from .utils import *
 from .websocket_client import *
