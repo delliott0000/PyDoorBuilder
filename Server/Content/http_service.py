@@ -111,4 +111,13 @@ class HTTPService(BaseService):
     async def logout(self, request: Request, /) -> Response:
         session = self.session_from_request(request)
         session.kill()
-        return json_response({"message": "Ok"}, status=200)
+        return json_response(
+            {
+                "message": "Ok",
+                "user_id": session.user.id,
+                "username": session.user.name,
+                "session_id": session.id,
+                "state": session.state.to_json(),
+            },
+            status=200,
+        )
