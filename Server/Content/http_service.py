@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from logging import getLogger
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
@@ -27,7 +28,30 @@ max_tokens = config["max_tokens_per_user"]
 
 class HTTPService(BaseService):
     async def task_coro(self) -> None:
-        pass
+        dead_sessions = defaultdict(int)
+
+        for token in list(self.server.token_to_session):
+            session = self.server.token_to_session[token]
+
+            if not session.active:
+                self.server.token_to_session.pop(token, None)
+                self.server.session_id_to_session.pop(session.id, None)
+
+                tokens = self.server.user_id_to_tokens.get(session.user.id)
+                if tokens is None:
+                    continue
+
+                tokens.discard(token)
+                if not tokens:
+                    self.server.user_id_to_tokens.pop(session.user.id, None)
+
+                dead_sessions[session] += 1
+
+        for session, token_count in dead_sessions.items():
+            _logger.info(
+                f"Discarded session and {token_count} token{'' if token_count == 1 else 's'} "
+                f"for user {session.user}. (Session ID: {session.id})"
+            )
 
     @route("post", "/auth/login")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
@@ -105,7 +129,6 @@ class HTTPService(BaseService):
         )
 
     @route("post", "/auth/logout")
-    @ratelimit(limit=1, interval=60, bucket_type=BucketType.Token)
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
     @validate_token
     async def logout(self, request: Request, /) -> Response:
