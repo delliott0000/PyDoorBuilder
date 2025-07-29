@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 from .utils import now
 
 if TYPE_CHECKING:
+    from .session import Session
+
     ExpirationType = datetime | timedelta | float
 
 
@@ -14,6 +16,7 @@ class Token:
     __slots__ = (
         "_id",
         "_nbytes",
+        "_session",
         "_killed",
         "_killed_at",
         "_access",
@@ -25,6 +28,7 @@ class Token:
     def __init__(
         self,
         nbytes: int,
+        session: Session,
         /,
         *,
         access_expires: ExpirationType,
@@ -33,8 +37,9 @@ class Token:
     ):
         self._id = token_urlsafe(nbytes)
         self._nbytes = nbytes
+        self._session = session
         self._killed = killed
-        self._killed_at: datetime | None = None
+        self._killed_at = None
         self.renew(access_expires=access_expires, refresh_expires=refresh_expires)
 
     def __hash__(self):
@@ -46,6 +51,10 @@ class Token:
     @property
     def id(self) -> str:
         return self._id
+
+    @property
+    def session(self) -> Session:
+        return self._session
 
     @property
     def killed(self) -> bool:

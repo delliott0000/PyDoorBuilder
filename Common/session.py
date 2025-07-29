@@ -27,10 +27,10 @@ class Session:
         killed: bool = False,
         state: State | None = None,
     ):
-        self._id: str = _id
-        self._user: User = user
-        self._killed: bool = killed
-        self._state: State = state if state is not None else State()
+        self._id = _id
+        self._user = user
+        self._killed = killed
+        self._state = state if state is not None else State()
         self.renew(duration)
 
     def __hash__(self):

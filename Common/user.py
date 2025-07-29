@@ -12,8 +12,8 @@ class User:
     __slots__ = ("_id", "_name")
 
     def __init__(self, _id: str, name: str, /):
-        self._id: str = _id
-        self._name: str = name
+        self._id = _id
+        self._name = name
 
     def __hash__(self):
         return hash(self._id)
