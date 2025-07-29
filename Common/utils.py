@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     Json = dict[str, Any]
 
-__all__ = ("now", "setup_logging", "to_json")
+__all__ = ("now", "decode_datetime", "encode_datetime", "setup_logging", "to_json")
 
 
 _logger = getLogger()
@@ -22,6 +22,17 @@ _logger = getLogger()
 
 def now() -> datetime:
     return datetime.now().astimezone()
+
+
+def decode_datetime(t: str, /) -> datetime:
+    return datetime.strptime(t, "%Y-%m-%dT%H:%M:%S.%f%z")
+
+
+def encode_datetime(t: datetime, /) -> str:
+    if t.tzinfo is None:
+        raise ValueError("Datetime must be timezone-aware.")
+    else:
+        return t.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
 
 
 def setup_logging(file: str, level: int = DEBUG, /) -> None:
