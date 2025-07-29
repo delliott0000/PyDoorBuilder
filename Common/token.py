@@ -4,18 +4,17 @@ from datetime import datetime, timedelta
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
-from .utils import now
+from .utils import decode_datetime, now
 
 if TYPE_CHECKING:
     from .session import Session
 
-    ExpirationType = datetime | timedelta | float
+    ExpirationType = datetime | timedelta | float | str
 
 
 class Token:
     __slots__ = (
         "_id",
-        "_nbytes",
         "_session",
         "_killed",
         "_killed_at",
@@ -27,20 +26,26 @@ class Token:
 
     def __init__(
         self,
-        nbytes: int,
         session: Session,
         /,
         *,
+        access: str | None = None,
+        refresh: str | None = None,
         access_expires: ExpirationType,
         refresh_expires: ExpirationType,
-        killed: bool = False,
     ):
-        self._id = token_urlsafe(nbytes)
-        self._nbytes = nbytes
+        # Only the server needs to know the ID
+        # Set it once and use for mapping
+        self._id = token_urlsafe(32)
         self._session = session
-        self._killed = killed
+        self._killed = False
         self._killed_at = None
-        self.renew(access_expires=access_expires, refresh_expires=refresh_expires)
+        self.renew(
+            access=access,
+            refresh=refresh,
+            access_expires=access_expires,
+            refresh_expires=refresh_expires,
+        )
 
     def __hash__(self):
         return hash(self._id)
@@ -100,6 +105,8 @@ class Token:
     def renew(
         self,
         *,
+        access: str | None = None,
+        refresh: str | None = None,
         access_expires: ExpirationType,
         refresh_expires: ExpirationType,
     ) -> bool:
@@ -117,11 +124,13 @@ class Token:
                     attrs[attr] = t + arg
                 elif isinstance(arg, (float, int)):
                     attrs[attr] = t + timedelta(seconds=arg)
+                elif isinstance(arg, str):
+                    attrs[attr] = decode_datetime(arg)
                 else:
                     raise TypeError("Expiration type not supported.")
 
-            self._access = token_urlsafe(self._nbytes)
-            self._refresh = token_urlsafe(self._nbytes)
+            self._access = access or token_urlsafe(32)
+            self._refresh = refresh or token_urlsafe(32)
 
             for attr in attrs:
                 setattr(self, attr, attrs[attr])
