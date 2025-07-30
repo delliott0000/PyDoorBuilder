@@ -6,7 +6,9 @@ from inspect import getmembers, isfunction
 from logging import getLogger
 from typing import TYPE_CHECKING
 
-from .decorators import _ensure_meta
+from aiohttp.web import HTTPBadRequest, HTTPUnauthorized
+
+from .decorators import ensure_meta
 
 if TYPE_CHECKING:
     from asyncio import Task
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 
     from aiohttp.web import Request
 
-    from Common import Session, User
+    from Common import Session, Token, User
 
     from .server import Server
 
@@ -68,41 +70,53 @@ class BaseService(ABC):
             await sleep(self.interval)
             await self.task_coro()
 
-    def token_is_valid(self, token: str, /) -> bool:
+    def key_is_valid(self, key: str, /, *, for_refresh: bool = False) -> bool:
         try:
-            return self.server.token_to_session[token].active
+            token = self.server.key_to_token[key]
         except KeyError:
             return False
 
-    def token_from_request(self, request: Request, /) -> str | None:
+        if for_refresh:
+            return not token.expired
+        else:
+            return token.active
+
+    def check_key(self, key: str | None, /, *, for_refresh: bool = False) -> None:
+        _type = "refresh" if for_refresh else "access"
+        if key is None:
+            raise HTTPBadRequest(reason=f"Missing {_type} token")
+        elif not self.key_is_valid(key, for_refresh=for_refresh):
+            raise HTTPUnauthorized(reason=f"Invalid {_type} token")
+
+    def access_from_request(self, request: Request, /) -> str | None:
         try:
-            return request["token"]
+            return request["access"]
         except KeyError:
             authorization = request.headers.get("Authorization")
 
             if isinstance(authorization, str) and authorization.startswith("Bearer "):
-                token = authorization.removeprefix("Bearer ")
-                request["token"] = token
-                return token
+                access = authorization.removeprefix("Bearer ")
+                request["access"] = access
+                return access
 
             else:
                 return None
 
+    def token_from_request(self, request: Request, /) -> Token | None:
+        try:
+            return self.server.key_to_token[self.access_from_request(request)]
+        except KeyError:
+            return None
+
     def session_from_request(self, request: Request, /) -> Session | None:
         try:
-            return self.server.token_to_session[self.token_from_request(request)]
-        except KeyError:
+            return self.token_from_request(request).session
+        except AttributeError:
             return None
 
     def user_from_request(self, request: Request, /) -> User | None:
         try:
             return self.session_from_request(request).user
-        except AttributeError:
-            return None
-
-    def user_id_from_request(self, request: Request, /) -> str | None:
-        try:
-            return self.user_from_request(request).id
         except AttributeError:
             return None
 
@@ -116,7 +130,7 @@ class BaseService(ABC):
     def register_routes(self) -> None:
         for func_name, func in getmembers(type(self), predicate=isfunction):
 
-            routes = _ensure_meta(func).get("routes", ())
+            routes = ensure_meta(func).get("routes", ())
             for route in routes:
                 try:
                     method = route["method"]

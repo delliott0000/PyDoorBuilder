@@ -5,7 +5,7 @@ from logging import getLogger
 from time import time
 from typing import TYPE_CHECKING
 
-from aiohttp.web import HTTPBadRequest, HTTPTooManyRequests, HTTPUnauthorized
+from aiohttp.web import HTTPTooManyRequests
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
@@ -19,13 +19,13 @@ if TYPE_CHECKING:
     RespFunc = Callable[[BaseService, Request], RespCoro]
     RespDeco = Callable[[RespFunc], RespFunc]
 
-__all__ = ("_ensure_meta", "BucketType", "ratelimit", "route", "validate_token")
+__all__ = ("ensure_meta", "BucketType", "ratelimit", "route", "validate_access")
 
 
 _logger = getLogger()
 
 
-def _ensure_meta(obj: Any, /) -> dict[str, Any]:
+def ensure_meta(obj: Any, /) -> dict[str, Any]:
     if not hasattr(obj, "__meta__"):
         obj.__meta__ = {}
     return obj.__meta__
@@ -37,11 +37,11 @@ class BucketType(Enum):
     Token = 2
     Route = 3
 
-    def get_source(self, service: BaseService, request: Request, /) -> str:
+    def get_source(self, service: BaseService, request: Request, /) -> Any:
         if self == BucketType.IP:
             return request.remote or "anon"
         elif self == BucketType.User:
-            return service.user_id_from_request(request) or "anon"
+            return service.user_from_request(request) or "anon"
         elif self == BucketType.Token:
             return service.token_from_request(request) or "anon"
         elif self == BucketType.Route:
@@ -61,7 +61,7 @@ def ratelimit(
             source = bucket_type.get_source(service, request)
 
             now = time()
-            meta = _ensure_meta(wrapper)
+            meta = ensure_meta(wrapper)
             hits = meta[k1][k2].get(source, ())
             hits = [hit for hit in hits if hit + interval > now]
 
@@ -81,7 +81,7 @@ def ratelimit(
 
             return await func(service, request)
 
-        wrapper.__meta__ = _ensure_meta(func)
+        wrapper.__meta__ = ensure_meta(func)
         wrapper.__meta__.setdefault(k1, {})[k2] = {}
 
         return wrapper
@@ -92,7 +92,7 @@ def ratelimit(
 def route(method: str, endpoint: str, /) -> RespDeco:
 
     def decorator(func: RespFunc, /) -> RespFunc:
-        meta = _ensure_meta(func)
+        meta = ensure_meta(func)
         routes = meta.setdefault("routes", [])
         routes.append({"method": method, "endpoint": endpoint})
 
@@ -101,17 +101,14 @@ def route(method: str, endpoint: str, /) -> RespDeco:
     return decorator
 
 
-def validate_token(func: RespFunc, /) -> RespFunc:
+def validate_access(func: RespFunc, /) -> RespFunc:
 
     async def wrapper(service: BaseService, request: Request, /) -> Response:
-        token = service.token_from_request(request)
-        if token is None:
-            raise HTTPBadRequest(reason="Missing token")
-        elif not service.token_is_valid(token):
-            raise HTTPUnauthorized(reason="Invalid token")
+        access = service.access_from_request(request)
+        service.check_key(access)
 
         return await func(service, request)
 
-    wrapper.__meta__ = _ensure_meta(func)
+    wrapper.__meta__ = ensure_meta(func)
 
     return wrapper
