@@ -33,13 +33,15 @@ class Token:
         refresh: str | None = None,
         access_expires: ExpirationType,
         refresh_expires: ExpirationType,
+        killed: bool = False,
+        killed_at: datetime | None = None,
     ):
         # Only the server needs to know the ID
         # Set it once and use for mapping
         self._id = token_urlsafe(32)
         self._session = session
-        self._killed = False
-        self._killed_at = None
+        self._killed = killed
+        self._killed_at = killed_at
         self.renew(
             access=access,
             refresh=refresh,
