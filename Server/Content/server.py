@@ -15,7 +15,7 @@ from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
 
 if TYPE_CHECKING:
-    from Common import Session
+    from Common import Session, Token, User
 
     from .base_service import BaseService
 
@@ -31,9 +31,9 @@ api_config = global_config["server"]["api"]
 
 class Server:
     def __init__(self):
-        self.db: ServerPostgreSQLClient = ServerPostgreSQLClient()
+        self.db = ServerPostgreSQLClient()
 
-        self.app: Application = Application(middlewares=middlewares)
+        self.app = Application(middlewares=middlewares)
         self.runner: AppRunner | None = None
 
         self.http = HTTPService(self, task_config["http_interval"])
@@ -42,8 +42,8 @@ class Server:
             self, task_config["autopilot_ws_interval"]
         )
 
-        self.token_to_session: dict[str, Session] = {}
-        self.user_id_to_tokens: dict[str, set[str]] = {}
+        self.key_to_token: dict[str, Token] = {}
+        self.user_to_tokens: dict[User, set[Token]] = {}
         self.session_id_to_session: dict[str, Session] = {}
 
     @property
