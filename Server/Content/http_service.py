@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from aiohttp.web import HTTPBadRequest, HTTPUnauthorized
+
 from Common import Token, to_json
 
 from .base_service import BaseService
@@ -36,11 +38,11 @@ class AuthService(BaseService):
             username = data["username"]
             password = data["password"]
         except KeyError:
-            raise ...
+            raise HTTPBadRequest(reason="Missing username/password")
 
         user = await self.server.db.get_user(username=username, password=password)
         if user is None:
-            ...
+            raise HTTPUnauthorized(reason="Incorrect username/password")
 
         ...
 
