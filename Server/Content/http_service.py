@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from Common import Token
+
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, validate_access
 
@@ -12,6 +14,14 @@ __all__ = ("AuthService",)
 
 
 class AuthService(BaseService):
+    def add_token_keys(self, token: Token, /) -> None:
+        self.server.key_to_token[token.access] = token
+        self.server.key_to_token[token.refresh] = token
+
+    def pop_token_keys(self, token: Token, /) -> None:
+        self.server.key_to_token.pop(token.access, None)
+        self.server.key_to_token.pop(token.refresh, None)
+
     async def task_coro(self) -> None: ...
 
     @route("post", "/auth/login")
