@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from logging import getLogger
+from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPBadRequest, HTTPUnauthorized
 
-from Common import Token, to_json
+from Common import Session, Token, to_json
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, validate_access
@@ -13,6 +15,9 @@ if TYPE_CHECKING:
     from aiohttp.web import Request, Response
 
 __all__ = ("AuthService",)
+
+
+_logger = getLogger()
 
 
 class AuthService(BaseService):
@@ -37,7 +42,6 @@ class AuthService(BaseService):
         try:
             username = data["username"]
             password = data["password"]
-
             user = await self.server.db.get_user(username=username, password=password)
 
         except (KeyError, ValueError):
@@ -46,9 +50,30 @@ class AuthService(BaseService):
         if user is None:
             raise HTTPUnauthorized(reason="Incorrect username/password")
 
-        ...
+        tokens = self.server.user_to_tokens.setdefault(user, set())
+        if len(tokens) >= self.server.config.max_tokens_per_user:
+            raise HTTPUnauthorized(reason="Too many unexpired tokens")
 
-        return self.ok_response(...)
+        try:
+            session = self.server.session_id_to_session[data["session_id"]]
+            if session.user != user:
+                raise ValueError("Invalid session ID.")
+
+        except (KeyError, ValueError):
+            session = Session(token_urlsafe(16), user)
+            self.server.session_id_to_session[session.id] = session
+            _logger.info(f"New session issued for {user}. (Session ID: {session.id})")
+
+        token = Token(
+            session,
+            access_expires=self.server.config.access_time,
+            refresh_expires=self.server.config.refresh_time
+        )
+        tokens.add(token)
+        self.add_token_keys(token)
+        _logger.info(f"New token issued for {user}. (Token ID: {token.id})")
+
+        return self.ok_response(token)
 
     @route("post", "/auth/refresh")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
