@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from Common import Token
+from Common import Token, to_json
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, validate_access
@@ -22,12 +22,29 @@ class AuthService(BaseService):
         self.server.key_to_token.pop(token.access, None)
         self.server.key_to_token.pop(token.refresh, None)
 
+    def ok_response(self, token: Token, /) -> Response: ...
+
     async def task_coro(self) -> None: ...
 
     @route("post", "/auth/login")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
     @ratelimit(limit=100, interval=60, bucket_type=BucketType.Route)
-    async def login(self, request: Request, /) -> Response: ...
+    async def login(self, request: Request, /) -> Response:
+        data = await to_json(request)
+
+        try:
+            username = data["username"]
+            password = data["password"]
+        except KeyError:
+            raise ...
+
+        user = await self.server.db.get_user(username=username, password=password)
+        if user is None:
+            ...
+
+        ...
+
+        return self.ok_response(...)
 
     @route("post", "/auth/refresh")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
@@ -38,4 +55,12 @@ class AuthService(BaseService):
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
     @validate_access
-    async def logout(self, request: Request, /) -> Response: ...
+    async def logout(self, request: Request, /) -> Response:
+        data = await to_json(request)
+
+        refresh = data.get("refresh")
+        self.check_key(refresh, for_refresh=True)
+
+        ...
+
+        return self.ok_response(...)
