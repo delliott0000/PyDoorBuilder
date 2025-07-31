@@ -27,9 +27,8 @@ _logger = getLogger()
 
 
 class BaseService(ABC):
-    def __init__(self, server: Server, interval: float, /):
+    def __init__(self, server: Server, /):
         self.server: Server = server
-        self.interval: float = interval
         self.register_routes()
         self.__task: Task | None = None
 
@@ -67,7 +66,7 @@ class BaseService(ABC):
 
     async def task_coro_loop(self) -> None:
         while True:
-            await sleep(self.interval)
+            await sleep(self.server.config["task_interval"])
             await self.task_coro()
 
     def key_is_valid(self, key: str, /, *, for_refresh: bool = False) -> bool:

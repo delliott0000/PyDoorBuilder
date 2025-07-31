@@ -25,22 +25,21 @@ __all__ = ("Server",)
 _logger = getLogger()
 
 
-task_config = global_config["server"]["tasks"]
-api_config = global_config["server"]["api"]
+config = global_config["server"]["api"]
 
 
 class Server:
     def __init__(self):
+        self.config = config
+
         self.db = ServerPostgreSQLClient()
 
         self.app = Application(middlewares=middlewares)
         self.runner: AppRunner | None = None
 
-        self.auth = AuthService(self, task_config["http_interval"])
-        self.client_ws = ClientWebSocketService(self, task_config["client_ws_interval"])
-        self.autopilot_ws = AutopilotWebSocketService(
-            self, task_config["autopilot_ws_interval"]
-        )
+        self.auth = AuthService(self)
+        self.client_ws = ClientWebSocketService(self)
+        self.autopilot_ws = AutopilotWebSocketService(self)
 
         self.key_to_token: dict[str, Token] = {}
         self.user_to_tokens: dict[User, set[Token]] = {}
@@ -57,10 +56,7 @@ class Server:
             self.runner = AppRunner(self.app, access_log=None)
             await self.runner.setup()
 
-            host = api_config["host"]
-            port = api_config["port"]
-
-            site = TCPSite(self.runner, host, port)
+            site = TCPSite(self.runner, config["host"], config["port"])
             await site.start()
 
             _logger.info("Service running.")

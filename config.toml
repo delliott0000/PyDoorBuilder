@@ -20,13 +20,10 @@ port = 0
 [server.api]
 host = "0.0.0.0"
 port = 8080
-token_duration = 900
+access_time = 900
+refresh_time = 3600
 max_tokens_per_user = 5
-
-[server.tasks]
-http_interval = 5
-client_ws_interval = 5
-autopilot_ws_interval = 5
+task_interval = 5
 
 [server.database]
 username = ""
