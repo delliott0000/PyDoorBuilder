@@ -8,7 +8,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any
 
-__all__ = ("ServerAPIConfig", "global_config",)
+__all__ = (
+    "ServerAPIConfig",
+    "global_config",
+)
 
 
 @dataclass(kw_only=True, frozen=True)
