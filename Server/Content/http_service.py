@@ -42,7 +42,45 @@ class AuthService(BaseService):
             status=200,
         )
 
-    async def task_coro(self) -> None: ...
+    async def task_coro(self) -> None:
+        key_to_token = self.server.key_to_token
+        user_to_tokens = self.server.user_to_tokens
+        session_id_to_session = self.server.session_id_to_session
+
+        for key in list(key_to_token):
+            try:
+                token = key_to_token[key]
+            except KeyError:
+                continue
+
+            if token.expired:
+                self.pop_token_keys(token)
+
+                user = token.session.user
+                if user in user_to_tokens:
+                    user_to_tokens[user].discard(token)
+                    _logger.info(f"Token discarded for {user}. (Token ID: {token.id})")
+
+        for user in list(user_to_tokens):
+            try:
+                tokens = user_to_tokens[user]
+            except KeyError:
+                continue
+
+            if not tokens:
+                user_to_tokens.pop(user, None)
+                _logger.info(f"Discarded empty token set for {user}.")
+
+        for session_id in list(session_id_to_session):
+            try:
+                session = session_id_to_session[session_id]
+            except KeyError:
+                continue
+
+            user = session.user
+            if user not in user_to_tokens:
+                session_id_to_session.pop(session_id, None)
+                _logger.info(f"Session discarded for user {user}. (Session ID: {session_id})")
 
     @route("post", "/auth/login")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
