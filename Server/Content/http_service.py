@@ -4,7 +4,7 @@ from logging import getLogger
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
-from aiohttp.web import HTTPBadRequest, HTTPUnauthorized
+from aiohttp.web import HTTPBadRequest, HTTPUnauthorized, json_response
 
 from Common import Session, Token, to_json
 
@@ -29,7 +29,18 @@ class AuthService(BaseService):
         self.server.key_to_token.pop(token.access, None)
         self.server.key_to_token.pop(token.refresh, None)
 
-    def ok_response(self, token: Token, /) -> Response: ...
+    def ok_response(self, token: Token, /) -> Response:
+        session = token.session
+        user = session.user
+        return json_response(
+            {
+                "message": "Ok",
+                "token": token.to_json(),
+                "session": session.to_json(),
+                "user": user.to_json(),
+            },
+            status=200,
+        )
 
     async def task_coro(self) -> None: ...
 
@@ -67,7 +78,7 @@ class AuthService(BaseService):
         token = Token(
             session,
             access_expires=self.server.config.access_time,
-            refresh_expires=self.server.config.refresh_time
+            refresh_expires=self.server.config.refresh_time,
         )
         tokens.add(token)
         self.add_token_keys(token)
