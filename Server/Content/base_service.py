@@ -34,7 +34,10 @@ class BaseService(ABC):
 
     async def __aenter__(self) -> Self:
         self.__task = create_task(self.task_coro_loop(), name=self.task_name)
-        _logger.info(f"{self.task_name} started.")
+        _logger.info(
+            f"{self.task_name} started at an interval of "
+            f"{self.server.config.task_interval} second(s)."
+        )
         return self
 
     async def __aexit__(self, *_) -> None:
@@ -66,7 +69,7 @@ class BaseService(ABC):
 
     async def task_coro_loop(self) -> None:
         while True:
-            await sleep(self.server.config["task_interval"])
+            await sleep(self.server.config.task_interval)
             await self.task_coro()
 
     def key_is_valid(self, key: str, /, *, for_refresh: bool = False) -> bool:

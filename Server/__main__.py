@@ -1,7 +1,8 @@
-from Common import setup_logging
+from Common import global_config, setup_logging
 from Server import Server
 
 setup_logging(__file__)
 
 if __name__ == "__main__":
-    Server().run()
+    config = global_config["server"]["api"]
+    Server(config=config).run()

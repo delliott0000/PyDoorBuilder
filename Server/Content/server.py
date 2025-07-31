@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from aiohttp.web import Application, AppRunner, TCPSite
 
-from Common import global_config
+from Common import ServerAPIConfig
 
 from .http_service import AuthService
 from .middlewares import middlewares
@@ -15,6 +15,8 @@ from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from Common import Session, Token, User
 
     from .base_service import BaseService
@@ -25,12 +27,9 @@ __all__ = ("Server",)
 _logger = getLogger()
 
 
-config = global_config["server"]["api"]
-
-
 class Server:
-    def __init__(self):
-        self.config = config
+    def __init__(self, *, config: dict[str, Any]):
+        self.__config = ServerAPIConfig(**config)
 
         self.db = ServerPostgreSQLClient()
 
@@ -46,6 +45,10 @@ class Server:
         self.session_id_to_session: dict[str, Session] = {}
 
     @property
+    def config(self) -> ServerAPIConfig:
+        return self.__config
+
+    @property
     def services(self) -> tuple[BaseService, ...]:
         return self.auth, self.client_ws, self.autopilot_ws
 
@@ -56,7 +59,7 @@ class Server:
             self.runner = AppRunner(self.app, access_log=None)
             await self.runner.setup()
 
-            site = TCPSite(self.runner, config["host"], config["port"])
+            site = TCPSite(self.runner, self.__config.host, self.__config.port)
             await site.start()
 
             _logger.info("Service running.")
