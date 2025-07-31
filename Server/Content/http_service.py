@@ -37,10 +37,12 @@ class AuthService(BaseService):
         try:
             username = data["username"]
             password = data["password"]
-        except KeyError:
+
+            user = await self.server.db.get_user(username=username, password=password)
+
+        except (KeyError, ValueError):
             raise HTTPBadRequest(reason="Missing username/password")
 
-        user = await self.server.db.get_user(username=username, password=password)
         if user is None:
             raise HTTPUnauthorized(reason="Incorrect username/password")
 
