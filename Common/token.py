@@ -155,5 +155,5 @@ class Token:
             "access_expires": encode_datetime(self._access_expires),
             "refresh_expires": encode_datetime(self._refresh_expires),
             "killed": self._killed,
-            "killed_at": killed_at
+            "killed_at": killed_at,
         }
