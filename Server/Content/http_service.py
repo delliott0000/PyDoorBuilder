@@ -73,7 +73,7 @@ class AuthService(BaseService):
         except (KeyError, ValueError):
             session = Session(token_urlsafe(16), user)
             self.server.session_id_to_session[session.id] = session
-            _logger.info(f"New session issued for {user}. (Session ID: {session.id})")
+            _logger.info(f"Session issued for {user}. (Session ID: {session.id})")
 
         token = Token(
             session,
@@ -82,7 +82,7 @@ class AuthService(BaseService):
         )
         tokens.add(token)
         self.add_token_keys(token)
-        _logger.info(f"New token issued for {user}. (Token ID: {token.id})")
+        _logger.info(f"Token issued for {user}. (Token ID: {token.id})")
 
         return self.ok_response(token)
 
@@ -95,9 +95,16 @@ class AuthService(BaseService):
         refresh = data.get("refresh")
         self.check_key(refresh, for_refresh=True)
 
-        ...
+        token = self.server.key_to_token[refresh]
+        self.pop_token_keys(token)
+        token.renew(
+            access_expires=self.server.config.access_time,
+            refresh_expires=self.server.config.refresh_time,
+        )
+        self.add_token_keys(token)
+        _logger.info(f"Token renewed for {token.session.user}. (Token ID: {token.id})")
 
-        return self.ok_response(...)
+        return self.ok_response(token)
 
     @route("post", "/auth/logout")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
