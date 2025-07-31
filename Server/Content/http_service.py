@@ -8,10 +8,10 @@ from .decorators import BucketType, ratelimit, route, validate_access
 if TYPE_CHECKING:
     from aiohttp.web import Request, Response
 
-__all__ = ("HTTPService",)
+__all__ = ("AuthService",)
 
 
-class HTTPService(BaseService):
+class AuthService(BaseService):
     async def task_coro(self) -> None: ...
 
     @route("post", "/auth/login")

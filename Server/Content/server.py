@@ -9,7 +9,7 @@ from aiohttp.web import Application, AppRunner, TCPSite
 
 from Common import global_config
 
-from .http_service import HTTPService
+from .http_service import AuthService
 from .middlewares import middlewares
 from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
@@ -36,7 +36,7 @@ class Server:
         self.app = Application(middlewares=middlewares)
         self.runner: AppRunner | None = None
 
-        self.http = HTTPService(self, task_config["http_interval"])
+        self.auth = AuthService(self, task_config["http_interval"])
         self.client_ws = ClientWebSocketService(self, task_config["client_ws_interval"])
         self.autopilot_ws = AutopilotWebSocketService(
             self, task_config["autopilot_ws_interval"]
@@ -48,7 +48,7 @@ class Server:
 
     @property
     def services(self) -> tuple[BaseService, ...]:
-        return self.http, self.client_ws, self.autopilot_ws
+        return self.auth, self.client_ws, self.autopilot_ws
 
     def run(self) -> None:
         async def _service():
