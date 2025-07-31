@@ -49,13 +49,7 @@ class AuthService(BaseService):
     @route("post", "/auth/refresh")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.Token)
-    async def renew(self, request: Request, /) -> Response: ...
-
-    @route("post", "/auth/logout")
-    @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
-    @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
-    @validate_access
-    async def logout(self, request: Request, /) -> Response:
+    async def refresh(self, request: Request, /) -> Response:
         data = await to_json(request)
 
         refresh = data.get("refresh")
@@ -64,3 +58,9 @@ class AuthService(BaseService):
         ...
 
         return self.ok_response(...)
+
+    @route("post", "/auth/logout")
+    @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
+    @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
+    @validate_access
+    async def logout(self, request: Request, /) -> Response: ...
