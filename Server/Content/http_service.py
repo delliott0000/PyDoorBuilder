@@ -110,4 +110,8 @@ class AuthService(BaseService):
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
     @validate_access
-    async def logout(self, request: Request, /) -> Response: ...
+    async def logout(self, request: Request, /) -> Response:
+        token = self.token_from_request(request)
+        token.kill()
+        _logger.info(f"Token killed for {token.session.user}. (Token ID: {token.id})")
+        return self.ok_response(token)
