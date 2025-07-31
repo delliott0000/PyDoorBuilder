@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 from .state import State
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from .user import User
 
 __all__ = ("Session",)
@@ -42,3 +44,6 @@ class Session:
     @property
     def state(self) -> State:
         return self._state
+
+    def to_json(self) -> dict[str, Any]:
+        return {"id": self._id, "state": self._state.to_json()}

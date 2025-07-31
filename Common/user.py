@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    ...
+    from typing import Any
 
 __all__ = ("User",)
 
@@ -31,3 +31,6 @@ class User:
     @property
     def name(self) -> str:
         return self._name
+
+    def to_json(self) -> dict[str, Any]:
+        return {"id": self._id, "name": self._name}

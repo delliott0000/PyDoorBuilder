@@ -4,9 +4,11 @@ from datetime import datetime, timedelta
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
-from .utils import decode_datetime, now
+from .utils import decode_datetime, encode_datetime, now
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from .session import Session
 
     ExpirationType = datetime | timedelta | float | str
@@ -140,3 +142,18 @@ class Token:
             return True
         else:
             return False
+
+    def to_json(self) -> dict[str, Any]:
+        if self._killed_at is None:
+            killed_at = None
+        else:
+            killed_at = encode_datetime(self._killed_at)
+
+        return {
+            "access": self._access,
+            "refresh": self._refresh,
+            "access_expires": encode_datetime(self._access_expires),
+            "refresh_expires": encode_datetime(self._refresh_expires),
+            "killed": self._killed,
+            "killed_at": killed_at
+        }
