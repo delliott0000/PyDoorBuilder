@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from enum import Enum
-from logging import getLogger
 from time import time
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPTooManyRequests
+
+from Common import log
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
@@ -20,9 +21,6 @@ if TYPE_CHECKING:
     RespDeco = Callable[[RespFunc], RespFunc]
 
 __all__ = ("ensure_meta", "BucketType", "ratelimit", "route", "validate_access")
-
-
-_logger = getLogger()
 
 
 def ensure_meta(obj: Any, /) -> dict[str, Any]:
@@ -75,7 +73,7 @@ def ratelimit(
 
             if len(hits) >= limit:
                 method, endpoint = service.decode_route_name(request.match_info.route.name)
-                _logger.info(
+                log(
                     f"{method.upper()} {endpoint} " f"has hit the {bucket_type.name} ratelimit."
                 )
 

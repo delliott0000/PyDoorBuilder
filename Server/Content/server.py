@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from asyncio import Runner, gather
 from contextlib import AsyncExitStack
-from logging import getLogger
 from typing import TYPE_CHECKING
 
 from aiohttp.web import Application, AppRunner, TCPSite
 
-from Common import ServerAPIConfig
+from Common import ServerAPIConfig, log
 
 from .http_service import AuthService
 from .middlewares import middlewares
@@ -22,9 +21,6 @@ if TYPE_CHECKING:
     from .base_service import BaseService
 
 __all__ = ("Server",)
-
-
-_logger = getLogger()
 
 
 class Server:
@@ -54,7 +50,7 @@ class Server:
 
     def run(self) -> None:
         async def _service():
-            _logger.info("Starting up service...")
+            log("Starting up service...")
 
             self.runner = AppRunner(self.app, access_log=None)
             await self.runner.setup()
@@ -62,7 +58,7 @@ class Server:
             site = TCPSite(self.runner, self.__config.host, self.__config.port)
             await site.start()
 
-            _logger.info("Service running.")
+            log("Service running.")
 
             services = self.services
             contexts = services + (self.db,)
@@ -82,8 +78,8 @@ class Server:
             try:
                 runner.run(_service())
             except (KeyboardInterrupt, SystemExit):
-                _logger.info("Received signal to terminate program.")
+                log("Received signal to terminate program.")
             finally:
-                _logger.info("Cleaning up...")
+                log("Cleaning up...")
                 runner.run(_cleanup())
-                _logger.info("Done. Have a nice day!")
+                log("Done. Have a nice day!")

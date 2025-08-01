@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from asyncio import sleep
-from logging import getLogger
 from time import time
 from typing import TYPE_CHECKING
 
 from aiohttp import ClientSession
 
 from .errors import HTTPException
-from .utils import to_json
+from .utils import log, to_json
 
 if TYPE_CHECKING:
     from collections.abc import Coroutine
@@ -20,9 +19,6 @@ if TYPE_CHECKING:
     JsonCoro = Coroutine[Any, Any, Json]
 
 __all__ = ("HTTPClient",)
-
-
-_logger = getLogger()
 
 
 class HTTPClient:
@@ -53,14 +49,11 @@ class HTTPClient:
 
         pre_time = time()
         async with self.__session.request(method, raw_url, **kwargs) as response:
-            _logger.info(
-                "%s %s returned %s %s in %.3fs",
-                method.upper(),
-                raw_url,
-                response.status,
-                response.reason,
-                time() - pre_time,
+            log(
+                f"{method.upper()} {raw_url} returned "
+                f"{response.reason} {response.status} in {time() - pre_time:.3f}"
             )
+
             data = await to_json(response)
 
             if 200 <= response.status < 300:
@@ -113,12 +106,7 @@ class HTTPClient:
                     if total_slept >= config["max_sleep_time"]:
                         raise error
 
-                    _logger.info(
-                        "Retrying %s %s in %.3fs...",
-                        method.upper(),
-                        url,
-                        sleep_time,
-                    )
+                    log(f"Retrying {method.upper()} {url} in {sleep_time:.3f} seconds...")
 
                     await sleep(sleep_time)
                     continue

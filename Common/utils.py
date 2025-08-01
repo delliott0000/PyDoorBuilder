@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime
-from logging import DEBUG, basicConfig, getLogger
+from logging import DEBUG, ERROR, INFO, basicConfig, getLogger
 from os import makedirs
 from pathlib import Path
+from sys import exc_info
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 
     Json = dict[str, Any]
 
-__all__ = ("now", "decode_datetime", "encode_datetime", "setup_logging", "to_json")
+__all__ = ("now", "decode_datetime", "encode_datetime", "setup_logging", "log", "to_json")
 
 
 _logger = getLogger()
@@ -49,6 +50,11 @@ def setup_logging(file: str, level: int = DEBUG, /) -> None:
         level=level,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
+
+
+def log(message: str, level: int = INFO, /) -> None:
+    with_traceback = exc_info()[0] is not None and level >= ERROR
+    _logger.log(level, message, exc_info=with_traceback)
 
 
 async def to_json(r: Request | ClientResponse, /, *, strict: bool = False) -> Json:

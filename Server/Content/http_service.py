@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from logging import getLogger
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPBadRequest, HTTPUnauthorized, json_response
 
-from Common import Session, Token, to_json
+from Common import Session, Token, log, to_json
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, validate_access
@@ -15,9 +14,6 @@ if TYPE_CHECKING:
     from aiohttp.web import Request, Response
 
 __all__ = ("AuthService",)
-
-
-_logger = getLogger()
 
 
 class AuthService(BaseService):
@@ -59,7 +55,7 @@ class AuthService(BaseService):
                 user = token.session.user
                 if user in user_to_tokens:
                     user_to_tokens[user].discard(token)
-                    _logger.info(f"Token discarded for {user}. (Token ID: {token.id})")
+                    log(f"Token discarded for {user}. (Token ID: {token.id})")
 
         for user in list(user_to_tokens):
             try:
@@ -69,7 +65,7 @@ class AuthService(BaseService):
 
             if not tokens:
                 user_to_tokens.pop(user, None)
-                _logger.info(f"Discarded empty token set for {user}.")
+                log(f"Discarded empty token set for {user}.")
 
         for session_id in list(session_id_to_session):
             try:
@@ -80,7 +76,7 @@ class AuthService(BaseService):
             user = session.user
             if user not in user_to_tokens:
                 session_id_to_session.pop(session_id, None)
-                _logger.info(f"Session discarded for user {user}. (Session ID: {session_id})")
+                log(f"Session discarded for user {user}. (Session ID: {session_id})")
 
     @route("post", "/auth/login")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)
@@ -111,7 +107,7 @@ class AuthService(BaseService):
         except (KeyError, ValueError):
             session = Session(token_urlsafe(16), user)
             self.server.session_id_to_session[session.id] = session
-            _logger.info(f"Session issued for {user}. (Session ID: {session.id})")
+            log(f"Session issued for {user}. (Session ID: {session.id})")
 
         token = Token(
             session,
@@ -120,7 +116,7 @@ class AuthService(BaseService):
         )
         tokens.add(token)
         self.add_token_keys(token)
-        _logger.info(f"Token issued for {user}. (Token ID: {token.id})")
+        log(f"Token issued for {user}. (Token ID: {token.id})")
 
         return self.ok_response(token)
 
@@ -140,7 +136,7 @@ class AuthService(BaseService):
             refresh_expires=self.server.config.refresh_time,
         )
         self.add_token_keys(token)
-        _logger.info(f"Token renewed for {token.session.user}. (Token ID: {token.id})")
+        log(f"Token renewed for {token.session.user}. (Token ID: {token.id})")
 
         return self.ok_response(token)
 
@@ -151,5 +147,5 @@ class AuthService(BaseService):
     async def logout(self, request: Request, /) -> Response:
         token = self.token_from_request(request)
         token.kill()
-        _logger.info(f"Token killed for {token.session.user}. (Token ID: {token.id})")
+        log(f"Token killed for {token.session.user}. (Token ID: {token.id})")
         return self.ok_response(token)

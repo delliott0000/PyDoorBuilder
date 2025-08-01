@@ -3,10 +3,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from asyncio import CancelledError, create_task, sleep
 from inspect import getmembers, isfunction
-from logging import getLogger
+from logging import ERROR
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPBadRequest, HTTPUnauthorized
+
+from Common import log
 
 from .decorators import ensure_meta
 
@@ -23,9 +25,6 @@ if TYPE_CHECKING:
 __all__ = ("BaseService",)
 
 
-_logger = getLogger()
-
-
 class BaseService(ABC):
     def __init__(self, server: Server, /):
         self.server: Server = server
@@ -34,7 +33,7 @@ class BaseService(ABC):
 
     async def __aenter__(self) -> Self:
         self.__task = create_task(self.task_coro_loop(), name=self.task_name)
-        _logger.info(
+        log(
             f"{self.task_name} started at an interval of "
             f"{self.server.config.task_interval} second(s)."
         )
@@ -49,9 +48,9 @@ class BaseService(ABC):
         try:
             await self.__task
         except CancelledError:
-            _logger.info(f"{self.task_name} cancelled.")
+            log(f"{self.task_name} cancelled.")
         except Exception as error:
-            _logger.exception(f"{self.task_name} raised {type(error).__name__}.")
+            log(f"{self.task_name} raised {type(error).__name__}.", ERROR)
 
         self.__task = None
 
@@ -146,6 +145,6 @@ class BaseService(ABC):
                     func.__get__(self),
                     name=self.encode_route_name(method, endpoint),
                 )
-                _logger.info(
+                log(
                     f"Registered listener: {method.upper()} {endpoint} -> {type(self).__name__}.{func_name}()"
                 )

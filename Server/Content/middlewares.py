@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from logging import getLogger
+from logging import ERROR
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPException, json_response, middleware
 from multidict import CIMultiDict
+
+from Common import log
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
@@ -17,9 +19,6 @@ if TYPE_CHECKING:
 __all__ = ("middlewares",)
 
 
-_logger = getLogger()
-
-
 @middleware
 async def json_wrapper(request: Request, handler: Handler) -> Response:
     try:
@@ -29,7 +28,7 @@ async def json_wrapper(request: Request, handler: Handler) -> Response:
         headers.pop("Content-Type", None)
         return json_response({"message": error.reason}, status=error.status, headers=headers)
     except Exception as error:
-        _logger.exception(f"An error occurred whilst processing a request - {error}")
+        log(f"An error occurred whilst processing a request - {error}", ERROR)
         return json_response({"message": "Internal server error"}, status=500)
 
 
