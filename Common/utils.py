@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from logging import DEBUG, ERROR, INFO, basicConfig, getLogger
+from logging import DEBUG, ERROR, INFO, WARNING, basicConfig, getLogger
 from os import makedirs
 from pathlib import Path
 from sys import exc_info
@@ -66,5 +66,5 @@ async def to_json(r: Request | ClientResponse, /, *, strict: bool = False) -> Js
     except Exception as error:
         if strict:
             raise
-        _logger.error(f"Failed to parse JSON payload - {type(error).__name__}.")
+        log(f"Failed to parse JSON payload - {type(error).__name__}.", WARNING)
         return {}
