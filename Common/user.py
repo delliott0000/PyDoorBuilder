@@ -9,11 +9,12 @@ __all__ = ("User",)
 
 
 class User:
-    __slots__ = ("_id", "_name")
+    __slots__ = ("_id", "_name", "_autopilot")
 
-    def __init__(self, _id: str, name: str, /):
+    def __init__(self, _id: str, name: str, autopilot: bool, /):
         self._id = _id
         self._name = name
+        self._autopilot: bool = autopilot
 
     def __hash__(self):
         return hash(self._id)
@@ -32,5 +33,9 @@ class User:
     def name(self) -> str:
         return self._name
 
+    @property
+    def autopilot(self) -> bool:
+        return self._autopilot
+
     def to_json(self) -> dict[str, Any]:
-        return {"id": self._id, "name": self._name}
+        return {"id": self._id, "name": self._name, "autopilot": self._autopilot}

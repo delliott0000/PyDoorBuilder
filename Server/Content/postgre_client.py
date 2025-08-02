@@ -27,4 +27,4 @@ class ServerPostgreSQLClient(PostgreSQLClient):
 
         ...
 
-        return User("...", "...")
+        return User("...", "...", False)

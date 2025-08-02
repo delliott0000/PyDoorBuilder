@@ -4,7 +4,7 @@ from enum import Enum
 from time import time
 from typing import TYPE_CHECKING
 
-from aiohttp.web import HTTPTooManyRequests
+from aiohttp.web import HTTPForbidden, HTTPTooManyRequests
 
 from Common import log
 
@@ -16,7 +16,8 @@ if TYPE_CHECKING:
 
     from .base_service import BaseService
 
-    RespCoro = Coroutine[Any, Any, Response | WebSocketResponse]
+    RespType = Response | WebSocketResponse
+    RespCoro = Coroutine[Any, Any, RespType]
     RespFunc = Callable[[BaseService, Request], RespCoro]
     RespDeco = Callable[[RespFunc], RespFunc]
 
@@ -53,7 +54,7 @@ def ratelimit(*, limit: int, interval: float, bucket_type: BucketType) -> RespDe
 
     def decorator(func: RespFunc, /) -> RespFunc:
 
-        async def wrapper(service: BaseService, request: Request, /) -> Response:
+        async def wrapper(service: BaseService, request: Request, /) -> RespType:
             source = bucket_type.get_source(service, request)
 
             now = time()
@@ -99,9 +100,37 @@ def route(method: str, endpoint: str, /) -> RespDeco:
 
 def validate_access(func: RespFunc, /) -> RespFunc:
 
-    async def wrapper(service: BaseService, request: Request, /) -> Response:
+    async def wrapper(service: BaseService, request: Request, /) -> RespType:
         access = service.access_from_request(request)
         service.check_key(access)
+
+        return await func(service, request)
+
+    wrapper.__meta__ = ensure_meta(func)
+
+    return wrapper
+
+
+def user_only(func: RespFunc, /) -> RespFunc:
+
+    async def wrapper(service: BaseService, request: Request, /) -> RespType:
+        user = service.user_from_request(request)
+        if user is not None and user.autopilot is True:
+            raise HTTPForbidden(reason="This endpoint is user-only.")
+
+        return await func(service, request)
+
+    wrapper.__meta__ = ensure_meta(func)
+
+    return wrapper
+
+
+def autopilot_only(func: RespFunc, /) -> RespFunc:
+
+    async def wrapper(service: BaseService, request: Request, /) -> RespType:
+        user = service.user_from_request(request)
+        if user is not None and user.autopilot is False:
+            raise HTTPForbidden(reason="This endpoint is autopilot-only.")
 
         return await func(service, request)
 
