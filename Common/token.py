@@ -44,6 +44,7 @@ class Token:
             refresh=refresh,
             access_expires=access_expires,
             refresh_expires=refresh_expires,
+            force=True,
         )
 
     def __hash__(self):
@@ -107,8 +108,9 @@ class Token:
         refresh: str | None = None,
         access_expires: ExpirationType,
         refresh_expires: ExpirationType,
+        force: bool = False
     ) -> bool:
-        if not self.expired:
+        if force or not self.expired:
             t = now()
             attrs = {}
 
