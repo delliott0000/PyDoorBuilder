@@ -48,9 +48,7 @@ class BucketType(Enum):
             raise NotImplementedError("Bucket type not implemented.")
 
 
-def ratelimit(
-    *, limit: int, interval: float, bucket_type: BucketType = BucketType.Token
-) -> RespDeco:
+def ratelimit(*, limit: int, interval: float, bucket_type: BucketType) -> RespDeco:
     k1, k2 = "ratelimits", bucket_type.name
 
     def decorator(func: RespFunc, /) -> RespFunc:
