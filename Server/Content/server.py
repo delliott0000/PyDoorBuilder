@@ -8,7 +8,7 @@ from aiohttp.web import Application, AppRunner, TCPSite
 
 from Common import ServerAPIConfig, log
 
-from .http_service import AuthService
+from .auth_service import AuthService
 from .middlewares import middlewares
 from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
