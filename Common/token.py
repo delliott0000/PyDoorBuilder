@@ -18,7 +18,6 @@ class Token:
     __slots__ = (
         "_id",
         "_session",
-        "_killed",
         "_killed_at",
         "_access",
         "_refresh",
@@ -35,14 +34,10 @@ class Token:
         refresh: str | None = None,
         access_expires: ExpirationType,
         refresh_expires: ExpirationType,
-        killed: bool = False,
         killed_at: datetime | None = None,
     ):
-        # Only the server needs to know the ID
-        # Set it once and use for mapping
         self._id = token_urlsafe(32)
         self._session = session
-        self._killed = killed
         self._killed_at = killed_at
         self.renew(
             access=access,
@@ -67,7 +62,7 @@ class Token:
 
     @property
     def killed(self) -> bool:
-        return self._killed
+        return self._killed_at is not None
 
     @property
     def killed_at(self) -> datetime | None:
@@ -91,15 +86,14 @@ class Token:
 
     @property
     def active(self) -> bool:
-        return not self._killed and self._access_expires > now()
+        return not self.killed and self._access_expires > now()
 
     @property
     def expired(self) -> bool:
-        return self._killed or self._refresh_expires < now()
+        return self.killed or self._refresh_expires < now()
 
     def kill(self) -> bool:
-        if not self._killed:
-            self._killed = True
+        if not self.killed:
             self._killed_at = now()
 
             return True
@@ -114,7 +108,7 @@ class Token:
         access_expires: ExpirationType,
         refresh_expires: ExpirationType,
     ) -> bool:
-        if not self._killed:
+        if not self.killed:
             t = now()
             attrs = {}
 
@@ -144,16 +138,16 @@ class Token:
             return False
 
     def to_json(self) -> dict[str, Any]:
-        if self._killed_at is None:
-            killed_at = None
-        else:
+        try:
             killed_at = encode_datetime(self._killed_at)
+        except AttributeError:
+            killed_at = None
 
         return {
             "access": self._access,
             "refresh": self._refresh,
             "access_expires": encode_datetime(self._access_expires),
             "refresh_expires": encode_datetime(self._refresh_expires),
-            "killed": self._killed,
+            "killed": self.killed,
             "killed_at": killed_at,
         }
