@@ -108,7 +108,7 @@ class Token:
         refresh: str | None = None,
         access_expires: ExpirationType,
         refresh_expires: ExpirationType,
-        force: bool = False
+        force: bool = False,
     ) -> bool:
         if force or not self.expired:
             t = now()

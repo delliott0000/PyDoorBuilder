@@ -8,14 +8,17 @@ from .utils import log
 if TYPE_CHECKING:
     from typing import Any
 
+    from aiohttp.web import WebSocketResponse
+
     from .resource import Resource
+    from .token import Token
     from .user import User
 
 __all__ = ("Session",)
 
 
 class Session:
-    __slots__ = ("_id", "_user", "_state", "_resource")
+    __slots__ = ("_id", "_user", "_state", "_resource", "_connections")
 
     def __init__(
         self,
@@ -29,6 +32,7 @@ class Session:
         self._user = user
         self._state = state if state is not None else State()
         self._resource = None
+        self._connections = {}
 
     def __hash__(self):
         return hash(self._id)
@@ -52,10 +56,14 @@ class Session:
     def resource(self) -> Resource | None:
         return self._resource
 
+    @property
+    def connections(self) -> dict[Token, WebSocketResponse]:
+        return self._connections
+
     def acquire_resource(self, resource: Resource, /) -> None:
         if self._resource is None:
             resource.acquire(self)
-            log(f"{self.user} acquired {resource.id}. (Session ID: {self._id})")
+            log(f"{self._user} acquired {resource.id}. (Session ID: {self._id})")
             self._resource = resource
         else:
             raise RuntimeError("Session has already acquired a resource.")
@@ -63,8 +71,13 @@ class Session:
     def release_resource(self) -> None:
         if self._resource is not None:
             self._resource.release(self)
-            log(f"{self.user} released {self._resource.id}. (Session ID: {self._id})")
+            log(f"{self._user} released {self._resource.id}. (Session ID: {self._id})")
             self._resource = None
 
     def to_json(self) -> dict[str, Any]:
-        return {"id": self._id, "state": self._state.to_json()}
+        try:
+            resource_id = self._resource.id
+        except AttributeError:
+            resource_id = None
+
+        return {"id": self._id, "resource_id": resource_id, "state": self._state.to_json()}

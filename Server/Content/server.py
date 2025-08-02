@@ -16,7 +16,7 @@ from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
 if TYPE_CHECKING:
     from typing import Any
 
-    from Common import Session, Token, User
+    from Common import Resource, Session, Token, User
 
     from .base_service import BaseService
 
@@ -39,6 +39,7 @@ class Server:
         self.key_to_token: dict[str, Token] = {}
         self.user_to_tokens: dict[User, set[Token]] = {}
         self.session_id_to_session: dict[str, Session] = {}
+        self.resource_id_to_resource: dict[str, Resource] = {}
 
     @property
     def config(self) -> ServerAPIConfig:
