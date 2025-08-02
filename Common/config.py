@@ -22,6 +22,7 @@ class ServerAPIConfig:
     refresh_time: float
     max_tokens_per_user: int
     task_interval: float
+    ws_heartbeat: float
 
 
 config_file = Path(__file__).parent.parent / "config.toml"

@@ -24,6 +24,7 @@ access_time = 900
 refresh_time = 3600
 max_tokens_per_user = 5
 task_interval = 5
+ws_heartbeat = 5
 
 [server.database]
 username = ""
