@@ -21,7 +21,15 @@ if TYPE_CHECKING:
     RespFunc = Callable[[BaseService, Request], RespCoro]
     RespDeco = Callable[[RespFunc], RespFunc]
 
-__all__ = ("ensure_meta", "BucketType", "ratelimit", "route", "validate_access")
+__all__ = (
+    "ensure_meta",
+    "BucketType",
+    "ratelimit",
+    "route",
+    "validate_access",
+    "user_only",
+    "autopilot_only",
+)
 
 
 def ensure_meta(obj: Any, /) -> dict[str, Any]:
