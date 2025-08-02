@@ -93,7 +93,7 @@ class Token:
         return self.killed or self._refresh_expires < now()
 
     def kill(self) -> bool:
-        if not self.killed:
+        if not self.expired:
             self._killed_at = now()
 
             return True
@@ -108,7 +108,7 @@ class Token:
         access_expires: ExpirationType,
         refresh_expires: ExpirationType,
     ) -> bool:
-        if not self.killed:
+        if not self.expired:
             t = now()
             attrs = {}
 
