@@ -4,6 +4,7 @@ from abc import ABC
 from logging import ERROR
 from typing import TYPE_CHECKING
 
+from aiohttp import WSMessage
 from aiohttp.web import HTTPConflict, WebSocketResponse
 
 from Common import log
@@ -64,6 +65,8 @@ class UserWebSocketService(BaseWebSocketService):
         response = await self.prepare_ws(request, token)
 
         try:
+            async for _ in response:
+                _: WSMessage
             ...
         finally:
             await self.cleanup_ws(token)
@@ -84,6 +87,8 @@ class AutopilotWebSocketService(BaseWebSocketService):
         response = await self.prepare_ws(request, token)
 
         try:
+            async for _ in response:
+                _: WSMessage
             ...
         finally:
             await self.cleanup_ws(token)
