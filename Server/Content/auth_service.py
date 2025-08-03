@@ -48,14 +48,15 @@ class AuthService(BaseService):
                 token = key_to_token[key]
             except KeyError:
                 continue
+            if not token.expired:
+                continue
 
-            if token.expired:
-                self.pop_token_keys(token)
+            self.pop_token_keys(token)
 
-                user = token.session.user
-                if user in user_to_tokens:
-                    user_to_tokens[user].discard(token)
-                    log(f"Token discarded for {user}. (Token ID: {token.id})")
+            user = token.session.user
+            if user in user_to_tokens:
+                user_to_tokens[user].discard(token)
+                log(f"Token discarded for {user}. (Token ID: {token.id})")
 
         for user in list(user_to_tokens):
             try:
