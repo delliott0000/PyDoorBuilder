@@ -11,7 +11,7 @@ from Common import ServerAPIConfig, log
 from .auth_service import AuthService
 from .middlewares import middlewares
 from .postgre_client import ServerPostgreSQLClient
-from .websocket_service import AutopilotWebSocketService, ClientWebSocketService
+from .websocket_service import AutopilotWebSocketService, UserWebSocketService
 
 if TYPE_CHECKING:
     from typing import Any
@@ -33,7 +33,7 @@ class Server:
         self.runner: AppRunner | None = None
 
         self.auth = AuthService(self)
-        self.client_ws = ClientWebSocketService(self)
+        self.user_ws = UserWebSocketService(self)
         self.autopilot_ws = AutopilotWebSocketService(self)
 
         self.key_to_token: dict[str, Token] = {}
@@ -47,7 +47,7 @@ class Server:
 
     @property
     def services(self) -> tuple[BaseService, ...]:
-        return self.auth, self.client_ws, self.autopilot_ws
+        return self.auth, self.user_ws, self.autopilot_ws
 
     def run(self) -> None:
         async def _service():
