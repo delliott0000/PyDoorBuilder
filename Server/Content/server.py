@@ -73,6 +73,12 @@ class Server:
                 await gather(*tasks)
 
         async def _cleanup():
+            coros = (
+                connection.close()
+                for session in self.session_id_to_session.values()
+                for connection in session.connections.values()
+            )
+            await gather(*coros)
             await self.runner.cleanup()
 
         with Runner() as runner:
