@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from asyncio import gather
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
@@ -43,6 +44,8 @@ class AuthService(BaseService):
         user_to_tokens = self.server.user_to_tokens
         session_id_to_session = self.server.session_id_to_session
 
+        expired_cons = set()
+
         for key in list(key_to_token):
             try:
                 token = key_to_token[key]
@@ -53,7 +56,11 @@ class AuthService(BaseService):
 
             self.pop_token_keys(token)
 
+            cons = token.session.connections
             user = token.session.user
+
+            expired_cons.add(cons.get(token))
+
             if user in user_to_tokens:
                 user_to_tokens[user].discard(token)
                 log(f"Token discarded for {user}. (Token ID: {token.id})")
@@ -68,13 +75,22 @@ class AuthService(BaseService):
                 user_to_tokens.pop(user, None)
                 log(f"Discarded empty token set for {user}.")
 
+        expired_cons.discard(None)
+        coros = (con.close() for con in expired_cons)
+        await gather(*coros)
+
         for session_id in list(session_id_to_session):
             try:
                 session = session_id_to_session[session_id]
             except KeyError:
                 continue
 
+            cons = session.connections
             user = session.user
+
+            if not cons:
+                session.release_resource()
+
             if user not in user_to_tokens:
                 session_id_to_session.pop(session_id, None)
                 log(f"Session discarded for user {user}. (Session ID: {session_id})")
