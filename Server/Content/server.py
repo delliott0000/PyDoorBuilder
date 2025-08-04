@@ -18,36 +18,28 @@ if TYPE_CHECKING:
 
     from Common import Resource, Session, Token, User
 
-    from .base_service import BaseService
-
 __all__ = ("Server",)
 
 
 class Server:
     def __init__(self, *, config: dict[str, Any]):
-        self.__config = ServerAPIConfig(**config)
+        self.config = ServerAPIConfig(**config)
 
         self.db = ServerPostgreSQLClient()
 
         self.app = Application(middlewares=middlewares)
         self.runner: AppRunner | None = None
 
-        self.auth = AuthService(self)
-        self.user_ws = UserWebSocketService(self)
-        self.autopilot_ws = AutopilotWebSocketService(self)
+        self.services = (
+            AuthService(self),
+            UserWebSocketService(self),
+            AutopilotWebSocketService(self),
+        )
 
         self.key_to_token: dict[str, Token] = {}
         self.user_to_tokens: dict[User, set[Token]] = {}
         self.session_id_to_session: dict[str, Session] = {}
         self.resource_id_to_resource: dict[str, Resource] = {}
-
-    @property
-    def config(self) -> ServerAPIConfig:
-        return self.__config
-
-    @property
-    def services(self) -> tuple[BaseService, ...]:
-        return self.auth, self.user_ws, self.autopilot_ws
 
     def run(self) -> None:
         async def _service():
@@ -56,7 +48,7 @@ class Server:
             self.runner = AppRunner(self.app, access_log=None)
             await self.runner.setup()
 
-            site = TCPSite(self.runner, self.__config.host, self.__config.port)
+            site = TCPSite(self.runner, self.config.host, self.config.port)
             await site.start()
 
             log("Service running.")
