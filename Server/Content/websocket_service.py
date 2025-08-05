@@ -4,7 +4,6 @@ from abc import ABC
 from logging import ERROR
 from typing import TYPE_CHECKING
 
-from aiohttp import WSMessage
 from aiohttp.web import HTTPConflict, WebSocketResponse
 
 from Common import log
@@ -20,6 +19,7 @@ from .decorators import (
 )
 
 if TYPE_CHECKING:
+    from aiohttp import WSMessage
     from aiohttp.web import Request
 
     from Common import Token
