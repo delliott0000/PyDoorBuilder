@@ -13,9 +13,10 @@ backoff_factor = 1.5
 backoff_start = 1.0
 backoff_cap = 20
 
-[database]
+[postgres]
 host = ""
 port = 0
+database = ""
 
 [server.api]
 host = "0.0.0.0"
@@ -26,14 +27,14 @@ max_tokens_per_user = 5
 task_interval = 5
 ws_heartbeat = 5
 
-[server.database]
-username = ""
+[server.postgres]
+user = ""
 password = ""
 
 [autopilot.api]
-username = ""
+user = ""
 password = ""
 
-[autopilot.database]
-username = ""
+[autopilot.postgres]
+user = ""
 password = ""
