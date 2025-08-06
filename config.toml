@@ -2,6 +2,8 @@
 domain = ""
 secure = true
 local = true
+host = "localhost"
+port = 8080
 
 [api.http]
 max_retries = 5
