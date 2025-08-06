@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
     from asyncpg import Pool
 
-    from Common import PostgresConfig
+    from .config import PostgresConfig
 
 __all__ = ("PostgreSQLClient",)
 
