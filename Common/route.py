@@ -5,7 +5,9 @@ from typing import TYPE_CHECKING
 from urllib.parse import quote
 
 if TYPE_CHECKING:
-    from typing import Any, ClassVar
+    from typing import ClassVar
+
+    from .config import ClientAPIConfig
 
 __all__ = ("build_base", "setup_routes", "Route", "HTTPRoute", "WebSocketRoute")
 
@@ -14,19 +16,13 @@ def build_base(protocol: str, domain: str, use_secure: bool, /) -> str:
     return f"{protocol}{'s' if use_secure else ''}://{domain}"
 
 
-def setup_routes(config: dict[str, Any], /) -> None:
-    domain = config["api"]["domain"]
-    secure = config["api"]["secure"]
-    local = config["api"]["local"]
+def setup_routes(config: ClientAPIConfig, /) -> None:
+    use_secure = config.secure and not config.local
 
-    use_secure = secure and not local
-
-    if local:
-        host = config["server"]["api"]["host"]
-        port = config["server"]["api"]["port"]
-        resolved_domain = f"{host}:{port}"
+    if config.local:
+        resolved_domain = f"{config.host}:{config.port}"
     else:
-        resolved_domain = domain
+        resolved_domain = config.domain
 
     HTTPRoute.BASE = build_base("http", resolved_domain, use_secure)
     WebSocketRoute.BASE = build_base("ws", resolved_domain, use_secure)
