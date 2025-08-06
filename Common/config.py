@@ -9,9 +9,29 @@ if TYPE_CHECKING:
     from typing import Any
 
 __all__ = (
+    "ClientAPIConfig",
+    "PostgresConfig",
     "ServerAPIConfig",
     "global_config",
 )
+
+
+@dataclass(kw_only=True, frozen=True)
+class ClientAPIConfig:
+    domain: str
+    secure: bool
+    local: bool
+    host: str
+    port: int
+
+
+@dataclass(kw_only=True, frozen=True)
+class PostgresConfig:
+    host: str
+    port: int
+    database: str
+    user: str
+    password: str
 
 
 @dataclass(kw_only=True, frozen=True)
