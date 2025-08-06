@@ -24,6 +24,8 @@ class PostgreSQLClient:
     async def __aexit__(self, *_) -> None:
         await self.disconnect()
 
-    async def connect(self) -> None: ...
+    async def connect(self) -> None:
+        pass
 
-    async def disconnect(self) -> None: ...
+    async def disconnect(self) -> None:
+        pass
