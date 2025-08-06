@@ -8,11 +8,14 @@ from asyncpg import create_pool
 from .utils import log
 
 if TYPE_CHECKING:
-    from typing import Self
+    from collections.abc import Callable, Coroutine
+    from typing import Any, Self, TypeVar
 
-    from asyncpg import Pool
+    from asyncpg import Connection, Pool, Record
 
     from .config import PostgresConfig
+
+    T = TypeVar("T")
 
 __all__ = ("PostgreSQLClient",)
 
@@ -67,3 +70,19 @@ class PostgreSQLClient:
             log(f"Failed to disconnect from {config.database} - {type(error).__name__}.", ERROR)
 
         self.__pool = None
+
+    async def make_call(self, func: Callable[[Connection], Coroutine[Any, Any, T]], /) -> T:
+        if not self.is_open:
+            raise RuntimeError("Postgres connection pool is closed.")
+
+        async with self.__pool.acquire() as connection:
+            return await func(connection)
+
+    async def fetch_one(self, query: str, *args: Any) -> Record | None:
+        return await self.make_call(lambda connection: connection.fetchrow(query, *args))
+
+    async def fetch_all(self, query: str, *args: Any) -> list[Record]:
+        return await self.make_call(lambda connection: connection.fetch(query, *args))
+
+    async def execute(self, query: str, *args: Any) -> str:
+        return await self.make_call(lambda connection: connection.execute(query, *args))
