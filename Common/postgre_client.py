@@ -24,6 +24,10 @@ class PostgreSQLClient:
     async def __aexit__(self, *_) -> None:
         await self.disconnect()
 
+    @property
+    def is_open(self) -> bool:
+        return self.__pool is not None and not self.__pool.is_closing()
+
     async def connect(self) -> None:
         pass
 
