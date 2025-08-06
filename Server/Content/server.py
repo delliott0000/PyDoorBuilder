@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from aiohttp.web import Application, AppRunner, TCPSite
 
-from Common import ServerAPIConfig, log
+from Common import log
 
 from .auth_service import AuthService
 from .middlewares import middlewares
@@ -14,18 +14,21 @@ from .postgre_client import ServerPostgreSQLClient
 from .websocket_service import AutopilotWebSocketService, UserWebSocketService
 
 if TYPE_CHECKING:
-    from typing import Any
-
-    from Common import Resource, Session, Token, User
+    from Common import PostgresConfig, Resource, ServerAPIConfig, Session, Token, User
 
 __all__ = ("Server",)
 
 
 class Server:
-    def __init__(self, *, config: dict[str, Any]):
-        self.config = ServerAPIConfig(**config)
+    def __init__(
+        self,
+        *,
+        config: ServerAPIConfig,
+        db_config: PostgresConfig,
+    ):
+        self.config = config
 
-        self.db = ServerPostgreSQLClient()
+        self.db = ServerPostgreSQLClient(config=db_config)
 
         self.app = Application(middlewares=middlewares)
         self.runner: AppRunner | None = None
