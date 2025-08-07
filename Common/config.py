@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 __all__ = (
     "ClientAPIConfig",
+    "HTTPRetryConfig",
     "PostgresConfig",
     "ServerAPIConfig",
     "global_config",
@@ -23,6 +24,18 @@ class ClientAPIConfig:
     local: bool
     host: str
     port: int
+
+
+@dataclass(kw_only=True, frozen=True)
+class HTTPRetryConfig:
+    max_retries: int
+    max_sleep_time: float
+    handle_ratelimits: bool
+    max_retry_after: float
+    handle_backoffs: bool
+    backoff_factor: float
+    backoff_start: float
+    backoff_cap: float
 
 
 @dataclass(kw_only=True, frozen=True)

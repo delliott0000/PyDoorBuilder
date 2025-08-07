@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from collections.abc import Coroutine
     from typing import Any
 
+    from .config import HTTPRetryConfig
     from .route import Route
 
     Json = dict[str, Any]
@@ -22,8 +23,8 @@ __all__ = ("HTTPClient",)
 
 
 class HTTPClient:
-    def __init__(self, *, config: dict[str, Any]):
-        self.config: dict[str, Any] = config
+    def __init__(self, *, config: HTTPRetryConfig):
+        self.config = config
         self.__session: ClientSession | None = None
 
     @property
@@ -67,7 +68,7 @@ class HTTPClient:
 
         tries = 0
         total_slept = 0
-        backoff = config["backoff_start"]
+        backoff = config.backoff_start
 
         while True:
             tries += 1
@@ -77,7 +78,7 @@ class HTTPClient:
                 return await self.make_request(method, url, **kwargs)
 
             except HTTPException as error:
-                if tries >= config["max_retries"]:
+                if tries >= config.max_retries:
                     raise error
 
                 elif error.response.status == 429:
@@ -85,17 +86,14 @@ class HTTPClient:
 
                     if retry_after is not None:
                         if (
-                            config["handle_ratelimits"] is True
-                            and retry_after <= config["max_retry_after"]
+                            config.handle_ratelimits is True
+                            and retry_after <= config.max_retry_after
                         ):
                             sleep_time = retry_after
 
                     else:
-                        backoff *= config["backoff_factor"]
-                        if (
-                            config["handle_backoffs"] is True
-                            and backoff <= config["backoff_cap"]
-                        ):
+                        backoff *= config.backoff_factor
+                        if config.handle_backoffs is True and backoff <= config.backoff_cap:
                             sleep_time = backoff
 
                 elif error.response.status >= 500:
@@ -103,7 +101,7 @@ class HTTPClient:
 
                 if sleep_time > 0:
                     total_slept += sleep_time
-                    if total_slept >= config["max_sleep_time"]:
+                    if total_slept >= config.max_sleep_time:
                         raise error
 
                     log(f"Retrying {method.upper()} {url} in {sleep_time:.3f} seconds...")
