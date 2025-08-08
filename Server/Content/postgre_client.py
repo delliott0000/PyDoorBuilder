@@ -14,7 +14,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
     async def get_user(
         self,
         *,
-        user_id: str | None = None,
+        user_id: int | None = None,
         username: str | None = None,
         password: str | None = None,
         with_password: bool = True,
@@ -25,6 +25,8 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         elif password is None and with_password is True:
             raise ValueError("Password is required.")
 
-        ...
+        record = await self.fetch_one(..., *...)
+        if record is None:
+            return None
 
-        return User("...", "...", False)
+        return User(record)
