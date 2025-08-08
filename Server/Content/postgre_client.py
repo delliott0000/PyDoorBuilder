@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from Common import PostgreSQLClient, User, check_password
+from Common import PostgreSQLClient, User, check_password, encrypt_password
 
 if TYPE_CHECKING:
     ...
 
 __all__ = ("ServerPostgreSQLClient",)
+
+
+DUMMY_HASH = encrypt_password("my_dummy_password")
 
 
 class ServerPostgreSQLClient(PostgreSQLClient):
@@ -29,6 +32,8 @@ class ServerPostgreSQLClient(PostgreSQLClient):
             raise ValueError("Username or ID is required.")
 
         if record is None:
+            # Dummy check so we don't leak any info due to query timing
+            check_password(password, DUMMY_HASH)
             return None
         elif with_password and not check_password(password, record["password"]):
             raise ValueError("Incorrect password.")
