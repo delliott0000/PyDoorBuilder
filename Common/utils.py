@@ -7,6 +7,8 @@ from pathlib import Path
 from sys import exc_info
 from typing import TYPE_CHECKING
 
+from bcrypt import checkpw, gensalt, hashpw
+
 if TYPE_CHECKING:
     from typing import Any
 
@@ -15,7 +17,16 @@ if TYPE_CHECKING:
 
     Json = dict[str, Any]
 
-__all__ = ("now", "decode_datetime", "encode_datetime", "setup_logging", "log", "to_json")
+__all__ = (
+    "now",
+    "decode_datetime",
+    "encode_datetime",
+    "check_password",
+    "encrypt_password",
+    "setup_logging",
+    "log",
+    "to_json",
+)
 
 
 _logger = getLogger()
@@ -34,6 +45,14 @@ def encode_datetime(t: datetime, /) -> str:
         raise ValueError("Datetime must be timezone-aware.")
     else:
         return t.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+
+
+def check_password(password: str, hashed_password: str, /) -> bool:
+    return checkpw(password.encode(), hashed_password.encode())
+
+
+def encrypt_password(password: str, /) -> str:
+    return hashpw(password.encode(), gensalt()).decode()
 
 
 def setup_logging(file: str, level: int = DEBUG, /) -> None:
