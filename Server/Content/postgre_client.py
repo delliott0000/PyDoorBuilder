@@ -36,6 +36,6 @@ class ServerPostgreSQLClient(PostgreSQLClient):
             check_password(password, DUMMY_HASH)
             return None
         elif with_password and not check_password(password, record["password"]):
-            raise ValueError("Incorrect password.")
+            return None
 
         return User(record)
