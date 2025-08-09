@@ -61,4 +61,5 @@ class User:
             "display_name": self._display_name,
             "email": self.email,
             "autopilot": self._autopilot,
+            "admin": self._admin,
         }
