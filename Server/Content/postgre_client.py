@@ -32,7 +32,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
             raise ValueError("Username or ID is required.")
 
         if with_password and record is None:
-            # Dummy check so we don't leak any info due through query timing
+            # Dummy check so we don't leak any info through query timing
             check_password(password, DUMMY_HASH)
             return None
         elif with_password and not check_password(password, record["password"]):
