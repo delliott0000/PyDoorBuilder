@@ -25,7 +25,7 @@ class User:
         return hash(self._id)
 
     def __str__(self):
-        return self._display_name
+        return self._display_name or self._username
 
     def __eq__(self, other):
         return isinstance(other, User) and self._id == other._id
@@ -39,11 +39,11 @@ class User:
         return self._username
 
     @property
-    def display_name(self) -> str:
+    def display_name(self) -> str | None:
         return self._display_name
 
     @property
-    def email(self) -> str:
+    def email(self) -> str | None:
         return self._email
 
     @property
