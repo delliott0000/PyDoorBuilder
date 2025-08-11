@@ -7,6 +7,7 @@ from .permissions import *
 from .postgre_client import *
 from .resource import *
 from .route import *
+from .rules import *
 from .session import *
 from .state import *
 from .token import *

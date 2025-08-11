@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .enums import DoorType
+from .errors import ValidationError
+from .rules import door_rules
 
 if TYPE_CHECKING:
     from typing import Any
@@ -134,3 +136,15 @@ class Door:
             self.__leaf_split = (self.leaf_sum_x / 2, self.leaf_sum_x / 2)
         else:
             self.__leaf_split = None
+
+    def validate(self) -> None:
+        results = set()
+
+        for rule in door_rules:
+            result = rule(self)
+            results.add(result)
+
+        results.discard(None)
+
+        if results:
+            raise ValidationError(results)
