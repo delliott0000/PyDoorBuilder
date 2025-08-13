@@ -8,8 +8,13 @@ from .decorators import BucketType, ratelimit, route, user_only, validate_access
 if TYPE_CHECKING:
     from aiohttp.web import Request, Response
 
+    from Common import Resource
+
 
 class ResourceService(BaseService):
+    async def load_resource(self, rtype: str, rid: str, /) -> Resource:
+        pass
+
     async def task_coro(self) -> None:
         pass
 
