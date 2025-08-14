@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from .config import HTTPRetryConfig
     from .route import Route
 
+    URL = str | Route
     Json = dict[str, Any]
     JsonCoro = Coroutine[Any, Any, Json]
 
@@ -62,7 +63,7 @@ class HTTPClient:
 
             raise HTTPException(response, data)
 
-    async def request(self, method: str, url: str | Route, /, **kwargs: Any) -> Json:
+    async def request(self, method: str, url: URL, /, **kwargs: Any) -> Json:
         url = str(url)
         config = self.config
 
@@ -111,17 +112,17 @@ class HTTPClient:
 
                 raise error
 
-    def get(self, url: str | Route, /, **kwargs) -> JsonCoro:
+    def get(self, url: URL, /, **kwargs) -> JsonCoro:
         return self.request("get", url, **kwargs)
 
-    def put(self, url: str | Route, /, **kwargs) -> JsonCoro:
+    def put(self, url: URL, /, **kwargs) -> JsonCoro:
         return self.request("put", url, **kwargs)
 
-    def post(self, url: str | Route, /, **kwargs) -> JsonCoro:
+    def post(self, url: URL, /, **kwargs) -> JsonCoro:
         return self.request("post", url, **kwargs)
 
-    def patch(self, url: str | Route, /, **kwargs) -> JsonCoro:
+    def patch(self, url: URL, /, **kwargs) -> JsonCoro:
         return self.request("patch", url, **kwargs)
 
-    def delete(self, url: str | Route, /, **kwargs) -> JsonCoro:
+    def delete(self, url: URL, /, **kwargs) -> JsonCoro:
         return self.request("delete", url, **kwargs)
