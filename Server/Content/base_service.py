@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from asyncio import CancelledError, create_task, sleep
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 from inspect import getmembers, isfunction
 from logging import ERROR
 from typing import TYPE_CHECKING
@@ -122,11 +123,14 @@ class BaseService(ABC):
             return None
 
     def encode_route_name(self, method: str, endpoint: str, /) -> str:
-        return f"{method}.{endpoint[1:]}".replace("/", "-")
+        route = f"{method} {endpoint}"
+        encoded = urlsafe_b64encode(route.encode()).decode().rstrip("=")
+        return encoded
 
-    def decode_route_name(self, name: str, /) -> tuple[str, str]:
-        method, endpoint = name.split(".", 1)
-        return method, "/" + endpoint.replace("-", "/")
+    def decode_route_name(self, encoded: str, /) -> tuple[str, str]:
+        encoded += "=" * (-len(encoded) % 4)
+        method, endpoint = urlsafe_b64decode(encoded).decode().split(" ", 1)
+        return method, endpoint
 
     def register_routes(self) -> None:
         for func_name, func in getmembers(type(self), predicate=isfunction):

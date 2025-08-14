@@ -10,6 +10,8 @@ if TYPE_CHECKING:
 
     from Common import Resource
 
+__all__ = ("ResourceService",)
+
 
 class ResourceService(BaseService):
     async def load_resource(self, rtype: str, rid: str, /) -> Resource:

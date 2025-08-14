@@ -11,6 +11,7 @@ from Common import log
 from .auth_service import AuthService
 from .middlewares import middlewares
 from .postgre_client import ServerPostgreSQLClient
+from .resource_service import ResourceService
 from .websocket_service import AutopilotWebSocketService, UserWebSocketService
 
 if TYPE_CHECKING:
@@ -35,6 +36,7 @@ class Server:
 
         self.services = (
             AuthService(self),
+            ResourceService(self),
             UserWebSocketService(self),
             AutopilotWebSocketService(self),
         )
