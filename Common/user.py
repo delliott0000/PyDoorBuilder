@@ -59,7 +59,7 @@ class User:
             "id": self._id,
             "username": self._username,
             "display_name": self._display_name,
-            "email": self.email,
+            "email": self._email,
             "autopilot": self._autopilot,
             "admin": self._admin,
         }
