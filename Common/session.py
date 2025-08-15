@@ -80,4 +80,9 @@ class Session:
         except AttributeError:
             resource_id = None
 
-        return {"id": self._id, "resource_id": resource_id, "state": self._state.to_json()}
+        return {
+            "id": self._id,
+            "user": self._user.to_json(),
+            "state": self._state.to_json(),
+            "resource_id": resource_id,
+        }

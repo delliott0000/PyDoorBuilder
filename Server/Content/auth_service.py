@@ -27,14 +27,10 @@ class AuthService(BaseService):
         self.server.key_to_token.pop(token.refresh, None)
 
     def ok_response(self, token: Token, /) -> Response:
-        session = token.session
-        user = session.user
         return json_response(
             {
                 "message": "Ok",
                 "token": token.to_json(),
-                "session": session.to_json(),
-                "user": user.to_json(),
             },
             status=200,
         )
