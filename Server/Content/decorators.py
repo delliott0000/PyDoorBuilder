@@ -27,8 +27,9 @@ __all__ = (
     "ratelimit",
     "route",
     "validate_access",
-    "user_only",
+    "admin_only",
     "autopilot_only",
+    "user_only",
 )
 
 
@@ -119,12 +120,12 @@ def validate_access(func: RespFunc, /) -> RespFunc:
     return wrapper
 
 
-def user_only(func: RespFunc, /) -> RespFunc:
+def admin_only(func: RespFunc, /) -> RespFunc:
 
     async def wrapper(service: BaseService, request: Request, /) -> RespType:
         user = service.user_from_request(request)
-        if user is not None and user.autopilot is True:
-            raise HTTPForbidden(reason="This endpoint is user-only.")
+        if user is not None and user.admin is False:
+            raise HTTPForbidden(reason="This endpoint is admin-only")
 
         return await func(service, request)
 
@@ -138,7 +139,21 @@ def autopilot_only(func: RespFunc, /) -> RespFunc:
     async def wrapper(service: BaseService, request: Request, /) -> RespType:
         user = service.user_from_request(request)
         if user is not None and user.autopilot is False:
-            raise HTTPForbidden(reason="This endpoint is autopilot-only.")
+            raise HTTPForbidden(reason="This endpoint is autopilot-only")
+
+        return await func(service, request)
+
+    wrapper.__meta__ = ensure_meta(func)
+
+    return wrapper
+
+
+def user_only(func: RespFunc, /) -> RespFunc:
+
+    async def wrapper(service: BaseService, request: Request, /) -> RespType:
+        user = service.user_from_request(request)
+        if user is not None and user.autopilot is True:
+            raise HTTPForbidden(reason="This endpoint is user-only")
 
         return await func(service, request)
 
