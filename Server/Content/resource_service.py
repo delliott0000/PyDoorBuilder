@@ -14,7 +14,7 @@ __all__ = ("ResourceService",)
 
 
 class ResourceService(BaseService):
-    async def load_resource(self, rtype: str, rid: str, /) -> Resource:
+    async def load_resource(self, request: Request, /) -> Resource:
         pass
 
     async def task_coro(self) -> None:
