@@ -27,7 +27,7 @@ class ResourceService(BaseService):
     async def acquire(self, request: Request, /) -> Response:
         pass
 
-    @route("post", "/resource/{rtype}/{rid}/release")
+    @route("post", "/resource/release")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
     @user_only
     @validate_access
