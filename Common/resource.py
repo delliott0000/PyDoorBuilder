@@ -61,7 +61,3 @@ class Resource(ABC):
     @abstractmethod
     def new(cls, data: Any, /) -> Self:
         pass
-
-    @abstractmethod
-    def update(self, data: Any, /) -> None:
-        pass
