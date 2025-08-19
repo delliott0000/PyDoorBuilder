@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Self
 
     from .session import Session
     from .user import User
@@ -56,3 +56,8 @@ class Resource(ABC):
             raise RuntimeError("Cannot release a resource locked by another session.")
         else:
             self._session = None  # noqa
+
+    @classmethod
+    @abstractmethod
+    def from_data(cls, data: Any, /) -> Self:
+        pass
