@@ -4,7 +4,10 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from typing import Any, Self
+
+    from asyncpg import Record
 
     from .session import Session
     from .user import User
@@ -59,5 +62,5 @@ class Resource(ABC):
 
     @classmethod
     @abstractmethod
-    def new(cls, data: Any, /) -> Self:
+    def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self:
         pass
