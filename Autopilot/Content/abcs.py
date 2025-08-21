@@ -30,6 +30,7 @@ class DynamicBOMItem(BOMBase, ABC):
 
 
 class ImplementsBOM(ABC):
+    @property
     @abstractmethod
     def bom(self) -> Iterable[AnyBOMItem]:
         pass
@@ -45,6 +46,7 @@ class Piece(ImplementsBOM, ABC):
 
 
 class Hardware(ImplementsBOM, ABC):
+    @property
     @abstractmethod
     def pieces(self) -> Iterable[Piece]:
         pass

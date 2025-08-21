@@ -15,11 +15,26 @@ __all__ = ("APDoor",)
 
 
 class APDoor(Door, ImplementsBOM):
-
+    @property
     def pieces(self) -> tuple[Piece, ...]:
         # TODO: implement this
         return ()
 
-    def bom(self) -> tuple[AnyBOMItem, ...]:
+    @property
+    def leaf_bom(self) -> tuple[AnyBOMItem, ...]:
         # TODO: implement this
         return ()
+
+    @property
+    def frame_bom(self) -> tuple[AnyBOMItem, ...]:
+        # TODO: implement this
+        return ()
+
+    @property
+    def bom(self) -> tuple[AnyBOMItem, ...]:
+        if ...:
+            return self.frame_bom
+        elif ...:
+            return self.leaf_bom
+        else:
+            return self.frame_bom + self.leaf_bom

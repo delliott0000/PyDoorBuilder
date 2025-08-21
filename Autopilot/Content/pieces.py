@@ -18,6 +18,7 @@ __all__ = ()
 
 
 class MyPiece(Piece):
+    @property
     def bom(self) -> tuple[StaticBOMItem, ...]:
         return ()
 
