@@ -32,7 +32,10 @@ class APDoor(Door, ImplementsBOM):
 
     @property
     def bom(self) -> tuple[AnyBOMItem, ...]:
-        if ...:
+        # TODO: implement this
+        if ... and ...:
+            raise ...
+        elif ...:
             return self.frame_bom
         elif ...:
             return self.leaf_bom
