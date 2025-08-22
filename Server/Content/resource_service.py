@@ -15,7 +15,15 @@ __all__ = ("ResourceService",)
 
 class ResourceService(BaseService):
     async def load_resource(self, request: Request, /) -> Resource:
-        pass
+        rtype = request.match_info["rtype"]
+        rid = request.match_info["rid"]
+
+        try:
+            return self.server.rtype_rid_to_resource[(rtype, rid)]
+        except KeyError:
+            pass
+
+        ...
 
     async def task_coro(self) -> None:
         pass
