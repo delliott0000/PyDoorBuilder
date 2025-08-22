@@ -13,7 +13,7 @@ __all__ = ("User",)
 class User:
     __slots__ = ("_id", "_username", "_display_name", "_email", "_autopilot", "_admin")
 
-    def __init__(self, record: Record, /):
+    def __init__(self, record: Record | dict, /):
         self._id = record["id"]
         self._username = record["username"]
         self._display_name = record["display_name"]
