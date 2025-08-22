@@ -44,7 +44,7 @@ class Server:
         self.key_to_token: dict[str, Token] = {}
         self.user_to_tokens: dict[User, set[Token]] = {}
         self.session_id_to_session: dict[str, Session] = {}
-        self.resource_id_to_resource: dict[str, Resource] = {}
+        self.rtype_rid_to_resource: dict[tuple[str, str], Resource] = {}
 
     def run(self) -> None:
         async def _service():
