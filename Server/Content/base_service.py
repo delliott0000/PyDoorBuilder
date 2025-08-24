@@ -124,18 +124,17 @@ class BaseService(ABC):
 
     def ip_from_request(self, request: Request, /) -> str | None:
         if self.server.config.proxy is True:
-            k1, k2 = "X-Forwarded-For", "X-Real-IP"
-            get = request.headers.get
+            keys = "X-Forwarded-For", "X-Real-IP"
 
-            forwarded_for = get(k1)
-            if forwarded_for:
-                return forwarded_for.split(",")[0].strip()
+            for key in keys:
+                value = request.headers.get(key)
+                if value is not None:
+                    return value.split(",")[0].strip()
 
-            real_ip = get(k2)
-            if real_ip:
-                return real_ip.strip()
-
-            log(f"Proxy mode enabled but missing expected proxy headers ({k1}/{k2}).", WARN)
+            log(
+                f"Proxy mode enabled but missing expected proxy headers ({'/'.join(keys)}).",
+                WARN,
+            )
 
         remote = request.remote
 
