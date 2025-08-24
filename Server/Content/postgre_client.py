@@ -14,6 +14,10 @@ DUMMY_HASH = encrypt_password("my_dummy_password")
 
 
 class ServerPostgreSQLClient(PostgreSQLClient):
+    async def new_id(self) -> int:
+        record = await self.fetch_one("INSERT INTO ids DEFAULT VALUES RETURNING id")
+        return record["id"]
+
     async def get_user(
         self,
         *,
