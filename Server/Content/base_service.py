@@ -128,7 +128,7 @@ class BaseService(ABC):
 
             for key in keys:
                 value = request.headers.get(key)
-                if value is not None:
+                if value:
                     return value.split(",")[0].strip()
 
             log(
