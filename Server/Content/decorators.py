@@ -47,7 +47,7 @@ class BucketType(Enum):
 
     def get_source(self, service: BaseService, request: Request, /) -> Any:
         if self == BucketType.IP:
-            return request.remote or "anon"
+            return service.ip_from_request(request) or "anon"
         elif self == BucketType.User:
             return service.user_from_request(request) or "anon"
         elif self == BucketType.Token:

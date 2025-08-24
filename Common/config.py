@@ -53,6 +53,7 @@ class PostgresConfig:
 class ServerAPIConfig:
     host: str
     port: int
+    proxy: bool
     access_time: float
     refresh_time: float
     max_tokens_per_user: int

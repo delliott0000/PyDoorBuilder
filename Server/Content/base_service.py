@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from asyncio import CancelledError, create_task, sleep
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from inspect import getmembers, isfunction
-from logging import ERROR
+from logging import ERROR, WARN
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPBadRequest, HTTPUnauthorized
@@ -121,6 +121,28 @@ class BaseService(ABC):
             return self.session_from_request(request).user
         except AttributeError:
             return None
+
+    def ip_from_request(self, request: Request, /) -> str | None:
+        if self.server.config.proxy is True:
+            k1, k2 = "X-Forwarded-For", "X-Real-IP"
+            get = request.headers.get
+
+            forwarded_for = get(k1)
+            if forwarded_for:
+                return forwarded_for.split(",")[0].strip()
+
+            real_ip = get(k2)
+            if real_ip:
+                return real_ip.strip()
+
+            log(f"Proxy mode enabled but missing expected proxy headers ({k1}/{k2}).", WARN)
+
+        remote = request.remote
+
+        if remote is None:
+            log("Unable to determine client IP.", WARN)
+
+        return remote
 
     def encode_route_name(self, method: str, endpoint: str, /) -> str:
         route = f"{method} {endpoint}"
