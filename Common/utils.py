@@ -52,7 +52,7 @@ def check_password(password: str, hashed_password: str, /) -> bool:
 
 
 def encrypt_password(password: str, /) -> str:
-    return hashpw(password.encode(), gensalt(rounds=10)).decode()
+    return hashpw(password.encode(), gensalt()).decode()
 
 
 def setup_logging(file: str, level: int = DEBUG, /) -> None:
