@@ -9,10 +9,10 @@ if TYPE_CHECKING:
 
     from .server import Server
 
-__all__ = ("AutopilotConnection", "AutopilotManager")
+__all__ = ("AutopilotInstance", "AutopilotManager")
 
 
-class AutopilotConnection:
+class AutopilotInstance:
     __slots__ = ("__token", "__task_id")
 
     def __init__(self, token: Token, /):
@@ -52,10 +52,10 @@ class AutopilotManager:
     def __init__(self, server: Server, /):
         self.__server = server
         self.__task_queue: list[int] = []
-        self.__autopilots: dict[Token, AutopilotConnection] = {}
+        self.__autopilots: dict[Token, AutopilotInstance] = {}
 
     async def autopilot_connect(self, token: Token, /) -> None: ...
 
     async def autopilot_disconnect(self, token: Token, /) -> None: ...
 
-    async def wait_for_autopilot(self) -> AutopilotConnection: ...
+    async def wait_for_autopilot(self) -> AutopilotInstance: ...

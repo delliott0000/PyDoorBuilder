@@ -1,6 +1,7 @@
 from .auth_service import *
 from .base_service import *
 from .decorators import *
+from .manager import *
 from .middlewares import *
 from .postgre_client import *
 from .resource_service import *
