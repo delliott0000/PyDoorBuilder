@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
     from Common import Token
 
+    from .server import Server
+
 __all__ = ("AutopilotConnection", "AutopilotManager")
 
 
@@ -47,7 +49,8 @@ class AutopilotConnection:
 
 
 class AutopilotManager:
-    def __init__(self):
+    def __init__(self, server: Server, /):
+        self.__server = server
         self.__task_queue: list[int] = []
         self.__autopilots: dict[Token, AutopilotConnection] = {}
 
