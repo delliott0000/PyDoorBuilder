@@ -7,8 +7,6 @@ if TYPE_CHECKING:
 
     from Common import Token
 
-    from .websocket_service import AutopilotWebSocketService
-
 __all__ = ("AutopilotConnection", "AutopilotManager")
 
 
@@ -49,8 +47,7 @@ class AutopilotConnection:
 
 
 class AutopilotManager:
-    def __init__(self, service: AutopilotWebSocketService, /):
-        self.__service = service
+    def __init__(self):
         self.__task_queue: list[int] = []
         self.__autopilots: dict[Token, AutopilotConnection] = {}
 
