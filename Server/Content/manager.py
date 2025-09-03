@@ -66,6 +66,11 @@ class AutopilotManager:
         except IndexError:
             return None
 
+    def get_autopilot(self) -> AutopilotInstance | None:
+        for autopilot in self.__autopilots.values():
+            if not autopilot.busy:
+                return autopilot
+
     async def autopilot_connect(self, token: Token, /) -> None: ...
 
     async def autopilot_disconnect(self, token: Token, /) -> None: ...
