@@ -54,7 +54,17 @@ class AutopilotManager:
         self.__task_queue: list[int] = []
         self.__autopilots: dict[Token, AutopilotInstance] = {}
 
-    def add_task(self, task_id: int, /) -> None: ...
+    def queue_task(self, task_id: int, /) -> None:
+        if task_id in self.__task_queue:
+            raise ValueError(f"Task {task_id} is already queued.")
+        else:
+            self.__task_queue.append(task_id)
+
+    def get_next_task(self) -> int | None:
+        try:
+            return self.__task_queue.pop(0)
+        except IndexError:
+            return None
 
     async def autopilot_connect(self, token: Token, /) -> None: ...
 
