@@ -9,6 +9,7 @@ from aiohttp.web import Application, AppRunner, TCPSite
 from Common import log
 
 from .auth_service import AuthService
+from .manager import AutopilotManager
 from .middlewares import middlewares
 from .postgre_client import ServerPostgreSQLClient
 from .resource_service import ResourceService
@@ -40,6 +41,8 @@ class Server:
             UserWebSocketService(self),
             AutopilotWebSocketService(self),
         )
+
+        self.apm = AutopilotManager(self)
 
         self.key_to_token: dict[str, Token] = {}
         self.user_to_tokens: dict[User, set[Token]] = {}
