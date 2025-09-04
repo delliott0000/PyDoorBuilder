@@ -70,7 +70,7 @@ class UserWebSocketService(BaseWebSocketService):
         try:
             async for _ in response:
                 _: WSMessage
-            ...
+
         finally:
             await self.cleanup_ws(token)
 
@@ -92,7 +92,7 @@ class AutopilotWebSocketService(BaseWebSocketService):
         try:
             async for _ in response:
                 _: WSMessage
-            ...
+
         finally:
             await self.cleanup_ws(token)
 
