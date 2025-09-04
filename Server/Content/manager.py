@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from asyncio import Condition
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -58,6 +59,7 @@ class AutopilotManager:
         self.__server = server
         self.__task_queue: list[int] = []
         self.__autopilots: dict[Token, AutopilotInstance] = {}
+        self.__condition = Condition()
 
     def queue_task(self, task_id: int, /) -> None:
         if task_id in self.__task_queue:
@@ -82,4 +84,6 @@ class AutopilotManager:
 
     async def autopilot_task_done(self, token: Token, /) -> None: ...
 
-    async def wait_for_autopilot(self) -> AutopilotInstance: ...
+    async def wait_for_autopilot(self) -> AutopilotInstance:
+        async with self.__condition:
+            return await self.__condition.wait_for(self.get_autopilot)
