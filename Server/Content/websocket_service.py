@@ -48,7 +48,10 @@ class BaseWebSocketService(BaseService, ABC):
 
         try:
             await response.close()
-            log(f"Closed WebSocket with code {response.close_code}. (Token ID: {token.id})")
+            # TODO: properly track/log close codes that we send and receive
+            log(
+                f"Closed WebSocket, received code {response.close_code}. (Token ID: {token.id})"
+            )
         except AttributeError:
             pass
         except Exception as error:
