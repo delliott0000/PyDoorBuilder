@@ -31,6 +31,7 @@ refresh_time = 3600
 max_tokens_per_user = 5
 task_interval = 5
 ws_heartbeat = 5
+ws_max_message_size = 16  # In kilobytes
 
 [server.postgres]
 user = ""

@@ -32,7 +32,10 @@ class BaseWebSocketService(BaseService, ABC):
         if token in token.session.connections:
             raise HTTPConflict(reason="Already connected")
 
-        response = WebSocketResponse(heartbeat=self.server.config.ws_heartbeat)
+        response = WebSocketResponse(
+            heartbeat=self.server.config.ws_heartbeat,
+            max_msg_size=self.server.config.ws_max_message_size * 1024,
+        )
         token.session.connections[token] = response
 
         await response.prepare(request)

@@ -59,6 +59,7 @@ class ServerAPIConfig:
     max_tokens_per_user: int
     task_interval: float
     ws_heartbeat: float
+    ws_max_message_size: int
 
 
 config_file = Path(__file__).parent.parent / "config.toml"
