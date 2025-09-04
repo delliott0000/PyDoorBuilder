@@ -44,8 +44,13 @@ class AutopilotInstance:
         else:
             self.__task_id = task_id
 
-    def clear_task(self) -> None:
-        self.__task_id = None
+    def clear_task(self) -> int:
+        if not self.busy:
+            raise RuntimeError(f"{self} is not busy.")
+        else:
+            last_task_id = self.__task_id
+            self.__task_id = None
+            return last_task_id
 
 
 class AutopilotManager:
