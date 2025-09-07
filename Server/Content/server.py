@@ -4,6 +4,7 @@ from asyncio import Runner, gather
 from contextlib import AsyncExitStack
 from typing import TYPE_CHECKING
 
+from aiohttp import WSCloseCode
 from aiohttp.web import Application, AppRunner, TCPSite
 
 from Common import log
@@ -74,7 +75,7 @@ class Server:
 
         async def _cleanup():
             coros = (
-                connection.close()
+                connection.close(code=WSCloseCode.GOING_AWAY)
                 for session in self.session_id_to_session.values()
                 for connection in session.connections.values()
             )
