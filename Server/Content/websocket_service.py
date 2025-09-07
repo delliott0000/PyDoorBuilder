@@ -48,7 +48,6 @@ class BaseWebSocketService(BaseService, ABC):
 
         try:
             await response.close()
-            # TODO: properly track/log close codes that we send and receive
             log(
                 f"Closed WebSocket, received code {response.close_code}. (Token ID: {token.id})"
             )

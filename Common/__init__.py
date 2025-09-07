@@ -1,4 +1,3 @@
-from .aiohttp_extensions import *
 from .config import *
 from .door import *
 from .enums import *
