@@ -32,9 +32,13 @@ class ResourceService(BaseService):
             return cached
 
         try:
-            ...
+            loader = self.map[rtype]
         except KeyError:
             raise HTTPNotFound(reason="Unknown resource type")
+
+        class_ = loader["class"]
+        executors = loader["executors"]
+        data = {}
 
         ...
 
