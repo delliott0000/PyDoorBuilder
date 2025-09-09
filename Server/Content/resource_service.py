@@ -8,6 +8,8 @@ from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from aiohttp.web import Request, Response
 
     from Common import Resource
@@ -17,7 +19,7 @@ __all__ = ("ResourceService",)
 
 class ResourceService(BaseService):
     @property
-    def map(self):
+    def map(self) -> dict[str, Any]:
         return {}
 
     async def load_resource(self, request: Request, /) -> Resource:
