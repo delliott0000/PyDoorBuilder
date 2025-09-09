@@ -5,4 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     ...
 
-__all__ = ()
+__all__ = ("Quote",)
+
+
+class Quote: ...
