@@ -39,7 +39,7 @@ class BaseWebSocketService(BaseService, ABC):
         token.session.connections[token] = response
 
         await response.prepare(request)
-        log(f"Opened WebSocket. (Token ID: {token.id})")
+        log(f"Opened WebSocket for {token.session.user}. (Token ID: {token.id})")
 
         return response
 
@@ -49,7 +49,8 @@ class BaseWebSocketService(BaseService, ABC):
         try:
             await response.close()
             log(
-                f"Closed WebSocket. Received code {response.close_code}. (Token ID: {token.id})"
+                f"Closed WebSocket for {token.session.user}. "
+                f"Received code {response.close_code}. (Token ID: {token.id})"
             )
         except AttributeError:
             pass
