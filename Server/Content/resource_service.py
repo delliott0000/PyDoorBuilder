@@ -21,8 +21,20 @@ __all__ = ("ResourceService",)
 class ResourceService(BaseService):
     @property
     def map(self) -> dict[str, Any]:
-        # TODO: fill this in
-        return {}
+        # Confirm the structure for later
+        return {
+            "...": {
+                "class": ...,
+                "executors": {
+                    "...": {
+                        "func": ...,
+                        "query": ...,
+                        "check": ...,
+                        "exception": ...,
+                    }
+                },
+            }
+        }
 
     async def run_executor(
         self, rid: str, key: str, executor: dict[str, Any], /
