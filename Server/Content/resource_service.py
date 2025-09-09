@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from asyncio import gather
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPNotFound
@@ -20,7 +21,24 @@ __all__ = ("ResourceService",)
 class ResourceService(BaseService):
     @property
     def map(self) -> dict[str, Any]:
+        # TODO: fill this in
         return {}
+
+    async def run_executor(
+        self, rid: str, key: str, executor: dict[str, Any], /
+    ) -> tuple[str, Any]:
+        func = executor["func"]
+        query = executor["query"]
+        check = executor["check"]
+        exception = executor["exception"]
+
+        args = query, rid
+        result = await func(*args)
+
+        if not check(result):
+            raise exception
+
+        return key, result
 
     async def load_resource(self, request: Request, /) -> Resource:
         rtype = request.match_info["rtype"]
@@ -38,9 +56,14 @@ class ResourceService(BaseService):
 
         class_ = loader["class"]
         executors = loader["executors"]
-        data = {}
 
-        ...
+        tasks = (self.run_executor(rid, key, executor) for key, executor in executors.items())
+        results = await gather(*tasks)
+        data = {key: result for key, result in results}
+
+        resource = class_.new(data)
+        self.server.rtype_rid_to_resource[cache_key] = resource
+        return resource
 
     async def task_coro(self) -> None:
         pass
