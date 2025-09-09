@@ -25,10 +25,9 @@ class ResourceService(BaseService):
         rid = request.match_info["rid"]
         cache_key = rtype, rid
 
-        try:
-            return self.server.rtype_rid_to_resource[cache_key]
-        except KeyError:
-            pass
+        cached = self.server.rtype_rid_to_resource.get(cache_key)
+        if cached is not None:
+            return cached
 
         try:
             ...
