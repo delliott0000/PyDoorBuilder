@@ -61,6 +61,10 @@ class AutopilotManager:
         self.__autopilots: dict[Token, AutopilotInstance] = {}
         self.__condition = Condition()
 
+    @property
+    def autopilot_count(self) -> int:
+        return len(self.__autopilots)
+
     def queue_task(self, task_id: int, /) -> None:
         if task_id in self.__task_queue:
             raise ValueError(f"Task {task_id} is already queued.")
