@@ -14,6 +14,8 @@ __all__ = ("QuoteResource",)
 
 
 class QuoteResource(ResourceMixin, Quote, ResourceABC):
+    __slots__ = ("_session",)
+
     @property
     def id(self) -> str: ...
 

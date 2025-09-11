@@ -8,4 +8,5 @@ if TYPE_CHECKING:
 __all__ = ("Quote",)
 
 
-class Quote: ...
+class Quote:
+    __slots__ = ()
