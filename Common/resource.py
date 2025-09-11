@@ -18,20 +18,20 @@ __all__ = ("Resource",)
 class Resource(ABC):
     __slots__ = ()  # Defer to subclasses
 
-    def __init__(self, _id: str, session: Session | None = None, *args: Any, **kwargs: Any):
+    def __init__(self, session: Session | None = None, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self._id = _id  # noqa
         self._session = session  # noqa
 
     def __eq__(self, other):
-        return isinstance(other, Resource) and self._id == other._id
+        return isinstance(other, Resource) and self.id == other.id
 
     def __hash__(self):
-        return hash(self._id)
+        return hash(self.id)
 
     @property
+    @abstractmethod
     def id(self) -> str:
-        return self._id
+        pass
 
     @property
     def user(self) -> User | None:
