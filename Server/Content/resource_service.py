@@ -7,6 +7,7 @@ from aiohttp.web import HTTPNotFound
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
+from .resource_types import QuoteResource
 
 if TYPE_CHECKING:
     from typing import Any
@@ -23,8 +24,8 @@ class ResourceService(BaseService):
     def map(self) -> dict[str, Any]:
         # Confirm the structure for later
         return {
-            "...": {
-                "class": ...,
+            "quote": {
+                "class": QuoteResource,
                 "executors": {
                     "...": {
                         "func": ...,

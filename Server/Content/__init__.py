@@ -5,5 +5,6 @@ from .manager import *
 from .middlewares import *
 from .postgre_client import *
 from .resource_service import *
+from .resource_types import *
 from .server import *
 from .websocket_service import *
