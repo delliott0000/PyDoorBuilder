@@ -37,7 +37,7 @@ class ResourceMixin:
         self._session = session  # noqa
 
     def __eq__(self, other):
-        return type(self) is type(other) and self.id == other.id  # noqa
+        return isinstance(other, Resource) and self.id == other.id  # noqa
 
     def __hash__(self):
         return hash(self.id)  # noqa
