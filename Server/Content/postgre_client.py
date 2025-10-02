@@ -29,18 +29,20 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         if password is None and with_password is True:
             raise ValueError("Password is required.")
         elif user_id is not None:
-            record = await self.fetch_one("SELECT * FROM users WHERE id = $1", user_id)
+            user_record = await self.fetch_one("SELECT * FROM users WHERE id = $1", user_id)
         elif username is not None:
-            record = await self.fetch_one("SELECT * FROM users WHERE username = $1", username)
+            user_record = await self.fetch_one(
+                "SELECT * FROM users WHERE username = $1", username
+            )
         else:
             raise ValueError("Username or ID is required.")
 
-        if record is None:
+        if user_record is None:
             if with_password:
                 # Dummy check so we don't leak any info through query timing
                 check_password(password, DUMMY_HASH)
             return None
-        elif with_password and not check_password(password, record["password"]):
+        elif with_password and not check_password(password, user_record["password"]):
             return None
 
-        return User(record)
+        return User(user_record)

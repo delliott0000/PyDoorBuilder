@@ -11,6 +11,7 @@ from .route import *
 from .rules import *
 from .session import *
 from .state import *
+from .team import *
 from .token import *
 from .user import *
 from .utils import *

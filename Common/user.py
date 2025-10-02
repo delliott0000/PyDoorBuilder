@@ -15,13 +15,13 @@ __all__ = ("User",)
 class User(ComparesIDMixin, ComparesIDABC):
     __slots__ = ("_id", "_username", "_display_name", "_email", "_autopilot", "_admin")
 
-    def __init__(self, record: Record | dict, /):
-        self._id = record["id"]
-        self._username = record["username"]
-        self._display_name = record["display_name"]
-        self._email = record["email"]
-        self._autopilot = record["autopilot"]
-        self._admin = record["admin"]
+    def __init__(self, user_record: Record | dict, /):
+        self._id = user_record["id"]
+        self._username = user_record["username"]
+        self._display_name = user_record["display_name"]
+        self._email = user_record["email"]
+        self._autopilot = user_record["autopilot"]
+        self._admin = user_record["admin"]
 
     def __str__(self):
         return self._display_name or self._username
