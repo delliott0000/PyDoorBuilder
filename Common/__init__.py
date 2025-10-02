@@ -1,3 +1,4 @@
+from .bases import *
 from .config import *
 from .door import *
 from .enums import *

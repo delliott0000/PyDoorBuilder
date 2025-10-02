@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from .bases import ComparesIDABC, ComparesIDMixin
+
 if TYPE_CHECKING:
     from typing import Any
 
@@ -10,7 +12,7 @@ if TYPE_CHECKING:
 __all__ = ("User",)
 
 
-class User:
+class User(ComparesIDMixin, ComparesIDABC):
     __slots__ = ("_id", "_username", "_display_name", "_email", "_autopilot", "_admin")
 
     def __init__(self, record: Record | dict, /):
@@ -21,14 +23,8 @@ class User:
         self._autopilot = record["autopilot"]
         self._admin = record["admin"]
 
-    def __hash__(self):
-        return hash(self._id)
-
     def __str__(self):
         return self._display_name or self._username
-
-    def __eq__(self, other):
-        return isinstance(other, User) and self._id == other._id
 
     @property
     def id(self) -> int:

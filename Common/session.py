@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from .bases import ComparesIDABC, ComparesIDMixin
 from .state import State
 from .utils import log
 
@@ -17,7 +18,7 @@ if TYPE_CHECKING:
 __all__ = ("Session",)
 
 
-class Session:
+class Session(ComparesIDMixin, ComparesIDABC):
     __slots__ = ("_id", "_user", "_state", "_resource", "_connections")
 
     def __init__(
@@ -33,12 +34,6 @@ class Session:
         self._state = state if state is not None else State()
         self._resource = None
         self._connections = {}
-
-    def __hash__(self):
-        return hash(self._id)
-
-    def __eq__(self, other):
-        return isinstance(other, Session) and self._id == other._id
 
     @property
     def id(self) -> str:

@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
+from .bases import ComparesIDABC, ComparesIDMixin
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from typing import Any, Self
@@ -15,13 +17,8 @@ if TYPE_CHECKING:
 __all__ = ("ResourceABC", "ResourceMixin", "Resource")
 
 
-class ResourceABC(ABC):
+class ResourceABC(ComparesIDABC, ABC):
     __slots__ = ()
-
-    @property
-    @abstractmethod
-    def id(self) -> str:
-        pass
 
     @classmethod
     @abstractmethod
@@ -29,18 +26,12 @@ class ResourceABC(ABC):
         pass
 
 
-class ResourceMixin:
+class ResourceMixin(ComparesIDMixin):
     __slots__ = ()
 
     def __init__(self, session: Session | None = None, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self._session = session  # noqa
-
-    def __eq__(self, other):
-        return isinstance(other, Resource) and self.id == other.id  # noqa
-
-    def __hash__(self):
-        return hash(self.id)  # noqa
 
     @property
     def user(self) -> User | None:
@@ -81,7 +72,7 @@ class Resource(Protocol):
         raise TypeError("Inherit from (ResourceMixin, ResourceABC) instead.")
 
     @property
-    def id(self) -> str: ...
+    def id(self) -> Any: ...
     @property
     def user(self) -> User | None: ...
     @property

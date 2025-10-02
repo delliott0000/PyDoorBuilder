@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from secrets import token_urlsafe
 from typing import TYPE_CHECKING
 
+from .bases import ComparesIDABC, ComparesIDMixin
 from .utils import decode_datetime, encode_datetime, now
 
 if TYPE_CHECKING:
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
     ExpirationType = datetime | timedelta | float | str
 
 
-class Token:
+class Token(ComparesIDMixin, ComparesIDABC):
     __slots__ = (
         "_id",
         "_session",
@@ -46,12 +47,6 @@ class Token:
             refresh_expires=refresh_expires,
             force=True,
         )
-
-    def __hash__(self):
-        return hash(self._id)
-
-    def __eq__(self, other):
-        return isinstance(other, Token) and self._id == other._id
 
     @property
     def id(self) -> str:

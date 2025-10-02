@@ -16,8 +16,5 @@ __all__ = ("QuoteResource",)
 class QuoteResource(ResourceMixin, Quote, ResourceABC):
     __slots__ = ("_session",)
 
-    @property
-    def id(self) -> str: ...
-
     @classmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
