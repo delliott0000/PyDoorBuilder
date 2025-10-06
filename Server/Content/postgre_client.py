@@ -1,4 +1,4 @@
-from Common import PostgreSQLClient, User, check_password, encrypt_password
+from Common import PostgreSQLClient, Team, User, check_password, encrypt_password
 
 __all__ = ("ServerPostgreSQLClient",)
 
@@ -39,3 +39,9 @@ class ServerPostgreSQLClient(PostgreSQLClient):
             return None
 
         return User(user_record)
+
+    async def get_teams(self, team_ids: tuple[int, ...]) -> tuple[Team, ...]:
+        if not team_ids:
+            return ()
+
+        ...
