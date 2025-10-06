@@ -9,11 +9,21 @@ if TYPE_CHECKING:
 
     from asyncpg import Record
 
+    from .team import Team
+
 __all__ = ("User",)
 
 
 class User(ComparesIDMixin, ComparesIDABC):
-    __slots__ = ("_id", "_username", "_display_name", "_email", "_autopilot", "_admin")
+    __slots__ = (
+        "_id",
+        "_username",
+        "_display_name",
+        "_email",
+        "_autopilot",
+        "_admin",
+        "_teams",
+    )
 
     def __init__(self, user_record: Record | dict, /):
         self._id = user_record["id"]
@@ -22,6 +32,7 @@ class User(ComparesIDMixin, ComparesIDABC):
         self._email = user_record["email"]
         self._autopilot = user_record["autopilot"]
         self._admin = user_record["admin"]
+        self._teams = ...
 
     def __str__(self):
         return self._display_name or self._username
@@ -50,7 +61,12 @@ class User(ComparesIDMixin, ComparesIDABC):
     def admin(self) -> bool:
         return self._admin
 
+    @property
+    def teams(self) -> frozenset[Team]:
+        return self._teams
+
     def to_json(self) -> dict[str, Any]:
+        # TODO: add teams in here
         return {
             "id": self._id,
             "username": self._username,
