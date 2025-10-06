@@ -13,11 +13,12 @@ __all__ = ("Team",)
 
 
 class Team(ComparesIDMixin, ComparesIDABC):
-    __slots__ = ("_id", "_name", "_permissions")
+    __slots__ = ("_id", "_name", "_hierarchy_index", "_permissions")
 
     def __init__(self, team_record: Record | dict, permissions: frozenset[Permission], /):
         self._id = team_record["id"]
         self._name = team_record["name"]
+        self._hierarchy_index = team_record["hierarchy_index"]
         self._permissions = permissions
 
     def __str__(self):
@@ -30,6 +31,10 @@ class Team(ComparesIDMixin, ComparesIDABC):
     @property
     def name(self) -> str:
         return self._name
+
+    @property
+    def hierarchy_index(self) -> int:
+        return self._hierarchy_index
 
     @property
     def permissions(self) -> frozenset[Permission]:
