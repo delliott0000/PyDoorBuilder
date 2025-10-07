@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
     from asyncpg import Record
 
+    from .company import Company
     from .team import Team
 
 __all__ = ("User",)
@@ -64,6 +65,10 @@ class User(ComparesIDMixin, ComparesIDABC):
     @property
     def teams(self) -> frozenset[Team]:
         return self._teams
+
+    @property
+    def companies(self) -> frozenset[Company]:
+        return frozenset(team.company for team in self._teams)
 
     def to_json(self) -> dict[str, Any]:
         return {
