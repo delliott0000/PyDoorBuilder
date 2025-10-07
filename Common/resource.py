@@ -20,6 +20,11 @@ __all__ = ("ResourceABC", "ResourceMixin", "Resource")
 class ResourceABC(ComparesIDABC, ABC):
     __slots__ = ()
 
+    @property
+    @abstractmethod
+    def owner(self) -> User:
+        pass
+
     @classmethod
     @abstractmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self:
@@ -81,5 +86,7 @@ class Resource(Protocol):
     def release(
         self, session: Session | None = None, /, *, unconditional: bool = False
     ) -> None: ...
+    @property
+    def owner(self) -> User: ...
     @classmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
