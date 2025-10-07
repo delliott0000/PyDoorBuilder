@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 from .bases import ComparesIDABC, ComparesIDMixin
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from asyncpg import Record
 
     from .company import Company
@@ -84,3 +86,7 @@ class Team(ComparesIDMixin, ComparesIDABC):
             )
         )
         # fmt: on
+
+    def to_json(self) -> dict[str, Any]:
+        # TODO: fill this out
+        ...

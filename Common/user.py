@@ -66,7 +66,6 @@ class User(ComparesIDMixin, ComparesIDABC):
         return self._teams
 
     def to_json(self) -> dict[str, Any]:
-        # TODO: add teams in here
         return {
             "id": self._id,
             "username": self._username,
@@ -74,4 +73,5 @@ class User(ComparesIDMixin, ComparesIDABC):
             "email": self._email,
             "autopilot": self._autopilot,
             "admin": self._admin,
+            "teams": list(team.to_json() for team in self._teams),
         }
