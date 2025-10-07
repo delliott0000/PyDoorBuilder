@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     from asyncpg import Record
 
     from .company import Company
+    from .permissions import PermissionType
+    from .resource import Resource
     from .team import Team
 
 __all__ = ("User",)
@@ -69,6 +71,13 @@ class User(ComparesIDMixin, ComparesIDABC):
     @property
     def companies(self) -> frozenset[Company]:
         return frozenset(team.company for team in self._teams)
+
+    def highest_team_in(self, company: Company, /) -> Team | None:
+        return max((team for team in self._teams if team.company == company), default=None)
+
+    def has_permission_for(
+        self, permission_type: PermissionType, resource: Resource, /
+    ) -> bool: ...
 
     def to_json(self) -> dict[str, Any]:
         return {
