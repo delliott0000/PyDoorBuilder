@@ -1,4 +1,5 @@
 from .bases import *
+from .company import *
 from .config import *
 from .door import *
 from .enums import *

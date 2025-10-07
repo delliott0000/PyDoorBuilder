@@ -24,19 +24,16 @@ class PermissionScope(Enum):
 
     __rank__ = {safe: 0, company: 1, universal: 2}
 
-    def __lt__(self, other):
+    def __check_null__(self, other):
         if not isinstance(other, PermissionScope):
             return NotImplemented
-        elif self.value is None or other.value is None:
-            return True
-        return self.__rank__[self.value] < self.__rank__[other.value]  # noqa
+        return self.value is None or other.value is None
+
+    def __lt__(self, other):
+        return self.__check_null__(other) or self.__rank__[self.value] < self.__rank__[other.value]  # noqa
 
     def __gt__(self, other):
-        if not isinstance(other, PermissionScope):
-            return NotImplemented
-        elif self.value is None or other.value is None:
-            return True
-        return self.__rank__[self.value] > self.__rank__[other.value]  # noqa
+        return self.__check_null__(other) or self.__rank__[self.value] > self.__rank__[other.value]  # noqa
 
 
 @dataclass(kw_only=True, slots=True, frozen=True)
