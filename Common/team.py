@@ -32,6 +32,25 @@ class Team(ComparesIDMixin, ComparesIDABC):
     def __str__(self):
         return self._name
 
+    def __lt__(self, other):
+        return self.__comparison_check__(other) or self.hierarchy_index < other.hierarchy_index
+
+    def __gt__(self, other):
+        return self.__comparison_check__(other) or self.hierarchy_index > other.hierarchy_index
+
+    def __le__(self, other):
+        return self.__comparison_check__(other) or self.hierarchy_index <= other.hierarchy_index
+
+    def __ge__(self, other):
+        return self.__comparison_check__(other) or self.hierarchy_index >= other.hierarchy_index
+
+    def __comparison_check__(self, other):
+        if not isinstance(other, Team):
+            return NotImplemented
+        elif self.company != other.company:
+            raise RuntimeError("Cannot compare two teams from different companies.")
+        return False
+
     @property
     def id(self) -> int:
         return self._id
