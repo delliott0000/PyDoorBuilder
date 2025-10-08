@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .bases import ComparesIDABC, ComparesIDMixin
+from .permissions import Permission, PermissionScope
 
 if TYPE_CHECKING:
     from typing import Any
@@ -77,7 +78,11 @@ class User(ComparesIDMixin, ComparesIDABC):
 
     def has_permission_for(
         self, permission_type: PermissionType, resource: Resource, /
-    ) -> bool: ...
+    ) -> bool:
+        if self.admin:
+            return True
+
+        ...
 
     def to_json(self) -> dict[str, Any]:
         return {
