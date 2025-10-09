@@ -79,10 +79,44 @@ class User(ComparesIDMixin, ComparesIDABC):
     def has_permission_for(
         self, permission_type: PermissionType, resource: Resource, /
     ) -> bool:
-        if self.admin:
+        if self._admin:
             return True
 
-        ...
+        owner = resource.owner
+        shared_companies = self.companies.intersection(owner.companies)
+
+        if any(
+            team.has_permission(
+                Permission(type=permission_type, scope=PermissionScope.universal)
+            )
+            for team in self._teams
+        ):
+            return True
+
+        elif not shared_companies:
+            return False
+
+        elif any(
+            team.company in shared_companies
+            and team.has_permission(
+                Permission(type=permission_type, scope=PermissionScope.company)
+            )
+            for team in self._teams
+        ):
+            return True
+
+        elif any(
+            team.company in shared_companies
+            and team >= owner.highest_team_in(team.company)
+            and team.has_permission(
+                Permission(type=permission_type, scope=PermissionScope.safe)
+            )
+            for team in self._teams
+        ):
+            return True
+
+        else:
+            return False
 
     def to_json(self) -> dict[str, Any]:
         return {
