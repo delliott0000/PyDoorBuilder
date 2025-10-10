@@ -36,7 +36,7 @@ class User(ComparesIDMixin, ComparesIDABC):
         self._email = user_record["email"]
         self._autopilot = user_record["autopilot"]
         self._admin = user_record["admin"]
-        self._teams = ...
+        self._teams = frozenset()
 
     def __str__(self):
         return self._display_name or self._username
