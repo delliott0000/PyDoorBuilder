@@ -1,5 +1,11 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any
 
 __all__ = ("PermissionType", "PermissionScope", "Permission")
 
@@ -40,3 +46,9 @@ class PermissionScope(Enum):
 class Permission:
     type:  PermissionType
     scope: PermissionScope
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "type": self.type.value,
+            "scope": self.scope.value,
+        }
