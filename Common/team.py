@@ -88,5 +88,10 @@ class Team(ComparesIDMixin, ComparesIDABC):
         # fmt: on
 
     def to_json(self) -> dict[str, Any]:
-        # TODO: fill this out
-        ...
+        return {
+            "id": self._id,
+            "name": self._name,
+            "hierarchy_index": self._hierarchy_index,
+            "company": self._company.to_json(),
+            "permissions": list(permission.to_json() for permission in self._permissions),
+        }
