@@ -38,7 +38,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         elif with_password and not check_password(password, user_record["password"]):
             return None
 
-        return User(user_record)
+        return User(user_record, frozenset())
 
     async def get_teams(self, team_ids: tuple[int, ...]) -> tuple[Team, ...]:
         if not team_ids:

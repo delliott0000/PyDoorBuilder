@@ -29,14 +29,14 @@ class User(ComparesIDMixin, ComparesIDABC):
         "_teams",
     )
 
-    def __init__(self, user_record: Record | dict, /):
+    def __init__(self, user_record: Record | dict, teams: frozenset[Team], /):
         self._id = user_record["id"]
         self._username = user_record["username"]
         self._display_name = user_record["display_name"]
         self._email = user_record["email"]
         self._autopilot = user_record["autopilot"]
         self._admin = user_record["admin"]
-        self._teams = frozenset()
+        self._teams = teams
 
     def __str__(self):
         return self._display_name or self._username
