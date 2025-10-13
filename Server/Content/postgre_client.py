@@ -40,8 +40,8 @@ class ServerPostgreSQLClient(PostgreSQLClient):
 
         return User(user_record, frozenset())
 
-    async def get_teams(self, team_ids: tuple[int, ...]) -> tuple[Team, ...]:
+    async def get_teams(self, team_ids: tuple[int, ...]) -> frozenset[Team]:
         if not team_ids:
-            return ()
+            return frozenset()
 
         ...
