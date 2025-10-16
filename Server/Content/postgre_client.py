@@ -50,4 +50,9 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         if not team_ids:
             return frozenset()
 
+        team_records = await self.fetch_all("SELECT * FROM teams WHERE id = ANY($1)", team_ids)
+
+        if not team_records:
+            return frozenset()
+
         ...
