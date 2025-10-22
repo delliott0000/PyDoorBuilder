@@ -1,4 +1,20 @@
-from Common import PostgreSQLClient, Team, User, check_password, encrypt_password
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from Common import (
+    Permission,
+    PermissionScope,
+    PermissionType,
+    PostgreSQLClient,
+    Team,
+    User,
+    check_password,
+    encrypt_password,
+)
+
+if TYPE_CHECKING:
+    from asyncpg import Record
 
 __all__ = ("ServerPostgreSQLClient",)
 
@@ -38,21 +54,10 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         elif with_password and not check_password(password, user_record["password"]):
             return None
 
-        team_assignment_records = await self.fetch_all(
-            "SELECT team_id FROM team_assignments WHERE user_id = $1", user_record["id"]
-        )
-        team_ids = (record["team_id"] for record in team_assignment_records)
-        teams = await self.get_teams(*team_ids)
+        return User(user_record, frozenset())
 
-        return User(user_record, teams)
+    async def get_team_records(self, *team_ids: int) -> dict[int, Record]: ...
 
-    async def get_teams(self, *team_ids: int) -> frozenset[Team]:
-        if not team_ids:
-            return frozenset()
+    async def get_company_records(self, *company_ids: int) -> dict[int, Record]: ...
 
-        team_records = await self.fetch_all("SELECT * FROM teams WHERE id = ANY($1)", team_ids)
-
-        if not team_records:
-            return frozenset()
-
-        ...
+    async def get_permission_records(self, *team_ids: int) -> dict[int, list[Record]]: ...
