@@ -58,19 +58,13 @@ class ServerPostgreSQLClient(PostgreSQLClient):
 
         team_assignments = await self.get_assignments(user_record["id"])
         team_ids = team_assignments.get(user_record["id"], [])
-        teams = await self.build_teams(*team_ids)
+        teams = await self.get_teams(*team_ids)
 
         return User(user_record, teams)
 
-    async def build_teams(self, *team_ids: int) -> frozenset[Team]:
+    async def get_teams(self, *team_ids: int) -> frozenset[Team]:
         if not team_ids:
             return frozenset()
-
-        ...
-
-    async def get_team_records(self, *team_ids: int) -> dict[int, Record]:
-        if not team_ids:
-            return {}
 
         ...
 
