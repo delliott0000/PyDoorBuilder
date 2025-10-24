@@ -54,10 +54,20 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         elif with_password and not check_password(password, user_record["password"]):
             return None
 
-        return User(user_record, frozenset())
+        team_assignments = await self.get_assignments(user_record["id"])
+        team_ids = team_assignments.get(user_record["id"], [])
+        teams = await self.build_teams(*team_ids)
+
+        return User(user_record, teams)
+
+    async def build_teams(self, *team_ids: int) -> frozenset[Team]: ...
 
     async def get_team_records(self, *team_ids: int) -> dict[int, Record]: ...
 
     async def get_company_records(self, *company_ids: int) -> dict[int, Record]: ...
 
     async def get_permission_records(self, *team_ids: int) -> dict[int, list[Record]]: ...
+
+    async def get_assignments(
+        self, *ids: int, inverse: bool = False
+    ) -> dict[int, list[int]]: ...
