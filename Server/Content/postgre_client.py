@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import TYPE_CHECKING
 
 from Common import (
@@ -68,6 +69,20 @@ class ServerPostgreSQLClient(PostgreSQLClient):
 
     async def get_permission_records(self, *team_ids: int) -> dict[int, list[Record]]: ...
 
-    async def get_assignments(
-        self, *ids: int, inverse: bool = False
-    ) -> dict[int, list[int]]: ...
+    async def get_assignments(self, *ids: int, inverse: bool = False) -> dict[int, list[int]]:
+        if not ids:
+            return {}
+
+        key_map = {False: "user_id", True: "team_id"}
+        key = key_map[inverse]
+        val = key_map[not inverse]
+
+        assignment_records = await self.fetch_all(
+            f"SELECT * FROM team_assignments WHERE {key} = ANY($1)", ids
+        )
+        assignments = defaultdict(list)
+
+        for record in assignment_records:
+            assignments[record[key]].append(record[val])
+
+        return dict(assignments)
