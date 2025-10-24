@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 from collections import defaultdict
-from typing import TYPE_CHECKING
 
 from Common import (
     Company,
@@ -14,9 +11,6 @@ from Common import (
     check_password,
     encrypt_password,
 )
-
-if TYPE_CHECKING:
-    from asyncpg import Record
 
 __all__ = ("ServerPostgreSQLClient",)
 
@@ -60,11 +54,11 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         team_ids = team_assignments.get(user_record["id"], [])
         teams = await self.get_teams(*team_ids)
 
-        return User(user_record, teams)
+        return User(user_record, frozenset(teams.values()))
 
-    async def get_teams(self, *team_ids: int) -> frozenset[Team]:
+    async def get_teams(self, *team_ids: int) -> dict[int, Team]:
         if not team_ids:
-            return frozenset()
+            return {}
 
         ...
 
