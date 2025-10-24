@@ -80,11 +80,24 @@ class ServerPostgreSQLClient(PostgreSQLClient):
 
         ...
 
-    async def get_permission_records(self, *team_ids: int) -> dict[int, list[Record]]:
+    async def get_permissions(self, *team_ids: int) -> dict[int, list[Permission]]:
         if not team_ids:
             return {}
 
-        ...
+        permission_records = await self.fetch_all(
+            "SELECT * FROM team_permissions WHERE team_id = ANY($1)", team_ids
+        )
+        permissions = defaultdict(list)
+
+        for record in permission_records:
+            permissions[record["team_id"]].append(
+                Permission(
+                    type=PermissionType(record["permission_type"]),
+                    scope=PermissionScope(record["permission_scope"]),
+                )
+            )
+
+        return dict(permissions)
 
     async def get_assignments(self, *ids: int, inverse: bool = False) -> dict[int, list[int]]:
         if not ids:
