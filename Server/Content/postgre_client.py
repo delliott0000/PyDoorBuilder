@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from asyncio import gather
 from typing import TYPE_CHECKING
 
 from Common import (
@@ -81,9 +82,20 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         if not team_ids:
             return {}
 
-        ...
+        team_records = await self.fetch_all("SELECT * FROM teams WHERE id = ANY($1)", team_ids)
 
-        teams = {}
+        company_ids = tuple(record["company_id"] for record in team_records)
+
+        companies, permissions = await gather(
+            self.get_companies(*company_ids), self.get_permissions(*team_ids)
+        )
+
+        teams = {
+            record["id"]: Team(
+                record, companies[record["company_id"]], frozenset(permissions[record["id"]])
+            )
+            for record in team_records
+        }
         self.validate_ids(team_ids, teams.keys(), context="team")
 
         return teams
