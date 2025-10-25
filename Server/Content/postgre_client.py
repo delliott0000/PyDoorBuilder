@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from Common import (
     Company,
     Permission,
@@ -79,7 +77,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         permission_records = await self.fetch_all(
             "SELECT * FROM team_permissions WHERE team_id = ANY($1)", team_ids
         )
-        permissions = defaultdict(list)
+        permissions = {id_: [] for id_ in team_ids}
 
         for record in permission_records:
             permissions[record["team_id"]].append(
@@ -89,7 +87,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
                 )
             )
 
-        return dict(permissions)
+        return permissions
 
     async def get_assignments(self, *ids: int, inverse: bool = False) -> dict[int, list[int]]:
         if not ids:
@@ -102,9 +100,9 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         assignment_records = await self.fetch_all(
             f"SELECT * FROM team_assignments WHERE {key} = ANY($1)", ids
         )
-        assignments = defaultdict(list)
+        assignments = {id_: [] for id_ in ids}
 
         for record in assignment_records:
             assignments[record[key]].append(record[val])
 
-        return dict(assignments)
+        return assignments
