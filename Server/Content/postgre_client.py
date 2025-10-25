@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from Common import (
     Company,
     Permission,
@@ -10,6 +14,9 @@ from Common import (
     encrypt_password,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 __all__ = ("ServerPostgreSQLClient",)
 
 
@@ -17,6 +24,22 @@ DUMMY_HASH = encrypt_password("my_dummy_password")
 
 
 class ServerPostgreSQLClient(PostgreSQLClient):
+    def validate_ids(
+        self,
+        passed_ids: Iterable[int],
+        found_ids: Iterable[int],
+        /,
+        *,
+        context: str | None = None,
+    ) -> None:
+        missing_ids = set(passed_ids) - set(found_ids)
+        if missing_ids:
+            formatted_missing_ids = ", ".join(map(str, sorted(missing_ids)))
+            formatted_context = context or "item"
+            raise ValueError(
+                f"Some of the requested {formatted_context} IDs were not found: {formatted_missing_ids}"
+            )
+
     async def new_id(self) -> int:
         record = await self.fetch_one("INSERT INTO ids DEFAULT VALUES RETURNING id")
         return record["id"]
@@ -60,7 +83,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
 
         teams = {}
 
-        ...
+        self.validate_ids(team_ids, teams.keys(), context="team")
 
         return teams
 
@@ -73,7 +96,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         )
         companies = {record["id"]: Company(record) for record in company_records}
 
-        ...
+        self.validate_ids(company_ids, companies.keys(), context="company")
 
         return companies
 
