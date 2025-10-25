@@ -97,14 +97,13 @@ class AuthService(BaseService):
     async def login(self, request: Request, /) -> Response:
         data = await to_json(request)
 
-        try:
-            username = data["username"]
-            password = data["password"]
-            user = await self.server.db.get_user(username=username, password=password)
+        username = data.get("username")
+        password = data.get("password")
 
-        except (KeyError, ValueError):
-            raise HTTPBadRequest(reason="Missing username/password")
+        if not isinstance(username, str) or not isinstance(password, str):
+            raise HTTPBadRequest(reason="Missing or invalid username/password")
 
+        user = await self.server.db.get_user(username=username, password=password)
         if user is None:
             raise HTTPUnauthorized(reason="Incorrect username/password")
 
