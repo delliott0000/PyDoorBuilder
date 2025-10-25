@@ -58,7 +58,11 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         if not team_ids:
             return {}
 
+        teams = {}
+
         ...
+
+        return teams
 
     async def get_companies(self, *company_ids: int) -> dict[int, Company]:
         if not company_ids:
@@ -67,8 +71,11 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         company_records = await self.fetch_all(
             "SELECT * FROM companies WHERE id = ANY($1)", company_ids
         )
+        companies = {record["id"]: Company(record) for record in company_records}
 
-        return {record["id"]: Company(record) for record in company_records}
+        ...
+
+        return companies
 
     async def get_permissions(self, *team_ids: int) -> dict[int, list[Permission]]:
         if not team_ids:
