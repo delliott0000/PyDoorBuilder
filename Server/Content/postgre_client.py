@@ -81,8 +81,9 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         if not team_ids:
             return {}
 
-        teams = {}
+        ...
 
+        teams = {}
         self.validate_ids(team_ids, teams.keys(), context="team")
 
         return teams
@@ -94,8 +95,8 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         company_records = await self.fetch_all(
             "SELECT * FROM companies WHERE id = ANY($1)", company_ids
         )
-        companies = {record["id"]: Company(record) for record in company_records}
 
+        companies = {record["id"]: Company(record) for record in company_records}
         self.validate_ids(company_ids, companies.keys(), context="company")
 
         return companies
@@ -107,6 +108,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         permission_records = await self.fetch_all(
             "SELECT * FROM team_permissions WHERE team_id = ANY($1)", team_ids
         )
+
         permissions = {id_: [] for id_ in team_ids}
 
         for record in permission_records:
@@ -130,6 +132,7 @@ class ServerPostgreSQLClient(PostgreSQLClient):
         assignment_records = await self.fetch_all(
             f"SELECT * FROM team_assignments WHERE {key} = ANY($1)", ids
         )
+
         assignments = {id_: [] for id_ in ids}
 
         for record in assignment_records:
