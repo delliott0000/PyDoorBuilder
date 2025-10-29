@@ -30,6 +30,10 @@ class ResourceABC(ComparesIDABC, ABC):
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self:
         pass
 
+    @abstractmethod
+    def to_json(self) -> dict[str, Any]:
+        pass
+
 
 class ResourceMixin(ComparesIDMixin):
     __slots__ = ()
@@ -90,3 +94,4 @@ class Resource(Protocol):
     def owner(self) -> User: ...
     @classmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
+    def to_json(self) -> dict[str, Any]: ...

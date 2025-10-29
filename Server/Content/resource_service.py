@@ -3,7 +3,7 @@ from __future__ import annotations
 from asyncio import gather
 from typing import TYPE_CHECKING
 
-from aiohttp.web import HTTPNotFound
+from aiohttp.web import HTTPNotFound, json_response
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
@@ -36,6 +36,15 @@ class ResourceService(BaseService):
                 },
             }
         }
+
+    def ok_response(self, resource: Resource, /) -> Response:
+        return json_response(
+            {
+                "message": "Ok",
+                "resource": resource.to_json(),
+            },
+            status=200,
+        )
 
     async def run_executor(
         self, rid: str, key: str, executor: dict[str, Any], /
