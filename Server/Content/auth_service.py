@@ -81,15 +81,12 @@ class AuthService(BaseService):
             except KeyError:
                 continue
 
-            cons = session.connections
-            user = session.user
-
-            if not cons:
+            if not session.connected:
                 session.release_resource()
 
-            if user not in user_to_tokens:
+            if session.user not in user_to_tokens:
                 session_id_to_session.pop(session_id, None)
-                log(f"Session discarded for user {user}. (Session ID: {session_id})")
+                log(f"Session discarded for {session.user}. (Session ID: {session_id})")
 
     @route("post", "/auth/login")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.IP)

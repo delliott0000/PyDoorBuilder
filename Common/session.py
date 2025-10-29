@@ -55,6 +55,10 @@ class Session(ComparesIDMixin, ComparesIDABC):
     def connections(self) -> dict[Token, WebSocketResponse]:
         return self._connections
 
+    @property
+    def connected(self) -> bool:
+        return bool(self._connections)
+
     def acquire_resource(self, resource: Resource, /) -> None:
         if self._resource is None:
             resource.acquire(self)
