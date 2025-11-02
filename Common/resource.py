@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from .bases import ComparesIDABC, ComparesIDMixin
+from .errors import ResourceLocked, ResourceNotOwned
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -55,7 +56,7 @@ class ResourceMixin(ComparesIDMixin):
 
     def acquire(self, session: Session, /) -> None:
         if self.locked:
-            raise RuntimeError("Cannot acquire a locked resource.")
+            raise ResourceLocked(session, self)  # noqa
         else:
             self._session = session  # noqa
 
@@ -65,7 +66,7 @@ class ResourceMixin(ComparesIDMixin):
         if not self.locked:
             return
         elif not unconditional and self._session != session:
-            raise RuntimeError("Cannot release a resource locked by another session.")
+            raise ResourceNotOwned(session, self)  # noqa
         else:
             self._session = None  # noqa
 

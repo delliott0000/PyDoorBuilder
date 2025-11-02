@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .bases import ComparesIDABC, ComparesIDMixin
+from .errors import SessionBound
 from .state import State
 from .utils import log
 
@@ -52,6 +53,10 @@ class Session(ComparesIDMixin, ComparesIDABC):
         return self._resource
 
     @property
+    def bound(self) -> bool:
+        return self._resource is not None
+
+    @property
     def connections(self) -> dict[Token, WebSocketResponse]:
         return self._connections
 
@@ -60,15 +65,15 @@ class Session(ComparesIDMixin, ComparesIDABC):
         return bool(self._connections)
 
     def acquire_resource(self, resource: Resource, /) -> None:
-        if self._resource is None:
+        if not self.bound:
             resource.acquire(self)
             log(f"{self._user} acquired {resource.id}. (Session ID: {self._id})")
             self._resource = resource
         else:
-            raise RuntimeError("Session has already acquired a resource.")
+            raise SessionBound(self, resource)
 
     def release_resource(self) -> None:
-        if self._resource is not None:
+        if self.bound:
             self._resource.release(self)
             log(f"{self._user} released {self._resource.id}. (Session ID: {self._id})")
             self._resource = None
