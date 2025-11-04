@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from .session import Session
     from .user import User
 
+    Json = dict[str, Any]
+
 __all__ = ("ResourceABC", "ResourceMixin", "Resource")
 
 
@@ -32,7 +34,7 @@ class ResourceABC(ComparesIDABC, ABC):
         pass
 
     @abstractmethod
-    def to_json(self) -> dict[str, Any]:
+    def to_json(self) -> Json:
         pass
 
 
@@ -95,4 +97,4 @@ class Resource(Protocol):
     def owner(self) -> User: ...
     @classmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
-    def to_json(self) -> dict[str, Any]: ...
+    def to_json(self) -> Json: ...
