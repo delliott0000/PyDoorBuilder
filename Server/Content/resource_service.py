@@ -39,7 +39,13 @@ class ResourceService(BaseService):
             }
         }
 
-    def ok_response(self, resource: Resource, /, *, version: ResourceJSONVersion) -> Response:
+    def ok_response(
+        self,
+        resource: Resource,
+        /,
+        *,
+        version: ResourceJSONVersion = ResourceJSONVersion.metadata,
+    ) -> Response:
         return json_response(
             {
                 "message": "Ok",
