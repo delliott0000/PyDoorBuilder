@@ -43,7 +43,7 @@ class ResourceService(BaseService):
         return json_response(
             {
                 "message": "Ok",
-                "resource": resource.to_json(version=ResourceJSONVersion.metadata),
+                "resource": resource.metadata(),
             },
             status=200,
         )
