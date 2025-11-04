@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPNotFound, json_response
 
-from Common import ResourceJSONVersion
-
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
 from .resource_types import QuoteResource
