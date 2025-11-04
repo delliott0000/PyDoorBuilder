@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPNotFound, json_response
 
+from Common import ResourceJSONVersion
+
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
 from .resource_types import QuoteResource
@@ -37,11 +39,11 @@ class ResourceService(BaseService):
             }
         }
 
-    def ok_response(self, resource: Resource, /) -> Response:
+    def ok_response(self, resource: Resource, /, *, version: ResourceJSONVersion) -> Response:
         return json_response(
             {
                 "message": "Ok",
-                "resource": resource.metadata(),
+                "resource": resource.to_json(version=version),
             },
             status=200,
         )

@@ -81,15 +81,6 @@ class ResourceMixin(ComparesIDMixin):
         else:
             self._session = None  # noqa
 
-    def metadata(self) -> Json:
-        return self.to_json(version=ResourceJSONVersion.metadata)  # noqa
-
-    def preview(self) -> Json:
-        return self.to_json(version=ResourceJSONVersion.preview)  # noqa
-
-    def view(self) -> Json:
-        return self.to_json(version=ResourceJSONVersion.view)  # noqa
-
 
 @runtime_checkable
 class Resource(Protocol):
@@ -116,6 +107,3 @@ class Resource(Protocol):
     @classmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
     def to_json(self, *, version: ResourceJSONVersion) -> Json: ...
-    def metadata(self) -> Json: ...
-    def preview(self) -> Json: ...
-    def view(self) -> Json: ...
