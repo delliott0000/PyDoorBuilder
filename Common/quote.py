@@ -7,6 +7,7 @@ from .bases import ComparesIDABC, ComparesIDMixin
 if TYPE_CHECKING:
     from typing import Any
 
+    from .resource import ResourceJSONVersion
     from .user import User
 
 __all__ = ("Quote",)
@@ -24,4 +25,4 @@ class Quote(ComparesIDMixin, ComparesIDABC):
     @property
     def owner(self) -> User: ...
 
-    def to_json(self) -> dict[str, Any]: ...
+    def to_json(self, *, version: ResourceJSONVersion) -> dict[str, Any]: ...

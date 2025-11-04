@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from .bases import ComparesIDABC, ComparesIDMixin
@@ -17,7 +18,15 @@ if TYPE_CHECKING:
 
     Json = dict[str, Any]
 
-__all__ = ("ResourceABC", "ResourceMixin", "Resource")
+__all__ = ("ResourceJSONVersion", "ResourceABC", "ResourceMixin", "Resource")
+
+
+# fmt: off
+class ResourceJSONVersion(Enum):
+    metadata = 0
+    preview  = 1
+    view     = 2
+# fmt: on
 
 
 class ResourceABC(ComparesIDABC, ABC):
@@ -34,7 +43,7 @@ class ResourceABC(ComparesIDABC, ABC):
         pass
 
     @abstractmethod
-    def to_json(self) -> Json:
+    def to_json(self, *, version: ResourceJSONVersion) -> Json:
         pass
 
 
@@ -72,6 +81,15 @@ class ResourceMixin(ComparesIDMixin):
         else:
             self._session = None  # noqa
 
+    def metadata(self) -> Json:
+        return self.to_json(version=ResourceJSONVersion.metadata)  # noqa
+
+    def preview(self) -> Json:
+        return self.to_json(version=ResourceJSONVersion.preview)  # noqa
+
+    def view(self) -> Json:
+        return self.to_json(version=ResourceJSONVersion.view)  # noqa
+
 
 @runtime_checkable
 class Resource(Protocol):
@@ -97,4 +115,7 @@ class Resource(Protocol):
     def owner(self) -> User: ...
     @classmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
-    def to_json(self) -> Json: ...
+    def to_json(self, *, version: ResourceJSONVersion) -> Json: ...
+    def metadata(self) -> Json: ...
+    def preview(self) -> Json: ...
+    def view(self) -> Json: ...
