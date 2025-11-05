@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPConflict, HTTPForbidden, HTTPNotFound, json_response
 
-from Common import PermissionType, ResourceJSONVersion, ResourceLocked, SessionBound
+from Common import (
+    PermissionType,
+    ResourceJSONVersion,
+    ResourceLocked,
+    ResourceNotOwned,
+    SessionBound,
+)
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
@@ -114,13 +120,13 @@ class ResourceService(BaseService):
 
         try:
             session.acquire_resource(resource)
-        except SessionBound as error:
-            raise self.attach_extra_data(
-                HTTPConflict(reason=str(error).strip(".")), {"session": session.to_json()}
-            )
         except ResourceLocked as error:
             raise self.attach_extra_data(
                 HTTPConflict(reason=str(error).strip(".")), {"locked_by": str(resource.user)}
+            )
+        except SessionBound as error:
+            raise self.attach_extra_data(
+                HTTPConflict(reason=str(error).strip(".")), {"session": session.to_json()}
             )
 
         return self.ok_response(resource)
@@ -130,4 +136,14 @@ class ResourceService(BaseService):
     @user_only
     @validate_access
     async def release(self, request: Request, /) -> Response:
-        pass
+        resource = await self.load_resource(request)
+        session = self.session_from_request(request)
+
+        try:
+            resource.release(session)
+        except ResourceNotOwned as error:
+            raise self.attach_extra_data(
+                HTTPConflict(reason=str(error).strip(".")), {"session": session.to_json()}
+            )
+
+        return self.ok_response(resource)
