@@ -23,10 +23,16 @@ __all__ = ("middlewares",)
 async def json_wrapper(request: Request, handler: Handler) -> Response:
     try:
         return await handler(request)
+
     except HTTPException as error:
         headers = CIMultiDict(error.headers or {})
         headers.pop("Content-Type", None)
-        return json_response({"message": error.reason}, status=error.status, headers=headers)
+
+        payload = {"message": error.reason}
+        payload.update(getattr(error, "_extra_data", {}))
+
+        return json_response(payload, status=error.status, headers=headers)
+
     except Exception as error:
         log(f"An error occurred whilst processing a request - {error}", ERROR)
         return json_response({"message": "Internal server error"}, status=500)

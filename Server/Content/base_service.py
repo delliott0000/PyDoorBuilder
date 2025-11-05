@@ -15,7 +15,7 @@ from .decorators import ensure_meta
 
 if TYPE_CHECKING:
     from asyncio import Task
-    from typing import Self
+    from typing import Any, Self
 
     from aiohttp.web import Request
 
@@ -173,3 +173,12 @@ class BaseService(ABC):
                 log(
                     f"Registered listener: {method.upper()} {endpoint} -> {type(self).__name__}.{func_name}()"
                 )
+
+    def attach_extra_data(self, exception: Exception, data: dict[str, Any], /) -> None:
+        attr = "_extra_data"
+        existing_data = getattr(exception, attr, None)
+
+        if existing_data is None:
+            setattr(exception, attr, dict(data))
+        else:
+            existing_data.update(data)
