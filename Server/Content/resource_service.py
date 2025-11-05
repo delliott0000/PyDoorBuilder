@@ -3,9 +3,9 @@ from __future__ import annotations
 from asyncio import gather
 from typing import TYPE_CHECKING
 
-from aiohttp.web import HTTPNotFound, json_response
+from aiohttp.web import HTTPConflict, HTTPForbidden, HTTPNotFound, json_response
 
-from Common import ResourceJSONVersion
+from Common import PermissionType, ResourceJSONVersion, ResourceLocked, SessionBound
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
@@ -103,7 +103,27 @@ class ResourceService(BaseService):
     @user_only
     @validate_access
     async def acquire(self, request: Request, /) -> Response:
-        pass
+        resource = await self.load_resource(request)
+        session = self.session_from_request(request)
+
+        if not session.user.has_permission_for(PermissionType.acquire, resource):
+            raise self.attach_extra_data(
+                HTTPForbidden(reason="Missing required permission(s)"),
+                {"permission": "acquire"},
+            )
+
+        try:
+            session.acquire_resource(resource)
+        except SessionBound as error:
+            raise self.attach_extra_data(
+                HTTPConflict(reason=str(error).strip(".")), {"session": session.to_json()}
+            )
+        except ResourceLocked as error:
+            raise self.attach_extra_data(
+                HTTPConflict(reason=str(error).strip(".")), {"locked_by": str(resource.user)}
+            )
+
+        return self.ok_response(resource)
 
     @route("post", "/resource/release")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
