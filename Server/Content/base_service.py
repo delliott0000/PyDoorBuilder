@@ -15,13 +15,15 @@ from .decorators import ensure_meta
 
 if TYPE_CHECKING:
     from asyncio import Task
-    from typing import Any, Self
+    from typing import Any, Self, TypeVar
 
     from aiohttp.web import Request
 
     from Common import Session, Token, User
 
     from .server import Server
+
+    ExceptionT = TypeVar("ExceptionT", bound=Exception)
 
 __all__ = ("BaseService",)
 
@@ -174,7 +176,7 @@ class BaseService(ABC):
                     f"Registered listener: {method.upper()} {endpoint} -> {type(self).__name__}.{func_name}()"
                 )
 
-    def attach_extra_data(self, exception: Exception, data: dict[str, Any], /) -> None:
+    def attach_extra_data(self, exception: ExceptionT, data: dict[str, Any], /) -> ExceptionT:
         attr = "_extra_data"
         existing_data = getattr(exception, attr, None)
 
@@ -182,3 +184,5 @@ class BaseService(ABC):
             setattr(exception, attr, dict(data))
         else:
             existing_data.update(data)
+
+        return exception
