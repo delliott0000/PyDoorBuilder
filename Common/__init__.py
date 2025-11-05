@@ -17,4 +17,3 @@ from .team import *
 from .token import *
 from .user import *
 from .utils import *
-from .websocket_client import *
