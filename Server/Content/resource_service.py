@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
     from aiohttp.web import Request, Response
 
-    from Common import Resource
+    from Common import Resource, User
 
 __all__ = ("ResourceService",)
 
@@ -59,6 +59,15 @@ class ResourceService(BaseService):
             },
             status=200,
         )
+
+    def permission_check(
+        self, user: User, resource: Resource, permission_type: PermissionType, /
+    ) -> None:
+        if not user.has_permission_for(permission_type, resource):
+            raise self.attach_extra_data(
+                HTTPForbidden(reason="Missing required permission"),
+                {"permission": permission_type.value},
+            )
 
     async def run_executor(
         self, rid: str, key: str, executor: dict[str, Any], /
@@ -112,11 +121,7 @@ class ResourceService(BaseService):
         resource = await self.load_resource(request)
         session = self.session_from_request(request)
 
-        if not session.user.has_permission_for(PermissionType.acquire, resource):
-            raise self.attach_extra_data(
-                HTTPForbidden(reason="Missing required permission(s)"),
-                {"permission": "acquire"},
-            )
+        self.permission_check(session.user, resource, PermissionType.acquire)
 
         try:
             session.acquire_resource(resource)
@@ -138,6 +143,8 @@ class ResourceService(BaseService):
     async def release(self, request: Request, /) -> Response:
         resource = await self.load_resource(request)
         session = self.session_from_request(request)
+
+        # No permission checks necessary
 
         try:
             resource.release(session)
