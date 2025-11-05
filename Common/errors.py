@@ -38,7 +38,7 @@ class ValidationError(Exception):
 class ResourceConflict(Exception):
     def __init__(self, session: Session, resource: Resource, *args: Any):
         super().__init__(*args)
-        self.session: Session = session  # The requesting session
+        self.session: Session = session  # The *requesting* session
         self.resource: Resource = resource  # The *requested* resource
 
 
