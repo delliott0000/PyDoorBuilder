@@ -125,7 +125,7 @@ class ResourceService(BaseService):
 
         return self.ok_response(resource)
 
-    @route("post", "/resource/release")
+    @route("post", "/resource/{rtype}/{rid}/release")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
     @user_only
     @validate_access
