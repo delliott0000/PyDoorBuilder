@@ -91,5 +91,5 @@ class Session(ComparesIDMixin, ComparesIDABC):
             "id": self._id,
             "user": self._user.to_json(),
             "state": self._state.to_json(),
-            "resource_id": resource,
+            "resource": resource,
         }
