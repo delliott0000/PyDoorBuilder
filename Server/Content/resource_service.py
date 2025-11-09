@@ -163,3 +163,29 @@ class ResourceService(BaseService):
             raise self.convert_conflict(error, {"session": session.to_json()})
 
         return self.ok_response(resource)
+
+    @route("get", "/resource/{rtype}/{rid}/preview")
+    @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
+    @user_only
+    @validate_access
+    async def preview(self, request: Request, /) -> Response:
+        resource = await self.load_resource(request)
+        session = self.session_from_request(request)
+
+        self.permission_check(session.user, resource, PermissionType.preview)
+        self.acquisition_check(session, resource)
+
+        return self.ok_response(resource, version=ResourceJSONVersion.preview)
+
+    @route("get", "/resource/{rtype}/{rid}/view")
+    @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
+    @user_only
+    @validate_access
+    async def view(self, request: Request, /) -> Response:
+        resource = await self.load_resource(request)
+        session = self.session_from_request(request)
+
+        self.permission_check(session.user, resource, PermissionType.view)
+        self.acquisition_check(session, resource)
+
+        return self.ok_response(resource, version=ResourceJSONVersion.view)
