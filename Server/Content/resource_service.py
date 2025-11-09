@@ -10,6 +10,7 @@ from Common import (
     ResourceJSONVersion,
     ResourceLocked,
     ResourceNotOwned,
+    Session,
     SessionBound,
 )
 
@@ -68,6 +69,8 @@ class ResourceService(BaseService):
                 HTTPForbidden(reason="Missing required permission"),
                 {"permission": permission_type.value},
             )
+
+    def acquisition_check(self, session: Session, resource: Resource, /) -> None: ...
 
     async def run_executor(
         self, rid: str, key: str, executor: dict[str, Any], /
