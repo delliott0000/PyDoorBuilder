@@ -135,6 +135,7 @@ class ResourceService(BaseService):
         session = self.session_from_request(request)
 
         self.permission_check(session.user, resource, PermissionType.acquire)
+        # No acquisition check necessary
 
         try:
             session.acquire_resource(resource)
@@ -153,7 +154,8 @@ class ResourceService(BaseService):
         resource = await self.load_resource(request)
         session = self.session_from_request(request)
 
-        # No permission checks necessary
+        # No permission check necessary
+        # No acquisition check necessary
 
         try:
             resource.release(session)
