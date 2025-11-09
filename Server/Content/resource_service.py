@@ -7,6 +7,7 @@ from aiohttp.web import HTTPConflict, HTTPForbidden, HTTPNotFound, json_response
 
 from Common import (
     PermissionType,
+    ResourceConflict,
     ResourceJSONVersion,
     ResourceLocked,
     ResourceNotOwned,
@@ -61,6 +62,11 @@ class ResourceService(BaseService):
             status=200,
         )
 
+    def convert_conflict(
+        self, error: ResourceConflict, data: dict[str, Any], /
+    ) -> HTTPConflict:
+        return self.attach_extra_data(HTTPConflict(reason=str(error).strip(".")), data)
+
     def permission_check(
         self, user: User, resource: Resource, permission_type: PermissionType, /
     ) -> None:
@@ -70,7 +76,11 @@ class ResourceService(BaseService):
                 {"permission": permission_type.value},
             )
 
-    def acquisition_check(self, session: Session, resource: Resource, /) -> None: ...
+    def acquisition_check(self, session: Session, resource: Resource, /) -> None:
+        try:
+            resource.ensure_acquired(session)
+        except ResourceNotOwned as error:
+            raise self.convert_conflict(error, {"session": session.to_json()})
 
     async def run_executor(
         self, rid: str, key: str, executor: dict[str, Any], /
@@ -129,13 +139,9 @@ class ResourceService(BaseService):
         try:
             session.acquire_resource(resource)
         except ResourceLocked as error:
-            raise self.attach_extra_data(
-                HTTPConflict(reason=str(error).strip(".")), {"locked_by": str(resource.user)}
-            )
+            raise self.convert_conflict(error, {"locked_by": str(resource.user)})
         except SessionBound as error:
-            raise self.attach_extra_data(
-                HTTPConflict(reason=str(error).strip(".")), {"session": session.to_json()}
-            )
+            raise self.convert_conflict(error, {"session": session.to_json()})
 
         return self.ok_response(resource)
 
@@ -152,8 +158,6 @@ class ResourceService(BaseService):
         try:
             resource.release(session)
         except ResourceNotOwned as error:
-            raise self.attach_extra_data(
-                HTTPConflict(reason=str(error).strip(".")), {"session": session.to_json()}
-            )
+            raise self.convert_conflict(error, {"session": session.to_json()})
 
         return self.ok_response(resource)
