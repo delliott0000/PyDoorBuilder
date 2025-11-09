@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 from .bases import ComparesIDABC, ComparesIDMixin
 from .errors import SessionBound
-from .resource import ResourceJSONVersion
 from .state import State
 from .utils import log
 
@@ -79,11 +78,9 @@ class Session(ComparesIDMixin, ComparesIDABC):
             log(f"{self._user} released {self._resource.id}. (Session ID: {self._id})")
             self._resource = None
 
-    def to_json(
-        self, *, version: ResourceJSONVersion = ResourceJSONVersion.metadata
-    ) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         try:
-            resource = self._resource.to_json(version=version)
+            resource = self._resource.to_json()
         except AttributeError:
             resource = None
 
