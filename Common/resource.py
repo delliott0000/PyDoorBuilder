@@ -81,6 +81,9 @@ class ResourceMixin(ComparesIDMixin):
         else:
             self._session = None  # noqa
 
+    def is_acquired_by(self, session: Session, /) -> bool:
+        return self._session is not None and session == self._session
+
 
 @runtime_checkable
 class Resource(Protocol):
@@ -102,6 +105,7 @@ class Resource(Protocol):
     def release(
         self, session: Session | None = None, /, *, unconditional: bool = False
     ) -> None: ...
+    def is_acquired_by(self, session: Session, /) -> bool: ...
     @property
     def owner(self) -> User: ...
     @classmethod
