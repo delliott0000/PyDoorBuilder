@@ -10,7 +10,7 @@ from .utils import now
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from datetime import timedelta
+    from datetime import datetime, timedelta
     from typing import Any, Self
 
     from asyncpg import Record
@@ -71,6 +71,10 @@ class ResourceMixin(ComparesIDMixin):
     def locked(self) -> bool:
         return self._session is not None
 
+    @property
+    def last_active(self) -> datetime:
+        return self._last_active
+
     def is_idle(self, grace: timedelta, /) -> bool:
         return not self.locked and self._last_active + grace < now()
 
@@ -112,6 +116,8 @@ class Resource(Protocol):
     def user(self) -> User | None: ...
     @property
     def locked(self) -> bool: ...
+    @property
+    def last_active(self) -> datetime: ...
     def is_idle(self, grace: timedelta, /) -> bool: ...
     def acquire(self, session: Session, /) -> None: ...
     def release(
