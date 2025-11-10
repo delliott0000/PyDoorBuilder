@@ -27,9 +27,6 @@ class Door(ComparesIDMixin, ComparesIDABC):
     def id(self) -> int: ...
 
     @property
-    def formatted_id(self) -> str: ...
-
-    @property
     def type(self) -> DoorType:
         return self.__type
 
