@@ -6,9 +6,11 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from .bases import ComparesIDABC, ComparesIDMixin
 from .errors import ResourceLocked, ResourceNotOwned
+from .utils import now
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from datetime import timedelta
     from typing import Any, Self
 
     from asyncpg import Record
@@ -53,6 +55,10 @@ class ResourceMixin(ComparesIDMixin):
     def __init__(self, session: Session | None = None, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self._session = session  # noqa
+        self._set_last_active()
+
+    def _set_last_active(self) -> None:
+        self._last_active = now()  # noqa
 
     @property
     def user(self) -> User | None:
@@ -64,6 +70,9 @@ class ResourceMixin(ComparesIDMixin):
     @property
     def locked(self) -> bool:
         return self._session is not None
+
+    def is_idle(self, grace: timedelta, /) -> bool:
+        return not self.locked and self._last_active + grace < now()
 
     def acquire(self, session: Session, /) -> None:
         if self.locked:
@@ -80,6 +89,7 @@ class ResourceMixin(ComparesIDMixin):
             raise ResourceNotOwned(session, self)  # noqa
         else:
             self._session = None  # noqa
+            self._set_last_active()
 
     def ensure_acquired(self, session: Session, /) -> None:
         if not self.locked or session != self._session:
@@ -102,6 +112,7 @@ class Resource(Protocol):
     def user(self) -> User | None: ...
     @property
     def locked(self) -> bool: ...
+    def is_idle(self, grace: timedelta, /) -> bool: ...
     def acquire(self, session: Session, /) -> None: ...
     def release(
         self, session: Session | None = None, /, *, unconditional: bool = False

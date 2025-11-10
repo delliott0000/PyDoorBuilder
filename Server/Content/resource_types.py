@@ -14,7 +14,7 @@ __all__ = ("QuoteResource",)
 
 
 class QuoteResource(ResourceMixin, Quote, ResourceABC):
-    __slots__ = ("_session",)
+    __slots__ = ("_session", "_last_active")
 
     @classmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
