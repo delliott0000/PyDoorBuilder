@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from asyncio import gather
+from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPConflict, HTTPForbidden, HTTPNotFound, json_response
@@ -13,6 +14,7 @@ from Common import (
     ResourceNotOwned,
     Session,
     SessionBound,
+    log,
 )
 
 from .base_service import BaseService
@@ -121,10 +123,22 @@ class ResourceService(BaseService):
 
         resource = class_.new(data)
         self.server.rtype_rid_to_resource[cache_key] = resource
+        log(f"Resource {resource} loaded.")
         return resource
 
     async def task_coro(self) -> None:
-        pass
+        rtype_rid_to_resource = self.server.rtype_rid_to_resource
+        grace = timedelta(seconds=self.server.config.resource_grace)
+
+        for key in list(rtype_rid_to_resource):
+            try:
+                resource = rtype_rid_to_resource[key]
+            except KeyError:
+                continue
+
+            if resource.is_idle(grace):
+                rtype_rid_to_resource.pop(key, None)
+                log(f"Resource {resource} unloaded.")
 
     @route("post", "/resource/{rtype}/{rid}/acquire")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
