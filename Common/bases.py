@@ -6,7 +6,15 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any
 
-__all__ = ("ComparesIDABC", "ComparesIDMixin")
+__all__ = (
+    "ComparesIDABC",
+    "ComparesIDMixin",
+    "ComparesIDFormattedABC",
+    "ComparesIDFormattedMixin",
+)
+
+
+# This *might* be overengineered.
 
 
 class ComparesIDABC(ABC):
@@ -25,4 +33,22 @@ class ComparesIDMixin:
         return hash((type(self), self.id))  # noqa
 
     def __eq__(self, other):
-        return type(self) is type(other) and self.id == other.id  # noqa
+        if type(self) is not type(other):
+            return NotImplemented
+        return self.id == other.id  # noqa
+
+
+class ComparesIDFormattedABC(ComparesIDABC, ABC):
+    __slots__ = ()
+
+    @property
+    @abstractmethod
+    def formatted_id(self) -> str:
+        pass
+
+
+class ComparesIDFormattedMixin(ComparesIDMixin):
+    __slots__ = ()
+
+    def __str__(self):
+        return self.formatted_id  # noqa

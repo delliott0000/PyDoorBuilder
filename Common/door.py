@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .bases import ComparesIDABC, ComparesIDMixin
+from .bases import ComparesIDFormattedABC, ComparesIDFormattedMixin
 from .enums import DoorType
 from .errors import ValidationError
 from .rules import door_rules
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 __all__ = ("Door",)
 
 
-class Door(ComparesIDMixin, ComparesIDABC):
+class Door(ComparesIDFormattedMixin, ComparesIDFormattedABC):
     def __init__(self, **kwargs: Any):
         self.__type = DoorType(kwargs.get("type", DoorType.Single))
 
@@ -25,6 +25,9 @@ class Door(ComparesIDMixin, ComparesIDABC):
 
     @property
     def id(self) -> int: ...
+
+    @property
+    def formatted_id(self) -> str: ...
 
     @property
     def type(self) -> DoorType:

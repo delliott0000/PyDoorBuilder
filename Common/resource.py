@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from .bases import ComparesIDABC, ComparesIDMixin
+from .bases import ComparesIDFormattedABC, ComparesIDFormattedMixin
 from .errors import ResourceLocked, ResourceNotOwned
 from .utils import now
 
@@ -31,7 +31,7 @@ class ResourceJSONVersion(Enum):
 # fmt: on
 
 
-class ResourceABC(ComparesIDABC, ABC):
+class ResourceABC(ComparesIDFormattedABC, ABC):
     __slots__ = ()
 
     @property
@@ -49,7 +49,7 @@ class ResourceABC(ComparesIDABC, ABC):
         pass
 
 
-class ResourceMixin(ComparesIDMixin):
+class ResourceMixin(ComparesIDFormattedMixin):
     __slots__ = ()
 
     def __init__(self, session: Session | None = None, *args: Any, **kwargs: Any):
@@ -112,6 +112,8 @@ class Resource(Protocol):
 
     @property
     def id(self) -> Any: ...
+    @property
+    def formatted_id(self) -> str: ...
     @property
     def user(self) -> User | None: ...
     @property
