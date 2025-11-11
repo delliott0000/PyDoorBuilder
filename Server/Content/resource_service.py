@@ -123,7 +123,9 @@ class ResourceService(BaseService):
 
         resource = class_.new(data)
         self.server.rtype_rid_to_resource[cache_key] = resource
+
         log(f"Resource {resource} loaded.")
+
         return resource
 
     async def task_coro(self) -> None:
@@ -138,7 +140,9 @@ class ResourceService(BaseService):
 
             if resource.is_idle(grace):
                 rtype_rid_to_resource.pop(key, None)
-                log(f"Resource {resource} unloaded.")
+
+                last_active = resource.last_active.strftime("%Y-%m-%d %H:%M:%S")
+                log(f"Resource {resource} unloaded. Last active at {last_active}.")
 
     @route("post", "/resource/{rtype}/{rid}/acquire")
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.User)
