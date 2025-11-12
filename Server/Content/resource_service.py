@@ -44,11 +44,11 @@ class ResourceService(BaseService):
             "quote": {
                 "class": QuoteResource,
                 "executors": {
-                    "...": {
-                        "func": ...,
-                        "query": ...,
-                        "check": ...,
-                        "exception": ...,
+                    "quote": {
+                        "func": self.server.db.fetch_one,
+                        "query": "SELECT * FROM quotes WHERE id = $1",
+                        "check": lambda result: result is not None,
+                        "exception": HTTPNotFound(reason="Resource not found"),
                     }
                 },
             }
@@ -127,7 +127,7 @@ class ResourceService(BaseService):
             loader = self.map[rtype]
         except KeyError:
             raise self.attach_extra_data(
-                HTTPNotFound(reason="Unknown resource type"), {"resource_type": rtype}
+                HTTPBadRequest(reason="Unknown resource type"), {"resource_type": rtype}
             )
 
         class_ = loader["class"]
