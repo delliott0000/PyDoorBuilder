@@ -36,6 +36,11 @@ class ResourceABC(ComparesIDFormattedABC, ABC):
 
     @property
     @abstractmethod
+    def id(self) -> int:
+        pass
+
+    @property
+    @abstractmethod
     def owner(self) -> User:
         pass
 
@@ -111,7 +116,7 @@ class Resource(Protocol):
         raise TypeError("Inherit from (ResourceMixin, ResourceABC) instead.")
 
     @property
-    def id(self) -> Any: ...
+    def id(self) -> int: ...
     @property
     def formatted_id(self) -> str: ...
     @property
