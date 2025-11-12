@@ -34,7 +34,6 @@ __all__ = ("ResourceService",)
 class ResourceService(BaseService):
     @property
     def map(self) -> dict[str, Any]:
-        # Confirm the structure for later
         return {
             "quote": {
                 "class": QuoteResource,
@@ -191,7 +190,7 @@ class ResourceService(BaseService):
         session = self.session_from_request(request)
 
         self.permission_check(session.user, resource, PermissionType.preview)
-        self.acquisition_check(session, resource)
+        # No acquisition check necessary
 
         return self.ok_response(resource, version=ResourceJSONVersion.preview)
 
