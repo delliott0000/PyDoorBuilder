@@ -4,7 +4,13 @@ from asyncio import gather
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
-from aiohttp.web import HTTPConflict, HTTPForbidden, HTTPNotFound, json_response
+from aiohttp.web import (
+    HTTPBadRequest,
+    HTTPConflict,
+    HTTPForbidden,
+    HTTPNotFound,
+    json_response,
+)
 
 from Common import (
     PermissionType,
@@ -84,7 +90,7 @@ class ResourceService(BaseService):
             raise self.convert_conflict(error, {"session": session.to_json()})
 
     async def run_executor(
-        self, rid: str, key: str, executor: dict[str, Any], /
+        self, rid: int, key: str, executor: dict[str, Any], /
     ) -> tuple[str, Any]:
         func = executor["func"]
         query = executor["query"]
@@ -102,6 +108,15 @@ class ResourceService(BaseService):
     async def load_resource(self, request: Request, /) -> Resource:
         rtype = request.match_info["rtype"]
         rid = request.match_info["rid"]
+
+        try:
+            rid = int(rid)
+        except ValueError:
+            raise self.attach_extra_data(
+                HTTPBadRequest(reason="Resource ID must be an integral string"),
+                {"resource_id": rid},
+            )
+
         cache_key = rtype, rid
 
         cached = self.server.rtype_rid_to_resource.get(cache_key)
@@ -111,7 +126,9 @@ class ResourceService(BaseService):
         try:
             loader = self.map[rtype]
         except KeyError:
-            raise HTTPNotFound(reason="Unknown resource type")
+            raise self.attach_extra_data(
+                HTTPNotFound(reason="Unknown resource type"), {"resource_type": rtype}
+            )
 
         class_ = loader["class"]
         executors = loader["executors"]
