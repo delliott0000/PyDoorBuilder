@@ -15,28 +15,20 @@ if TYPE_CHECKING:
     from .resource import Resource
     from .team import Team
 
-__all__ = ("User",)
+__all__ = ("PartialUser", "User")
 
 
-class User(ComparesIDMixin, ComparesIDABC):
+class PartialUser(ComparesIDMixin, ComparesIDABC):
     __slots__ = (
         "_id",
         "_username",
         "_display_name",
-        "_email",
-        "_autopilot",
-        "_admin",
-        "_teams",
     )
 
-    def __init__(self, user_record: Record | dict, teams: frozenset[Team], /):
+    def __init__(self, user_record: Record | dict, /):
         self._id = user_record["id"]
         self._username = user_record["username"]
         self._display_name = user_record["display_name"]
-        self._email = user_record["email"]
-        self._autopilot = user_record["autopilot"]
-        self._admin = user_record["admin"]
-        self._teams = teams
 
     def __str__(self):
         return self._display_name or self._username
@@ -52,6 +44,29 @@ class User(ComparesIDMixin, ComparesIDABC):
     @property
     def display_name(self) -> str | None:
         return self._display_name
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "id": self._id,
+            "username": self._username,
+            "display_name": self._display_name,
+        }
+
+
+class User(PartialUser):
+    __slots__ = (
+        "_email",
+        "_autopilot",
+        "_admin",
+        "_teams",
+    )
+
+    def __init__(self, user_record: Record | dict, teams: frozenset[Team], /):
+        super().__init__(user_record)
+        self._email = user_record["email"]
+        self._autopilot = user_record["autopilot"]
+        self._admin = user_record["admin"]
+        self._teams = teams
 
     @property
     def email(self) -> str | None:
@@ -119,10 +134,7 @@ class User(ComparesIDMixin, ComparesIDABC):
             return False
 
     def to_json(self) -> dict[str, Any]:
-        return {
-            "id": self._id,
-            "username": self._username,
-            "display_name": self._display_name,
+        return super().to_json() | {
             "email": self._email,
             "autopilot": self._autopilot,
             "admin": self._admin,

@@ -30,10 +30,10 @@ class ComparesIDMixin:
     __slots__ = ()
 
     def __hash__(self):
-        return hash((type(self), self.id))  # noqa
+        return hash(self.id)  # noqa
 
     def __eq__(self, other):
-        if type(self) is not type(other):
+        if not isinstance(other, ComparesIDMixin):
             return NotImplemented
         return self.id == other.id  # noqa
 
