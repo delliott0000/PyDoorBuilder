@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from .resource import ResourceJSONVersion
-    from .user import User
+    from .user import PartialUser
 
 __all__ = ("Quote",)
 
@@ -23,6 +23,6 @@ class Quote(ComparesIDFormattedMixin, ComparesIDFormattedABC):
     def formatted_id(self) -> str: ...
 
     @property
-    def owner(self) -> User: ...
+    def owner(self) -> PartialUser: ...
 
     def to_json(self, *, version: ResourceJSONVersion) -> dict[str, Any]: ...
