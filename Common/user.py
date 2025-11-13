@@ -133,15 +133,6 @@ class User(PartialUser):
         else:
             return False
 
-    def as_partial(self) -> PartialUser:
-        return PartialUser(
-            {
-                "id": self._id,
-                "username": self._username,
-                "display_name": self._display_name,
-            }
-        )
-
     def to_json(self) -> dict[str, Any]:
         return super().to_json() | {
             "email": self._email,
@@ -149,3 +140,6 @@ class User(PartialUser):
             "admin": self._admin,
             "teams": list(team.to_json() for team in self._teams),
         }
+
+    def as_partial(self) -> PartialUser:
+        return PartialUser(self.to_json())
