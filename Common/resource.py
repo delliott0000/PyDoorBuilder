@@ -39,6 +39,11 @@ class ResourceABC(ComparesIDFormattedABC, ABC):
     def id(self) -> int:
         pass
 
+    @property
+    @abstractmethod
+    def owner(self) -> User:
+        pass
+
     @classmethod
     @abstractmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self:
@@ -52,18 +57,13 @@ class ResourceABC(ComparesIDFormattedABC, ABC):
 class ResourceMixin(ComparesIDFormattedMixin):
     __slots__ = ()
 
-    def __init__(self, owner: User, session: Session | None = None, *args: Any, **kwargs: Any):
+    def __init__(self, session: Session | None = None, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self._owner = owner  # noqa
         self._session = session  # noqa
         self._set_last_active()
 
     def _set_last_active(self) -> None:
         self._last_active = now()  # noqa
-
-    @property
-    def owner(self) -> User:
-        return self._owner
 
     @property
     def current_user(self) -> User | None:
