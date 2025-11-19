@@ -40,7 +40,7 @@ __all__ = ("ResourceService",)
 
 
 class ResourceService(BaseService):
-    def resource_mapping(self, extra_data: Json, /) -> dict[str, Any]:
+    def resource_mapping(self, error_data: Json, /) -> dict[str, Any]:
         return {
             "quote": {
                 "class": QuoteResource,
@@ -50,7 +50,7 @@ class ResourceService(BaseService):
                         "query": "SELECT * FROM quotes WHERE id = $1",
                         "check": lambda result: result is not None,
                         "exception": self.attach_extra_data(
-                            HTTPNotFound(reason="Resource not found"), extra_data
+                            HTTPNotFound(reason="Resource not found"), error_data
                         ),
                     }
                 },
@@ -110,14 +110,14 @@ class ResourceService(BaseService):
         rtype = request.match_info["rtype"]
         rid = request.match_info["rid"]
 
-        extra_data = {"resource_type": rtype, "resource_id": rid}
+        error_data = {"resource_type": rtype, "resource_id": rid}
 
         try:
             rid = int(rid)
         except ValueError:
             raise self.attach_extra_data(
                 HTTPBadRequest(reason="Resource ID must be an integral string"),
-                extra_data,
+                error_data,
             )
 
         cache_key = rtype, rid
@@ -126,13 +126,13 @@ class ResourceService(BaseService):
         if cached is not None:
             return cached
 
-        mapping = self.resource_mapping(extra_data)
+        mapping = self.resource_mapping(error_data)
 
         try:
             loader = mapping[rtype]
         except KeyError:
             raise self.attach_extra_data(
-                HTTPBadRequest(reason="Unknown resource type"), extra_data
+                HTTPBadRequest(reason="Unknown resource type"), error_data
             )
 
         class_ = loader["class"]
