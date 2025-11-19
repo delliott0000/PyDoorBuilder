@@ -179,7 +179,7 @@ class ResourceService(BaseService):
         try:
             session.acquire_resource(resource)
         except ResourceLocked as error:
-            raise self.convert_conflict(error, {"locked_by": str(resource.user)})
+            raise self.convert_conflict(error, {"locked_by": str(resource.current_user)})
         except SessionBound as error:
             raise self.convert_conflict(error, {"session": session.to_json()})
 

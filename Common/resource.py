@@ -66,7 +66,7 @@ class ResourceMixin(ComparesIDFormattedMixin):
         return self._owner
 
     @property
-    def user(self) -> User | None:
+    def current_user(self) -> User | None:
         try:
             return self._session.user
         except AttributeError:
@@ -122,7 +122,7 @@ class Resource(Protocol):
     @property
     def owner(self) -> User: ...
     @property
-    def user(self) -> User | None: ...
+    def current_user(self) -> User | None: ...
     @property
     def locked(self) -> bool: ...
     @property
