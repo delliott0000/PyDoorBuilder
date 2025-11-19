@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from asyncio import gather
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
@@ -8,7 +7,6 @@ from aiohttp.web import (
     HTTPBadRequest,
     HTTPConflict,
     HTTPForbidden,
-    HTTPNotFound,
     json_response,
 )
 
@@ -25,37 +23,24 @@ from Common import (
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
-from .resource_types import QuoteResource
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Coroutine
     from typing import Any
 
     from aiohttp.web import Request, Response
 
     from Common import Resource, User
 
-    Json = dict[str, Any]
+    RLoader = Callable[[int], Coroutine[Any, Any, Resource]]
 
 __all__ = ("ResourceService",)
 
 
 class ResourceService(BaseService):
-    def resource_mapping(self, error_data: Json, /) -> dict[str, Any]:
-        return {
-            "quote": {
-                "class": QuoteResource,
-                "executors": {
-                    "quote": {
-                        "func": self.server.db.fetch_one,
-                        "query": "SELECT * FROM quotes WHERE id = $1",
-                        "check": lambda result: result is not None,
-                        "exception": self.attach_extra_data(
-                            HTTPNotFound(reason="Resource not found"), error_data
-                        ),
-                    }
-                },
-            }
-        }
+    @property
+    def resource_map(self) -> dict[str, RLoader]:
+        return {}
 
     def ok_response(
         self,
@@ -72,8 +57,10 @@ class ResourceService(BaseService):
             status=200,
         )
 
-    def convert_conflict(self, error: ResourceConflict, data: Json, /) -> HTTPConflict:
-        return self.attach_extra_data(HTTPConflict(reason=str(error).strip(".")), data)
+    def convert_conflict(
+        self, error: ResourceConflict, extra_data: dict[str, Any], /
+    ) -> HTTPConflict:
+        return self.attach_extra_data(HTTPConflict(reason=str(error).strip(".")), extra_data)
 
     def permission_check(
         self, user: User, resource: Resource, permission_type: PermissionType, /
@@ -90,63 +77,36 @@ class ResourceService(BaseService):
         except ResourceNotOwned as error:
             raise self.convert_conflict(error, {"session": session.to_json()})
 
-    async def run_executor(
-        self, rid: int, key: str, executor: dict[str, Any], /
-    ) -> tuple[str, Any]:
-        func = executor["func"]
-        query = executor["query"]
-        check = executor["check"]
-        exception = executor["exception"]
-
-        args = query, rid
-        result = await func(*args)
-
-        if not check(result):
-            raise exception
-
-        return key, result
-
     async def load_resource(self, request: Request, /) -> Resource:
         rtype = request.match_info["rtype"]
         rid = request.match_info["rid"]
 
-        error_data = {"resource_type": rtype, "resource_id": rid}
+        extra_data = {"resource_type": rtype, "resource_id": rid}
 
         try:
             rid = int(rid)
         except ValueError:
             raise self.attach_extra_data(
                 HTTPBadRequest(reason="Resource ID must be an integral string"),
-                error_data,
+                extra_data,
             )
 
-        cache_key = rtype, rid
+        cache = self.server.rtype_rid_to_resource
+        key = rtype, rid
 
-        cached = self.server.rtype_rid_to_resource.get(cache_key)
+        cached = cache.get(key)
         if cached is not None:
             return cached
 
-        mapping = self.resource_mapping(error_data)
-
         try:
-            loader = mapping[rtype]
+            loader = self.resource_map[rtype]
         except KeyError:
             raise self.attach_extra_data(
-                HTTPBadRequest(reason="Unknown resource type"), error_data
+                HTTPBadRequest(reason="Unknown resource type"), extra_data
             )
 
-        class_ = loader["class"]
-        executors = loader["executors"]
-
-        tasks = (self.run_executor(rid, key, executor) for key, executor in executors.items())
-        results = await gather(*tasks)
-        data = {key: result for key, result in results}
-
-        resource = class_.new(data)
-        self.server.rtype_rid_to_resource[cache_key] = resource
-
-        log(f"Resource {resource} loaded.")
-
+        resource = await loader(rid)
+        cache[key] = resource
         return resource
 
     async def task_coro(self) -> None:
