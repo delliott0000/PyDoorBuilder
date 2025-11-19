@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from asyncpg import Record
 
     from .session import Session
-    from .user import PartialUser, User
+    from .user import User
 
     Json = dict[str, Any]
 
@@ -41,7 +41,7 @@ class ResourceABC(ComparesIDFormattedABC, ABC):
 
     @property
     @abstractmethod
-    def owner(self) -> PartialUser:
+    def owner(self) -> User:
         pass
 
     @classmethod
@@ -132,7 +132,7 @@ class Resource(Protocol):
     ) -> None: ...
     def ensure_acquired(self, session: Session, /) -> None: ...
     @property
-    def owner(self) -> PartialUser: ...
+    def owner(self) -> User: ...
     @classmethod
     def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
     def to_json(self, *, version: ResourceJSONVersion) -> Json: ...

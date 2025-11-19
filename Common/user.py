@@ -15,20 +15,28 @@ if TYPE_CHECKING:
     from .resource import Resource
     from .team import Team
 
-__all__ = ("PartialUser", "User")
+__all__ = ("User",)
 
 
-class PartialUser(ComparesIDMixin, ComparesIDABC):
+class User(ComparesIDMixin, ComparesIDABC):
     __slots__ = (
         "_id",
         "_username",
         "_display_name",
+        "_email",
+        "_autopilot",
+        "_admin",
+        "_teams",
     )
 
-    def __init__(self, user_record: Record | dict, /):
+    def __init__(self, user_record: Record | dict, teams: frozenset[Team], /):
         self._id = user_record["id"]
         self._username = user_record["username"]
         self._display_name = user_record["display_name"]
+        self._email = user_record["email"]
+        self._autopilot = user_record["autopilot"]
+        self._admin = user_record["admin"]
+        self._teams = teams
 
     def __str__(self):
         return self._display_name or self._username
@@ -44,29 +52,6 @@ class PartialUser(ComparesIDMixin, ComparesIDABC):
     @property
     def display_name(self) -> str | None:
         return self._display_name
-
-    def to_json(self) -> dict[str, Any]:
-        return {
-            "id": self._id,
-            "username": self._username,
-            "display_name": self._display_name,
-        }
-
-
-class User(PartialUser):
-    __slots__ = (
-        "_email",
-        "_autopilot",
-        "_admin",
-        "_teams",
-    )
-
-    def __init__(self, user_record: Record | dict, teams: frozenset[Team], /):
-        super().__init__(user_record)
-        self._email = user_record["email"]
-        self._autopilot = user_record["autopilot"]
-        self._admin = user_record["admin"]
-        self._teams = teams
 
     @property
     def email(self) -> str | None:
@@ -134,12 +119,12 @@ class User(PartialUser):
             return False
 
     def to_json(self) -> dict[str, Any]:
-        return super().to_json() | {
+        return {
+            "id": self._id,
+            "username": self._username,
+            "display_name": self._display_name,
             "email": self._email,
             "autopilot": self._autopilot,
             "admin": self._admin,
             "teams": list(team.to_json() for team in self._teams),
         }
-
-    def as_partial(self) -> PartialUser:
-        return PartialUser(self.to_json())
