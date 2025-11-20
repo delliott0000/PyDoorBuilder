@@ -23,6 +23,7 @@ from Common import (
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, user_only, validate_access
+from .resource_types import QuoteResource
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
@@ -40,7 +41,9 @@ __all__ = ("ResourceService",)
 class ResourceService(BaseService):
     @property
     def resource_map(self) -> dict[str, RLoader]:
-        return {}
+        return {"quote": self.load_quote}  # noqa
+
+    async def load_quote(self, quote_id: int, /) -> QuoteResource: ...
 
     def ok_response(
         self,
