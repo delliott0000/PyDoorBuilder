@@ -9,11 +9,8 @@ from .errors import ResourceLocked, ResourceNotOwned
 from .utils import now
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from datetime import datetime, timedelta
-    from typing import Any, Self
-
-    from asyncpg import Record
+    from typing import Any
 
     from .session import Session
     from .user import User
@@ -42,11 +39,6 @@ class ResourceABC(ComparesIDFormattedABC, ABC):
     @property
     @abstractmethod
     def owner(self) -> User:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self:
         pass
 
     @abstractmethod
@@ -133,6 +125,4 @@ class Resource(Protocol):
         self, session: Session | None = None, /, *, unconditional: bool = False
     ) -> None: ...
     def ensure_acquired(self, session: Session, /) -> None: ...
-    @classmethod
-    def new(cls, data: dict[str, Record | Iterable[Record]], /) -> Self: ...
     def to_json(self, *, version: ResourceJSONVersion) -> Json: ...
