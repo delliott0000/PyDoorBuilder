@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from aiohttp.web import (
     HTTPBadRequest,
     HTTPConflict,
+    HTTPException,
     HTTPForbidden,
     json_response,
 )
@@ -108,8 +109,15 @@ class ResourceService(BaseService):
                 HTTPBadRequest(reason="Unknown resource type"), extra_data
             )
 
-        resource = await loader(rid)
+        try:
+            resource = await loader(rid)
+        except HTTPException as error:
+            raise self.attach_extra_data(error, extra_data)
+
         cache[key] = resource
+
+        log(f"Resource {resource} loaded.")
+
         return resource
 
     async def task_coro(self) -> None:
