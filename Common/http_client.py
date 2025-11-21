@@ -112,17 +112,17 @@ class HTTPClient:
 
                 raise error
 
-    def get(self, url: URL, /, **kwargs) -> JsonCoro:
+    def get(self, url: URL, /, **kwargs: Any) -> JsonCoro:
         return self.request("get", url, **kwargs)
 
-    def put(self, url: URL, /, **kwargs) -> JsonCoro:
+    def put(self, url: URL, /, **kwargs: Any) -> JsonCoro:
         return self.request("put", url, **kwargs)
 
-    def post(self, url: URL, /, **kwargs) -> JsonCoro:
+    def post(self, url: URL, /, **kwargs: Any) -> JsonCoro:
         return self.request("post", url, **kwargs)
 
-    def patch(self, url: URL, /, **kwargs) -> JsonCoro:
+    def patch(self, url: URL, /, **kwargs: Any) -> JsonCoro:
         return self.request("patch", url, **kwargs)
 
-    def delete(self, url: URL, /, **kwargs) -> JsonCoro:
+    def delete(self, url: URL, /, **kwargs: Any) -> JsonCoro:
         return self.request("delete", url, **kwargs)
