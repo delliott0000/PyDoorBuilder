@@ -67,16 +67,16 @@ class Session(ComparesIDMixin, ComparesIDABC):
     def acquire_resource(self, resource: Resource, /) -> None:
         if not self.bound:
             resource.acquire(self)
-            log(f"{self._user} acquired {resource.id}. (Session ID: {self._id})")
             self._resource = resource
+            log(f"{self._user} acquired {resource}. (Session ID: {self._id})")
         else:
             raise SessionBound(self, resource)
 
     def release_resource(self) -> None:
         if self.bound:
             self._resource.release(self)
-            log(f"{self._user} released {self._resource.id}. (Session ID: {self._id})")
             self._resource = None
+            log(f"{self._user} released {self._resource}. (Session ID: {self._id})")
 
     def to_json(self) -> dict[str, Any]:
         try:
