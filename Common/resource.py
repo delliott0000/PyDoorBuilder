@@ -49,7 +49,7 @@ class ResourceABC(ComparesIDFormattedABC, ABC):
 class ResourceMixin(ComparesIDFormattedMixin):
     __slots__ = ()
 
-    def __init__(self, session: Session | None = None, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, session: Session | None = None, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self._session = session  # noqa
         self._set_last_active()
@@ -100,7 +100,7 @@ class ResourceMixin(ComparesIDFormattedMixin):
 @runtime_checkable
 class Resource(Protocol):
     def __init__(
-        self, owner: User, session: Session | None = None, *args: Any, **kwargs: Any  # noqa
+        self, *args: Any, session: Session | None = None, **kwargs: Any  # noqa
     ) -> None:
         raise TypeError("Resource can not be directly instantiated.")
 
