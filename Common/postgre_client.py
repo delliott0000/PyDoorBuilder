@@ -8,6 +8,7 @@ from asyncpg import create_pool
 
 from .company import Company
 from .permissions import Permission, PermissionScope, PermissionType
+from .quote import Quote
 from .team import Team
 from .user import User
 from .utils import check_password, encrypt_password, log
@@ -21,6 +22,7 @@ if TYPE_CHECKING:
     from .config import PostgresConfig
 
     T = TypeVar("T")
+    QuoteT = TypeVar("QuoteT", bound=Quote)
 
 __all__ = ("PostgreSQLClient",)
 
@@ -217,3 +219,14 @@ class PostgreSQLClient:
             assignments[record[key]].append(record[val])
 
         return assignments
+
+    async def get_quote(self, quote_id: int, /, *, cls: type[QuoteT] = Quote) -> QuoteT | None:
+        quote_record = await self.fetch_one("SELECT * FROM quotes WHERE id = $1", quote_id)
+
+        if quote_record is None:
+            return None
+
+        owner_id = quote_record["owner_id"]
+        owner = await self.get_user(user_id=owner_id, with_password=False)
+
+        return cls(quote_record, owner)
