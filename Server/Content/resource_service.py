@@ -8,6 +8,7 @@ from aiohttp.web import (
     HTTPConflict,
     HTTPException,
     HTTPForbidden,
+    HTTPNotFound,
     json_response,
 )
 
@@ -44,7 +45,13 @@ class ResourceService(BaseService):
     def resource_map(self) -> dict[str, RLoader]:
         return {"quote": self.load_quote}  # noqa
 
-    async def load_quote(self, quote_id: int, /) -> QuoteResource: ...
+    async def load_quote(self, quote_id: int, /) -> QuoteResource:
+        quote = await self.server.db.get_quote(quote_id, cls=QuoteResource)
+
+        if quote is None:
+            raise HTTPNotFound(reason="Quote does not exist")
+
+        return quote
 
     def ok_response(
         self,
