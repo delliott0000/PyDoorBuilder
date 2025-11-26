@@ -1,5 +1,5 @@
 [![Python Version](https://img.shields.io/badge/Python-3.12%20%7C%203.13%20%7C%203.14-blue)](https://www.python.org/downloads/)
-[![Code Style: Black](https://img.shields.io/badge/Code%20Style-black-000000.svg)](https://github.com/psf/black)
+[![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-000000.svg)](https://github.com/psf/black)
 [![Imports: iSort](https://img.shields.io/badge/Imports-iSort-ef8336.svg)](https://github.com/PyCQA/isort)
 
 **Still in early development.**
@@ -16,7 +16,7 @@ This project is split into a few different modules:
 - [SQL](https://github.com/delliott0000/PyDoorBuilder/tree/master/SQL) - Tools used for PostgreSQL setup/development.
 
 # Features
-- Built-in HTTP API that manages user sessions and enforces rate limits.
+- HTTP API that manages user sessions and enforces rate limits.
 - Real-time communication of client states via WebSocket to prevent the loss of progress in the event of a crash.
 - Use of the `asyncio` framework to handle many IO-bound tasks concurrently.
 - Support for many autopilots running simultaneously.
