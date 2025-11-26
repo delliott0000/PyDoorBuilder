@@ -186,7 +186,7 @@ class PostgreSQLClient:
             return {}
 
         permission_records = await self.fetch_all(
-            "SELECT * FROM team_permissions WHERE team_id = ANY($1)", team_ids
+            "SELECT * FROM permissions WHERE team_id = ANY($1)", team_ids
         )
 
         permissions = {id_: [] for id_ in team_ids}
@@ -210,7 +210,7 @@ class PostgreSQLClient:
         val = key_map[not inverse]
 
         assignment_records = await self.fetch_all(
-            f"SELECT * FROM team_assignments WHERE {key} = ANY($1)", ids
+            f"SELECT * FROM assignments WHERE {key} = ANY($1)", ids
         )
 
         assignments = {id_: [] for id_ in ids}
