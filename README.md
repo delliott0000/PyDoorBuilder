@@ -1,5 +1,6 @@
-[![Code Style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Imports: isort](https://img.shields.io/badge/imports-isort-ef8336.svg)](https://github.com/PyCQA/isort)
+[![Python Version](https://img.shields.io/badge/Python-3.12%20%7C%203.13%20%7C%203.14-blue)](https://www.python.org/downloads/)
+[![Code Style: Black](https://img.shields.io/badge/Code%20Style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: iSort](https://img.shields.io/badge/Imports-iSort-ef8336.svg)](https://github.com/PyCQA/isort)
 
 **Still in early development.**
 
