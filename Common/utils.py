@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from logging import DEBUG, ERROR, INFO, WARNING, basicConfig, getLogger
 from os import makedirs
 from pathlib import Path
@@ -33,7 +33,7 @@ _logger = getLogger()
 
 
 def now() -> datetime:
-    return datetime.now().astimezone()
+    return datetime.now().astimezone(timezone.utc)
 
 
 def decode_datetime(t: str, /) -> datetime:
