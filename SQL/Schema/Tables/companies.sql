@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS companies (
+    id INT PRIMARY KEY REFERENCES ids(id),
+    name TEXT NOT NULL
+);
