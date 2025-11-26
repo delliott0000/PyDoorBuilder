@@ -17,7 +17,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Insert the sample data.
--- This will fail if any UNIQUE values are already taken.
+-- This will dynamically generate new IDs for insertion, but will fail if any other UNIQUE values are already taken.
 -- For example, running the script twice in a row.
 
 DO $$
