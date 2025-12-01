@@ -1,5 +1,5 @@
-# API
-This module documents the behaviour of the web API exposed by the Server module. It serves as a reference point for related development.
+# PyDoorBuilder Server API
+This module documents the behaviour of the web API exposed by the [Server](https://github.com/delliott0000/PyDoorBuilder/tree/master/Server) module. It serves as a reference point for related development.
 
 The API uses the [HTTP](https://www.rfc-editor.org/rfc/rfc2616) and [WebSocket](https://www.rfc-editor.org/rfc/rfc6455) communication protocols. It also uses a custom subprotocol layered on top of WebSocket to keep interactions well-defined and predictable.
 
