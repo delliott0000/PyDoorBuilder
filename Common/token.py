@@ -145,7 +145,6 @@ class Token(ComparesIDMixin, ComparesIDABC):
             "refresh": self._refresh,
             "access_expires": encode_datetime(self._access_expires),
             "refresh_expires": encode_datetime(self._refresh_expires),
-            "killed": self.killed,
             "killed_at": killed_at,
             "session": self._session.to_json(),
         }
