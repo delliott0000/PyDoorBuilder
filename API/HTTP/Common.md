@@ -35,6 +35,8 @@ With all of this in mind, we will organise the functionality of the server into 
 ```
 - **State** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). This is stored by the server mainly to prevent loss of progress.
 ```py
+{
+}
 # TODO: Define fields and types.
 ```
 - **Resource** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). Different `Resource` types will implement their own fields.
