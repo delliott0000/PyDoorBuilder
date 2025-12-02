@@ -8,15 +8,16 @@ Before we can jump straight in, we must first define a few things, and consider 
 - **Autopilot** - An automated, headless client application.
 - **User** - `Clients` and `Autopilots` are collectively referred to as `Users`.
 - **Instance** - A running copy of the program that a `User` is using to interact with the API.
-- **Resource** - An abstract entity that `Clients` can acquire, release, read from, and write to.
 - **Session** - A temporary context that keeps track of `User` activity, independent of authentication.
-- **State** - A container for a `Session's` real-time snapshot. Only applicable to `Clients`.
+- **Resource** - An abstract entity that `Sessions` can acquire, release, read from, and write to.
+- **State** - A container for a `Session's` real-time snapshot.
 
 # Considerations
-- `Clients` can have many ongoing `Sessions`.
-- `Clients` can recover previous `Sessions` by supplying the `Session's` ID.
-- Similarly, two or more `Instances` that belong to the same `Client` account, may share the same `Session`. In this case, their `States` are automatically synced together.
+- `Users` can have many ongoing `Sessions`.
+- `Users` can recover previous `Sessions` by supplying the `Session's` ID.
+- Therefore, two or more `Instances` that belong to the same `User` account, may share the same `Session`. In this case, their `States` are automatically synced together.
 - Each `Session` can acquire up to one `Resource` at a time; each `Resource` can be acquired by up to one `Session` at a time. These restrictions prevent race conditions, since a `Session` must acquire a `Resource` before modifying it.
+- `Sessions` owned by an `Autopilot` can not maintain a non-empty `State` or acquire a `Resource`.
 
 # Models
 With all of this in mind, we will organise the functionality of the server into the following models. Each bullet point includes a JSON-like representation of the model that it describes. Fields marked `ISO 8601` follow the format `%Y-%m-%dT%H:%M:%S.%f%z`.
