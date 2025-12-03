@@ -81,9 +81,9 @@ For successful requests, this object will contain `"message": "OK"` along with t
 ## Authentication
 Except for `/auth/login` and `/auth/refresh`, every endpoint requires an `"Authorization": "Bearer ..."` header, where `...` is a `Token` access key.
 
-If the access key is missing, the API will return `400 Bad Request`.
+If the `Authorization` header is missing, of the wrong type, or can not be parsed, the API will return `400 Bad Request`.
 
-If the access key is invalid, the API will return `401 Unauthorized`.
+If the `Authorization` header is incorrect, the API will return `401 Unauthorized`.
 
 ## Client/Autopilot/Admin-Only
 Endpoints can be `Client-only`, `Autopilot-only` or `Admin-only`. An `Admin` is simply a `User` with elevated permissions.
