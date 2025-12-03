@@ -69,7 +69,7 @@ With all of this in mind, we will organise the functionality of the server into 
 ```
 
 # Shared Endpoint Behaviour
-Unless stated otherwise, every endpoint exposed by the API follows the below rules. They are listed in descending order of precedence.
+Unless stated otherwise, every endpoint exposed by the API follows the below rules. They are listed in descending order of precedence. Furthermore, these rules all take precedence over any endpoint-specific behaviour.
 
 ## Response Structure
 The API will return a JSON object with every response.
