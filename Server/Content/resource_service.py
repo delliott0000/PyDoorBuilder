@@ -62,7 +62,7 @@ class ResourceService(BaseService):
     ) -> Response:
         return json_response(
             {
-                "message": "Ok",
+                "message": "OK",
                 "resource": resource.to_json(version=version),
             },
             status=200,

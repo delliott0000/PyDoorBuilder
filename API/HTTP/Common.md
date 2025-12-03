@@ -1,5 +1,5 @@
 # Introduction
-This file documents shared behaviour and definitions that are used across all HTTP endpoints. For more information on specific endpoints, please see [Contents](https://github.com/delliott0000/PyDoorBuilder/tree/master/API/HTTP/Contents).
+This file documents shared behaviour and definitions that are used across all HTTP endpoints.
 
 Before we can jump straight in, we must first define a few things, and consider our end goals for the API.
 
@@ -67,3 +67,36 @@ With all of this in mind, we will organise the functionality of the server into 
     "session": Session
 }
 ```
+
+# Common Endpoint Behaviour
+Unless stated otherwise, every endpoint exposed by the API follows the below rules. They are listed in descending order of precedence.
+
+## Response Structure
+The API will return a JSON object with every response.
+
+For unsuccessful requests, this object will contain a `"message": ...` field describing what went wrong.
+
+For successful requests, this object will contain `"message": "OK"` along with the relevant information.
+
+## Authentication
+Except for `/auth/login` and `/auth/refresh`, every endpoint requires an `"Authorization": "Bearer ..."` header, where `...` is a `Token` access key.
+
+If the access key is missing, the API will return `400 Bad Request`.
+
+If the access key is invalid, the API will return `401 Unauthorized`.
+
+## Client/Autopilot/Admin-Only
+Endpoints can be `Client-only`, `Autopilot-only` or `Admin-only`. An `Admin` is simply a `User` with elevated permissions.
+
+If a `User` sends a request to one of these endpoints and does not meet the required criteria, the API will return `403 Forbidden`.
+
+## Ratelimits
+Every endpoint is rate limited. Ratelimits can be applied per endpoint, per `Token`, per `User` or per IP address. Exact ratelimits are not published in this documentation.
+
+If a request is rate limited, the API will return `429 Too Many Requests`.
+
+## Success
+If a request is considered successful, the API will return `200 OK`.
+
+# Final Notes
+Please see [Contents](https://github.com/delliott0000/PyDoorBuilder/tree/master/API/HTTP/Contents) for more details on individual endpoints. Endpoints are organised into groups based on their functionality. For instance, endpoints related to authentication can be found in [Contents/Auth.md](https://github.com/delliott0000/PyDoorBuilder/tree/master/API/HTTP/Contents/Auth.md).

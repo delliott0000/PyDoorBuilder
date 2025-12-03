@@ -29,7 +29,7 @@ class AuthService(BaseService):
     def ok_response(self, token: Token, /) -> Response:
         return json_response(
             {
-                "message": "Ok",
+                "message": "OK",
                 "token": token.to_json(),
             },
             status=200,
