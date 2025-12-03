@@ -21,7 +21,7 @@ Returned by the API:
 This endpoint is `Client-only`.
 
 ## POST /resource/{type}/{id}/release
-Release a `Resource`, allowing it to be acquired by another `Session`. We don't perform any permission checks here.
+Release a `Resource`, allowing it to be acquired by another `Session`. Permission checks are not performed here.
 
 Returned by the API:
 ```py
@@ -37,7 +37,7 @@ Returned by the API:
 This endpoint is `Client-only`.
 
 ## GET /resource/{type}/{id}/preview
-Retrieve some basic information about a `Resource`. Different `Resource` types will implement their own previews. We don't perform any acquisition checks here.
+Retrieve some basic information about a `Resource`. Different `Resource` types will implement their own previews. Acquisition checks are not performed here.
 
 Returned by the API:
 ```py

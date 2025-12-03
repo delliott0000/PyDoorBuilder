@@ -4,7 +4,7 @@ This file documents endpoints related to authentication.
 If you haven't already, please read [Common.md](../Common.md) first.
 
 ## POST /auth/login
-Exchange a username and password for a `Token`. If a valid `session_id` is supplied, then the API will retrieve that `Session`. Otherwise, it will open a new `Session`.
+Exchange a username and a password for a `Token`. If a valid `session_id` is supplied, then the API will retrieve that `Session`. Otherwise, it will open a new `Session`.
 
 Supplied by the client application:
 ```py
