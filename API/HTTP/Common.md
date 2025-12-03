@@ -21,7 +21,7 @@ Before we can jump straight in, we must first define a few things, and consider 
 
 # Models
 With all of this in mind, we will organise the functionality of the server into the following models. Each bullet point includes a JSON-like representation of the model that it describes. Fields marked `ISO 8601` follow the format `%Y-%m-%dT%H:%M:%S.%f%z`.
-- **User** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions).
+- **User** - See [Definitions](Common.md#definitions).
 ```py
 {
     "id": int,
@@ -33,13 +33,13 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 # Omitted the "teams" field; this is not relevant here.
 ```
-- **State** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). This is stored by the server mainly to prevent loss of progress.
+- **State** - See [Definitions](Common.md#definitions). This is stored by the server mainly to prevent loss of progress.
 ```py
 {
 }
 # TODO: Define fields and types.
 ```
-- **Resource** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). Different `Resource` types will implement their own fields. `Resource` fields also depend on the context of the request.
+- **Resource** - See [Definitions](Common.md#definitions). Different `Resource` types will implement their own fields. `Resource` fields also depend on the context of the request.
 ```py
 {
     "id": int,
@@ -47,7 +47,7 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 # All resources must include these fields as a bare minimum.
 ```
-- **Session** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). Each `Session` is associated with a `User` (many-to-one), a `State` (one-to-one) and the `Resource` that it currently has acquired (one-to-one).
+- **Session** - See [Definitions](Common.md#definitions). Each `Session` is associated with a `User` (many-to-one), a `State` (one-to-one) and the `Resource` that it currently has acquired (one-to-one).
 ```py
 {
     "id": str,
@@ -99,7 +99,7 @@ If a request is rate limited, the API will return `429 Too Many Requests`.
 If a request is considered successful, the API will return `200 OK`.
 
 # Final Notes
-For further details on individual endpoints, please see [Contents](https://github.com/delliott0000/PyDoorBuilder/tree/master/API/HTTP/Contents). Endpoints are grouped by functionality, with each one detailed in its own dedicated section.
+For further details on individual endpoints, please see [Contents](Contents). Endpoints are grouped by functionality, with each one detailed in its own dedicated section.
 
 Each section will include the following:
 - A brief description of the endpoint.

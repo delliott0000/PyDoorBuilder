@@ -1,7 +1,7 @@
 # Resource Endpoints
 This file documents endpoints related to `Resources`.
 
-If you haven't already, please read [Common.md](https://github.com/delliott0000/PyDoorBuilder/tree/master/API/HTTP/Common.md) first.
+If you haven't already, please read [Common.md](../Common.md) first.
 
 ## POST /resource/{type}/{id}/acquire
 Acquire a `Resource`. Most interactions between a `Session` and a `Resource` will fail if the `Session` has not acquired the `Resource`.
