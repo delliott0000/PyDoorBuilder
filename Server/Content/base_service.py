@@ -87,7 +87,7 @@ class BaseService(ABC):
 
     def check_key(self, key: str | None, /, *, for_refresh: bool = False) -> None:
         _type = "refresh" if for_refresh else "access"
-        if key is None:
+        if not isinstance(key, str):
             raise HTTPBadRequest(reason=f"Missing {_type} token")
         elif not self.key_is_valid(key, for_refresh=for_refresh):
             raise HTTPUnauthorized(reason=f"Invalid {_type} token")
