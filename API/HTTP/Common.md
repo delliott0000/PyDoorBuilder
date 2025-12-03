@@ -68,10 +68,20 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 ```
 
-# Endpoints
-Unless stated otherwise, every endpoint exposed by the API follows the below rules. They are listed in descending order of precedence. Furthermore, these rules all take precedence over any endpoint-specific behaviour.
+# Groups and Rules
+Endpoints are arranged into groups based on their functionality. These groups collectively make up the API.
 
-## Response Structure
+Rules describe how endpoints behave. These are divided into API-level, group-level and endpoint-level rules.
+
+Aside from the noted exceptions, API-level rules apply to all endpoints in the API. Group-level rules apply to all endpoints in the given group. Endpoint-level rules only apply to the given endpoint.
+
+API-level rules take precedence over group-level rules, which take precedence over endpoint-level rules.
+
+API-level rules are listed below in descending order of precedence.
+
+## Request and Response Structures
+Most endpoints expect the caller to supply a JSON object with specific fields. Other endpoints don't expect a JSON object at all. Unexpected JSON objects/fields will be ignored and will not cause an error to be returned.
+
 The API will return a JSON object with every response.
 
 For unsuccessful requests, this object will contain a `"message": ...` field describing what went wrong.
@@ -90,6 +100,8 @@ Endpoints can be `Client-only`, `Autopilot-only` or `Admin-only`. An `Admin` is 
 
 If a `User` sends a request to one of these endpoints and does not meet the required criteria, the API will return `403 Forbidden`.
 
+This will be clarified on a per-endpoint basis. Some endpoints don't enforce any of these requirements, such as `/auth/login`.
+
 ## Ratelimits
 Every endpoint is rate limited. Ratelimits can be applied per endpoint, per `Token`, per `User` or per IP address. Exact ratelimits are not published in this documentation.
 
@@ -99,11 +111,13 @@ If a request is rate limited, the API will return `429 Too Many Requests`.
 If a request is considered successful, the API will return `200 OK`.
 
 # Final Notes
-For further details on individual endpoints, please see [Contents](Contents). Endpoints are grouped by functionality, with each one detailed in its own dedicated section.
+For further details on individual groups and endpoints, please see [Contents](Contents). Each file in this folder documents one group, and includes the following:
+- A list of group-level rules, listed in descending order of precedence.
+- A number of sections, each documenting one endpoint.
 
 Each section will include the following:
 - A brief description of the endpoint.
-- The JSON object that the client application should supply with the request. If this is omitted, then the API does not expect a JSON object to be supplied. Unexpected JSON objects/fields will be ignored and will not cause an error to be returned.
+- The JSON object that the client application should supply with their request. If this information is omitted from a given section, then the API does not expect a JSON object to be supplied when sending a request to the corresponding endpoint.
 - The JSON object that the API will return if the request is successful.
-- Possible HTTP error codes specific to the endpoint, listed in descending order of precedence.
+- Other endpoint-level rules, listed in descending order of precedence.
 - Any additional information, such as whether the endpoint is restricted to a certain type of `User`.

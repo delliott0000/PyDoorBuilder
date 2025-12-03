@@ -3,6 +3,11 @@ This file documents the group of endpoints related to `Resources`.
 
 If you haven't already, please read [Common.md](../Common.md) first.
 
+## Group-Level Rules
+- ...
+- ...
+- ...
+
 ## POST /resource/{type}/{id}/acquire
 Acquire a `Resource`. Most interactions between a `Session` and a `Resource` will fail if the `Session` has not acquired the `Resource`.
 
