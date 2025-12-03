@@ -39,7 +39,7 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 # TODO: Define fields and types.
 ```
-- **Resource** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). Different `Resource` types will implement their own fields.
+- **Resource** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). Different `Resource` types will implement their own fields. `Resource` fields also depend on the context of the request.
 ```py
 {
     "id": int,
@@ -47,13 +47,13 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 # All resources must include these fields as a bare minimum.
 ```
-- **Session** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). Each `Session` is associated with a `User` (many-to-one) and a `State` (one-to-one).
+- **Session** - See [Definitions](https://github.com/delliott0000/PyDoorBuilder/blob/master/API/HTTP/Common.md#definitions). Each `Session` is associated with a `User` (many-to-one), a `State` (one-to-one) and the `Resource` that it currently has acquired (one-to-one).
 ```py
 {
     "id": str,
     "user": User,
     "state": State,
-    "resource": Resource | None
+    "resource": Resource | None  # Metadata only
 }
 ```
 - **Token** - An authentication context. `Users` exchange their username and password for a `Token`. Each `Token` is associated with a `Session` (many-to-one).
