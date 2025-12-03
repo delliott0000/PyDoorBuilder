@@ -68,7 +68,7 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 ```
 
-# Common Endpoint Behaviour
+# Shared Endpoint Behaviour
 Unless stated otherwise, every endpoint exposed by the API follows the below rules. They are listed in descending order of precedence.
 
 ## Response Structure
@@ -99,4 +99,11 @@ If a request is rate limited, the API will return `429 Too Many Requests`.
 If a request is considered successful, the API will return `200 OK`.
 
 # Final Notes
-Please see [Contents](https://github.com/delliott0000/PyDoorBuilder/tree/master/API/HTTP/Contents) for more details on individual endpoints. Endpoints are organised into groups based on their functionality. For instance, endpoints related to authentication can be found in [Contents/Auth.md](https://github.com/delliott0000/PyDoorBuilder/tree/master/API/HTTP/Contents/Auth.md).
+For further details on individual endpoints, please see [Contents](https://github.com/delliott0000/PyDoorBuilder/tree/master/API/HTTP/Contents). Endpoints are grouped by functionality, with each one detailed in its own dedicated section.
+
+Each section will include the following:
+- A brief description of the endpoint.
+- The JSON object that the client application should supply with the request. If this is omitted, then the API does not expect a JSON object to be supplied. Unexpected JSON objects/fields will be ignored and will not cause an error to be returned.
+- The JSON object that the API will return if the request is successful.
+- Possible HTTP error codes specific to the endpoint, listed in descending order of precedence.
+- Any additional information, such as whether the endpoint is restricted to a certain type of `User`.
