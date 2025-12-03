@@ -1,5 +1,5 @@
 # Resource Endpoints
-This file documents endpoints related to `Resources`.
+This file documents the group of endpoints related to `Resources`.
 
 If you haven't already, please read [Common.md](../Common.md) first.
 

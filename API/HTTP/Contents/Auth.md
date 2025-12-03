@@ -1,5 +1,5 @@
 # Auth Endpoints
-This file documents endpoints related to authentication.
+This file documents the group of endpoints related to authentication.
 
 If you haven't already, please read [Common.md](../Common.md) first.
 
