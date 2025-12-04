@@ -17,7 +17,7 @@ Before we can jump straight in, we must first define a few things, and consider 
 - `Users` can recover previous `Sessions` by supplying the `Session's` ID.
 - Therefore, two or more `Instances` that belong to the same `User` account, may share the same `Session`. In this case, their `States` are automatically synced together.
 - Each `Session` can acquire up to one `Resource` at a time; each `Resource` can be acquired by up to one `Session` at a time. These restrictions prevent race conditions, since a `Session` must acquire a `Resource` before modifying it.
-- `Sessions` owned by an `Autopilot` can not maintain a non-empty `State` or acquire a `Resource`.
+- If a `Session` is owned by an `Autopilot`, then it cannot interact with `Resources`, and its `State` is functionally inert.
 
 # Models
 With all of this in mind, we will organise the functionality of the server into the following models. Each bullet point includes a JSON-like representation of the model that it describes. Fields marked `ISO 8601` follow the format `%Y-%m-%dT%H:%M:%S.%f%z`.
@@ -43,7 +43,7 @@ With all of this in mind, we will organise the functionality of the server into 
 ```py
 {
     "id": int,
-    "owner": User
+    "owner": User  # Semi-permanent owner; not necessarily the acquirer.
 }
 # All resources must include these fields as a bare minimum.
 ```
@@ -71,7 +71,7 @@ With all of this in mind, we will organise the functionality of the server into 
 # Groups and Rules
 Endpoints are arranged into groups based on their functionality. These groups collectively make up the API.
 
-Rules describe how endpoints behave. These are divided into API-level, group-level and endpoint-level rules.
+Rules describe how endpoints behave. These are divided into API-level, group-level, and endpoint-level rules.
 
 Aside from the noted exceptions, API-level rules apply to all endpoints in the API. Group-level rules apply to all endpoints in the given group. Endpoint-level rules only apply to the given endpoint.
 
@@ -91,7 +91,7 @@ For successful requests, this object will contain `"message": "OK"` along with t
 ## Authentication
 Except for `/auth/login` and `/auth/refresh`, every endpoint requires an `"Authorization": "Bearer ..."` header, where `...` is a `Token` access key.
 
-If the `Authorization` header is missing, of the wrong type, or can not be parsed, the API will return `400 Bad Request`.
+If the `Authorization` header is missing, is of the wrong type, or cannot be parsed, the API will return `400 Bad Request`.
 
 If the `Authorization` header is incorrect, the API will return `401 Unauthorized`.
 
@@ -102,8 +102,8 @@ If a `User` sends a request to one of these endpoints and does not meet the requ
 
 This will be clarified on a per-endpoint basis. Some endpoints don't enforce any of these requirements, such as `/auth/login`.
 
-## Ratelimits
-Every endpoint is rate limited. Ratelimits can be applied per endpoint, per `Token`, per `User` or per IP address. Exact ratelimits are not published in this documentation.
+## Rate Limits
+Every endpoint is rate limited. Rate limits can be applied per endpoint, per `Token`, per `User` or per IP address. Exact rate limits are not published in this documentation.
 
 If a request is rate limited, the API will return `429 Too Many Requests`.
 
