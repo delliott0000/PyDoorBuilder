@@ -86,7 +86,7 @@ The API will return a JSON object with every response.
 
 For unsuccessful requests, this object will contain a `"message": ...` field describing what went wrong.
 
-For successful requests, this object will contain `"message": "OK"` along with the relevant information.
+For successful requests, this object will contain `"message": "OK"` along with the other documented fields.
 
 ## Authentication
 Except for `/auth/login` and `/auth/refresh`, every endpoint requires an `"Authorization": "Bearer ..."` header, where `...` is a `Token` access key.
