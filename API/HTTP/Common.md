@@ -39,11 +39,11 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 # TODO: Define fields and types.
 ```
-- **Resource** - See [Definitions](Common.md#definitions). Different `Resource` types will implement their own fields. `Resource` fields also depend on the context of the request.
+- **Resource** - See [Definitions](Common.md#definitions). Different `Resource` types will implement their own fields. `Resource` fields also depend on the context of the request. Every `Resource` is owned by a `User`; the owner might not be the `User` whose `Session` has temporarily acquired the `Resource`.
 ```py
 {
     "id": int,
-    "owner": User  # Semi-permanent owner; not necessarily the acquirer.
+    "owner": User
 }
 # All resources must include these fields as a bare minimum.
 ```
