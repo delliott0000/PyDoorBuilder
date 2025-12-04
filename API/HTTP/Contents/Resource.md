@@ -10,7 +10,7 @@ If you haven't already, please read [Common.md](../Common.md) first.
 - If `{id}` is not found, the API will return `404 Not Found`.
 
 ## POST /resource/{type}/{id}/acquire
-Acquire a `Resource`. Most interactions between a `Session` and a `Resource` will fail if the `Session` has not acquired the `Resource`.
+Acquire a `Resource`. Most interactions between a `Session` and a `Resource` will fail if the `Session` has not acquired the `Resource`. If a `Session` that has acquired a `Resource` does not have at least one `Token` with an open WebSocket connection, the server will automatically release the `Resource` within a short time period without warning.
 
 Returned by the API:
 ```py

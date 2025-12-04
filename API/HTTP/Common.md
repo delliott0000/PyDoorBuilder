@@ -11,6 +11,7 @@ Before we can jump straight in, we must first define a few things, and consider 
 - **Session** - A temporary context that keeps track of `User` activity, independent of authentication.
 - **Resource** - An abstract entity that `Sessions` can acquire, release, read from, and write to.
 - **State** - A container for a `Session's` real-time snapshot.
+- **Task** - A job that is offloaded from the server to an `Autopilot`.
 
 # Considerations
 - `Users` can have many ongoing `Sessions`.
@@ -18,6 +19,7 @@ Before we can jump straight in, we must first define a few things, and consider 
 - Therefore, two or more `Instances` that belong to the same `User` account, may share the same `Session`. In this case, their `States` are automatically synced together.
 - Each `Session` can acquire up to one `Resource` at a time; each `Resource` can be acquired by up to one `Session` at a time. These restrictions prevent race conditions, since a `Session` must acquire a `Resource` before modifying it.
 - If a `Session` is owned by an `Autopilot`, then it cannot interact with `Resources`, and its `State` is functionally inert.
+- `Autopilots` can perform `Tasks` that require a lot of system resources and/or time. This keeps the `Server` freed up to continue communicating with `Users`.
 
 # Models
 With all of this in mind, we will organise the functionality of the server into the following models. Each bullet point includes a JSON-like representation of the model that it describes. Fields marked `ISO 8601` follow the format `%Y-%m-%dT%H:%M:%S.%f%z`.
@@ -82,7 +84,7 @@ API-level rules are listed below in descending order of precedence.
 ## Request and Response Structures
 Most endpoints expect the caller to supply a JSON object with specific fields. Other endpoints don't expect a JSON object at all. Unexpected JSON objects/fields will be ignored and will not cause an error to be returned.
 
-The API will return a JSON object with every response.
+The API will return a JSON object with every response, except for successful WebSocket upgrades.
 
 For unsuccessful requests, this object will contain a `"message": ...` field describing what went wrong.
 
@@ -108,7 +110,7 @@ Every endpoint is rate limited. Rate limits can be applied per endpoint, per `To
 If a request is rate limited, the API will return `429 Too Many Requests`.
 
 ## Success
-If a request is considered successful, the API will return `200 OK`.
+If a request is considered successful, the API will return `200 OK`. This does not include WebSocket upgrades.
 
 # Final Notes
 For further details on individual groups and endpoints, please see [Contents](Contents). Each file in this folder documents one group, and includes the following:
