@@ -16,7 +16,7 @@ The API will return `101 Switching Protocols`.
 This endpoint is `Client-only`.
 
 ## GET /ws/autopilot
-Open a WebSocket connection with the server as an `Autopilot`. Task-related communications will take place over this connection.
+Open a WebSocket connection with the server as an `Autopilot`. Communications relating to `Tasks` will take place over this connection.
 
 The API will return `101 Switching Protocols`.
 
