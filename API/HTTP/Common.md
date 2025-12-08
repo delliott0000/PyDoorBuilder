@@ -19,7 +19,7 @@ Before we can jump straight in, we must first define a few things, and consider 
 - Therefore, two or more `Instances` that belong to the same `User` account, may share the same `Session`. In this case, their `States` are automatically synced together.
 - Each `Session` can acquire up to one `Resource` at a time; each `Resource` can be acquired by up to one `Session` at a time. These restrictions prevent race conditions, since a `Session` must acquire a `Resource` before modifying it.
 - If a `Session` is owned by an `Autopilot`, then it cannot interact with `Resources`, and its `State` is functionally inert.
-- `Autopilots` can perform `Tasks` that require a lot of system resources and/or time. This keeps the `Server` freed up to continue communicating with `Users`.
+- `Autopilots` can perform `Tasks` that require a lot of system resources and/or time. This keeps the server freed up to continue communicating with `Users`.
 
 # Models
 With all of this in mind, we will organise the functionality of the server into the following models. Each bullet point includes a JSON-like representation of the model that it describes. Fields marked `ISO 8601` follow the format `%Y-%m-%dT%H:%M:%S.%f%z`.
