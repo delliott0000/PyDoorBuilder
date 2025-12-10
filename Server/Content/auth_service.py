@@ -72,7 +72,7 @@ class AuthService(BaseService):
                 log(f"Discarded empty token set for {user}.")
 
         expired_cons.discard(None)
-        coros = (con.close() for con in expired_cons)
+        coros = (con.close(code=4000) for con in expired_cons)
         await gather(*coros)
 
         for session_id in list(session_id_to_session):
