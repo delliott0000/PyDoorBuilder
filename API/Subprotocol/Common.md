@@ -4,7 +4,7 @@ This file documents shared behaviour and workflows that are used in our WebSocke
 It is recommended to read through [HTTP](../HTTP) in its entirety first.
 
 # Scope & Purpose
-The subprotocol only defines application-level messages and behaviours. Transport-level semantics, such as connection liveliness and message size limits, are handled at the WebSocket level and are not documented here.
+The subprotocol only defines application-level messages and behaviours. Transport-level semantics, such as connection liveliness and message size limits, are handled solely at the WebSocket layer and are not documented here.
 
 Before we get into the details, a reminder of the purpose of this subprotocol:
 - Send & receive `States` for syncing and store them for later recovery.
