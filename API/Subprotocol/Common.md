@@ -4,7 +4,7 @@ This file documents shared behaviour and workflows that are used in our WebSocke
 It is recommended to read through [HTTP](../HTTP) in its entirety first.
 
 # Scope & Purpose
-The subprotocol only defines application-level messages and behaviours. Transport-level semantics, such as connection liveliness and message size limits, are handled solely at the WebSocket layer and are not documented here.
+The subprotocol only defines application-level messages and behaviours. Transport semantics, such as connection liveliness and message size limits, are handled solely at the WebSocket level and are not documented here.
 
 Before we get into the details, a reminder of the purpose of this subprotocol:
 - Send & receive `States` for syncing and store them for later recovery.
@@ -17,6 +17,9 @@ The following rules define the `Event`/`Ack` message flow:
 - Each `Event` must be acknowledged exactly once and within an agreed-upon time limit.
 - Each `Ack` must reference an `Event` that exists and has not already been acknowledged.
 - An `Ack` must not be acknowledged.
+
+# Connection Phases
+Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
 
 # Message Structure
 Each message must be "JSON-like". That is to say that it must be a text frame that can be parsed into a valid JSON object.
