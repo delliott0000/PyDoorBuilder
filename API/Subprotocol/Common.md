@@ -36,8 +36,7 @@ If and only if a peer violates the subprotocol, then the other peer must immedia
 Close codes and their corresponding failure scenarios:
 - **4001** - A message is not a text frame.
 - **4002** - A message cannot be parsed into a valid JSON object.
-- **4003** - An `Event` was not acknowledged within the agreed-upon time limit.
-- **4004** - An `Ack` references an `Event` that does not exist or has already been acknowledged.
+- **4003** - A message is neither an `Event` nor an `Ack`.
 - **XXXX** - ...
 - **XXXX** - ...
 
