@@ -1,5 +1,5 @@
 # Introduction
-This file documents shared behaviour and workflows that are used in our WebSocket subprotocol.
+This file documents shared behaviour and workflows that are used in the WebSocket subprotocol.
 
 It is recommended to read through [HTTP](../HTTP) in its entirety first.
 
@@ -14,22 +14,32 @@ Before we get into the details, a reminder of the purpose of this subprotocol:
 Each message must be an `Event` or an `Ack` (acknowledgement).
 
 The following rules define the `Event`/`Ack` message flow:
+- Each `Event` must be assigned a Universally Unique Identifier (UUID) that is unique within the scope of the WebSocket connection.
 - Each `Event` must be acknowledged exactly once and within an agreed-upon time limit.
+- Each `Ack` must reference an `Event` by specifying the UUID of that `Event`.
 - Each `Ack` must reference an `Event` that exists and has not already been acknowledged.
-- An `Ack` must not be acknowledged.
+- `Events` and `Acks` may be sent & received out of order.
 
 # Connection Phases
 Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
 
+...
+
 # Message Structure
-Each message must be "JSON-like". That is to say that it must be a text frame that can be parsed into a valid JSON object.
+Each message must be a text frame that can be parsed into a valid JSON object.
+
+...
 
 # Close Codes
-If and only if a sending peer sends a message that violates the subprotocol, then the receiving peer must immediately close the WebSocket connection with the appropriate custom WebSocket close code.
+If and only if a peer violates the subprotocol, then the other peer must immediately close the WebSocket connection with the appropriate custom WebSocket close code.
 
 Close codes and their corresponding failure scenarios:
-- **4001** - The message is not a text frame.
-- **4002** - The message cannot be parsed into a valid JSON object.
+- **4001** - A message is not a text frame.
+- **4002** - A message cannot be parsed into a valid JSON object.
+- **4003** - An `Event` was not acknowledged within the agreed-upon time limit.
+- **4004** - An `Ack` references an `Event` that does not exist or has already been acknowledged.
+- **XXXX** - ...
+- **XXXX** - ...
 
 Not part of the subprotocol per se, but still application-specific:
 - **4000** - Sent by the server when the `Token` that was used to open the WebSocket connection is no longer valid.
