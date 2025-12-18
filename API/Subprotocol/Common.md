@@ -14,11 +14,13 @@ Before we get into the details, a reminder of the purpose of this subprotocol:
 Each message must be an `Event` or an `Ack`. An `Event` contains information. An `Ack` simply acknowledges an `Event`.
 
 The following rules define the `Event`/`Ack` message flow:
-- Each `Event` must be assigned a Universally Unique Identifier (UUID) that is unique within the scope of the WebSocket connection.
+- Each `Event` must be assigned a Universally Unique Identifier (UUID).
 - Each `Event` must be acknowledged exactly once and within an agreed-upon time limit.
 - Each `Ack` must reference an `Event` by specifying the UUID of that `Event`.
 - Each `Ack` must reference an `Event` that exists and has not already been acknowledged.
 - `Events` and `Acks` may be sent & received out of order.
+
+Please note that whilst UUIDs should ideally be unique within the scope of the WebSocket connection, this is not strictly required in practice. An implementation may discard an outgoing `Event` and its UUID as soon as it has been acknowledged - this is actually recommended to reduce the memory usage of a long-lasting or high-throughput connection. Therefore, a sending peer is only required to ensure UUID uniqueness within its current set of unacknowledged outgoing `Events`.
 
 # Message Structure
 Each message must be a text frame that can be parsed into a valid JSON object.
