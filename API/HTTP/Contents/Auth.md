@@ -13,7 +13,7 @@ Supplied by the client application:
 ```py
 {
     "username": str,
-    "password": str
+    "password": str,
     "session_id": str  # Optional
 }
 ```

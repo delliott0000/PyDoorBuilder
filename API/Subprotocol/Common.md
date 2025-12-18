@@ -20,13 +20,13 @@ The following rules define the `Event`/`Ack` message flow:
 - Each `Ack` must reference an `Event` that exists and has not already been acknowledged.
 - `Events` and `Acks` may be sent & received out of order.
 
-# Connection Phases
-Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
+# Message Structure
+Each message must be a text frame that can be parsed into a valid JSON object.
 
 ...
 
-# Message Structure
-Each message must be a text frame that can be parsed into a valid JSON object.
+# Connection Phases
+Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
 
 ...
 
