@@ -14,7 +14,7 @@ Before we get into the details, a reminder of the purpose of this subprotocol:
 Each message must be an `Event` or an `Ack`. An `Event` contains information. An `Ack` simply acknowledges an `Event`.
 
 The following rules define the `Event`/`Ack` message flow:
-- Each `Event` must be assigned a Universally Unique Identifier (UUID).
+- Each `Event` must be assigned a Universally Unique Identifier (UUID) that is unique within the scope of the WebSocket connection.
 - Each `Event` must be acknowledged exactly once and within an agreed-upon time limit.
 - Each `Ack` must reference an `Event` by specifying the UUID of that `Event`.
 - Each `Ack` must reference an `Event` that exists and has not already been acknowledged.
@@ -36,8 +36,6 @@ If and only if a peer violates the subprotocol, then the other peer must immedia
 Close codes and their corresponding failure scenarios:
 - **4001** - A message is not a text frame.
 - **4002** - A message cannot be parsed into a valid JSON object.
-- **XXXX** - ...
-- **XXXX** - ...
 
 Not part of the subprotocol per se, but still application-specific:
 - **4000** - Sent by the server when the `Token` that was used to open the WebSocket connection is no longer valid.
