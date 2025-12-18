@@ -1,20 +1,20 @@
 # Introduction
 This file documents shared behaviour and workflows that are used in the WebSocket subprotocol.
 
-It is recommended to read through [HTTP](../HTTP) in its entirety first.
+It is recommended to read through [HTTP](../HTTP) in its entirety first; this subfolder will reference some things that are defined there.
 
 # Scope & Purpose
 The subprotocol only defines application-level messages and behaviours. Transport semantics, such as connection liveliness and message size limits, are handled solely at the WebSocket level and are not documented here.
 
 Before we get into the details, a reminder of the purpose of this subprotocol:
 - Send & receive `States` for syncing and store them for later recovery.
-- Defer resource-intensive tasks, such as file generation, to another process.
+- Defer resource-intensive tasks, such as file generation, to an `Autopilot`.
 
 # Message Flow
-Each message must be an `Event` or an `Ack` (acknowledgement).
+Each message must be an `Event` or an `Ack`. An `Event` contains information. An `Ack` simply acknowledges an `Event`.
 
 The following rules define the `Event`/`Ack` message flow:
-- Each `Event` must be assigned a Universally Unique Identifier (UUID) that is unique within the scope of the WebSocket connection.
+- Each `Event` must be assigned a Universally Unique Identifier (UUID).
 - Each `Event` must be acknowledged exactly once and within an agreed-upon time limit.
 - Each `Ack` must reference an `Event` by specifying the UUID of that `Event`.
 - Each `Ack` must reference an `Event` that exists and has not already been acknowledged.
@@ -36,7 +36,6 @@ If and only if a peer violates the subprotocol, then the other peer must immedia
 Close codes and their corresponding failure scenarios:
 - **4001** - A message is not a text frame.
 - **4002** - A message cannot be parsed into a valid JSON object.
-- **4003** - A message is neither an `Event` nor an `Ack`.
 - **XXXX** - ...
 - **XXXX** - ...
 
