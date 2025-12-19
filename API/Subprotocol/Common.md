@@ -27,6 +27,24 @@ Each message must be a text frame that can be parsed into a valid JSON object.
 
 ...
 
+...
+```py
+{
+    "type": "event",  # By definition
+    "id": str,  # UUID
+    "sent_at": str  # ISO 8601
+}
+```
+
+...
+```py
+{
+    "type": "ack",  # By definition
+    "id": str,  # UUID of an Event
+    "sent_at": str  # ISO 8601
+}
+```
+
 # Connection Phases
 Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
 
