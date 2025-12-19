@@ -15,7 +15,7 @@ Each message must be an `Event` or an `Ack`. An `Event` contains information. An
 
 The following rules define the `Event`/`Ack` message flow:
 - Each `Event` must be assigned a Universally Unique Identifier (UUID).
-- Each `Event` must be acknowledged exactly once and within an agreed-upon time limit.
+- Each `Event` must be acknowledged exactly once, within a time limit negotiated during the [handshake phase](Common.md#connection-phases).
 - Each `Ack` must reference an `Event` by specifying the UUID of that `Event`.
 - Each `Ack` must reference an `Event` that exists and has not already been acknowledged.
 - `Events` and `Acks` may be sent & received out of order.
