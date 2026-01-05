@@ -25,7 +25,7 @@ Please note that whilst UUIDs should ideally be unique within the scope of the W
 # Message Structure
 Each message must be a text frame that can be parsed into a valid JSON object.
 
-...
+Below is a list of top-level fields and their corresponding data types (or recognised values) for each message type. Each field is mandatory unless `None` is listed as an allowed type, in which case that field is optional. Omitting an optional field should be interpretted in the same way as an explicit `None` for that field.
 
 `Event` fields:
 ```py
@@ -44,6 +44,8 @@ Each message must be a text frame that can be parsed into a valid JSON object.
     "sent_at": str  # ISO 8601
 }
 ```
+
+...
 
 # Connection Phases
 Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
