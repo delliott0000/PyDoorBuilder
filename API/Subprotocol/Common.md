@@ -27,7 +27,7 @@ Each message must be a text frame that can be parsed into a valid JSON object.
 
 ...
 
-...
+`Event` fields:
 ```py
 {
     "type": "event",  # By definition
@@ -36,7 +36,7 @@ Each message must be a text frame that can be parsed into a valid JSON object.
 }
 ```
 
-...
+`Ack` fields:
 ```py
 {
     "type": "ack",  # By definition
