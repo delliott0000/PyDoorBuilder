@@ -51,11 +51,11 @@ Below is a list of top-level fields and their corresponding types and enumeratio
 It *is* a violation of the subprotocol to:
 - Miss a mandatory top-level field.
 - Supply a value of an incorrect type.
-- Supply a value of the correct type that is not a member of the field's designated enumeration.
+- Supply a value that is not a member of the field's designated enumeration.
 - ...
 
 It *is not* a violation of the subprotocol to:
-- Supply an undocumented top-level field. This can be safely ignored by the receiving peer.
+- Supply an undocumented top-level field. The receiving peer can safely ignore this.
 - ...
 
 # Connection Phases
