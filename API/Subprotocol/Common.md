@@ -20,7 +20,7 @@ The following rules define the `Event`/`Ack` message flow:
 - Each `Ack` must reference an `Event` that exists and has not already been acknowledged.
 - `Events` and `Acks` may be sent & received out of order.
 
-Please note that whilst UUIDs should ideally be unique within the scope of the WebSocket connection, this is not strictly required in practice. An implementation may discard an outgoing `Event` and its UUID as soon as it has been acknowledged - this is actually recommended to reduce the memory usage of a long-lasting or high-throughput connection. Therefore, a sending peer is only required to ensure UUID uniqueness within its current set of unacknowledged outgoing `Events`.
+Please note that while UUIDs should ideally be unique within the scope of the WebSocket connection, this is not strictly required in practice. An implementation may discard an outgoing `Event` and its UUID as soon as it has been acknowledged - this is actually recommended to reduce the memory usage of a long-lasting or high-throughput connection. Therefore, a sending peer is only required to ensure UUID uniqueness within its current set of unacknowledged outgoing `Events`.  Peers may generate UUIDs using any method they choose.
 
 # Message Structure
 Each message must be a text frame that can be parsed into a valid JSON object.
@@ -30,16 +30,19 @@ Below is a list of top-level fields and their corresponding types and enumeratio
 `Event` fields:
 ```py
 {
-    "type": "event",  # By definition; enum ["event"]
+    "type": "event",  # By definition; Enum ["event"]
     "id": str,  # UUID
-    "sent_at": str  # ISO 8601
+    "sent_at": str,  # ISO 8601
+    "status": str,  # Enum ["ok", "error", "fatal"]
+    "reason": str | None,  # For human-readable logging and traceback
+    "payload": dict[str, Any]  # Required, but may be empty
 }
 ```
 
 `Ack` fields:
 ```py
 {
-    "type": "ack",  # By definition; enum ["ack"]
+    "type": "ack",  # By definition; Enum ["ack"]
     "id": str,  # UUID of an Event
     "sent_at": str  # ISO 8601
 }
@@ -49,9 +52,11 @@ It *is* a violation of the subprotocol to:
 - Miss a mandatory top-level field.
 - Supply a value of an incorrect type.
 - Supply a value of the correct type that is not a member of the field's designated enumeration.
+- ...
 
 It *is not* a violation of the subprotocol to:
 - Supply an undocumented top-level field. This can be safely ignored by the receiving peer.
+- ...
 
 # Connection Phases
 Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
