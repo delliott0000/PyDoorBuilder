@@ -47,6 +47,7 @@ class BaseWebSocketService(BaseService, ABC):
         response = token.session.connections.pop(token, None)
 
         try:
+            # TODO: sort this out
             await response.close()
             log(
                 f"Closed WebSocket for {token.session.user}. "

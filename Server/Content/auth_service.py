@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPBadRequest, HTTPUnauthorized, json_response
 
-from Common import Session, Token, log, to_json
+from Common import CustomWSCloseCode, Session, Token, log, to_json
 
 from .base_service import BaseService
 from .decorators import BucketType, ratelimit, route, validate_access
@@ -72,7 +72,7 @@ class AuthService(BaseService):
                 log(f"Discarded empty token set for {user}.")
 
         expired_cons.discard(None)
-        coros = (con.close(code=4000) for con in expired_cons)
+        coros = (con.close(code=CustomWSCloseCode.TokenExpired) for con in expired_cons)
         await gather(*coros)
 
         for session_id in list(session_id_to_session):
