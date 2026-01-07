@@ -52,22 +52,23 @@ Each field is mandatory unless `None` is listed as an allowed type, in which cas
 
 The `"status"` field describes the outcome of an `Event`. Unless the value is `"fatal"`, this field does not mandate any specific behaviour from the receiving peer.
 - `"ok"` indicates that an `Event` occurred without error.
-- `"error"` indicates that a recoverable application-level error occurred. The connection may or may not remain open.
+- `"error"` indicates that a recoverable application-level error occurred. The connection may remain open.
 - `"fatal"` indicates that an unrecoverable application-level error occurred. The connection must immediately close.
 
 The `"reason"` field is an optional, human-readable string for logging, debugging and so on. This field does not mandate any specific behaviour from the receiving peer.
 
 The `"payload"` field contains the actual data associated with an `Event`. Its semantics are defined in [Connection Phases](#connection-phases) and [Contents](Contents).
 
+The following rules apply to top-level and payload-level fields.
+
 It *is* a violation of the subprotocol to:
-- Miss a mandatory top-level field.
+- Miss a mandatory field.
 - Supply a value of an incorrect type.
 - Supply a value that is not a member of the field's designated enumeration.
 - Send an `Event` with `"status": "fatal"`.
 
 It *is not* a violation of the subprotocol to:
-- Supply an undocumented top-level field. The receiving peer can safely ignore this.
-- Send bad payload-level data. The receiving peer can handle this by sending back an `Event` with `"status": "error"` or `"status": "fatal"`.
+- Supply an undocumented field. The receiving peer can safely ignore this.
 
 # Connection Phases
 Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
