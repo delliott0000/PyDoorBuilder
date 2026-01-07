@@ -52,12 +52,12 @@ Each field is mandatory unless `None` is listed as an allowed type, in which cas
 
 The `"status"` field describes the outcome of an `Event`. Unless the value is `"fatal"`, this field does not mandate any specific behaviour from the receiving peer.
 - `"ok"` indicates that an `Event` occurred without error.
-- `"error"` indicates that a recoverable error occurred. The connection may or may not remain open.
-- `"fatal"` indicates that an unrecoverable error occurred. The connection must immediately close.
+- `"error"` indicates that a recoverable application-level error occurred. The connection may or may not remain open.
+- `"fatal"` indicates that an unrecoverable application-level error occurred. The connection must immediately close.
 
 The `"reason"` field is an optional, human-readable string for logging, debugging and so on. This field does not mandate any specific behaviour from the receiving peer.
 
-The `"payload"` field contains information about an `Event`. Its semantics are defined in [Contents](Contents).
+The `"payload"` field contains the actual data associated with an `Event`. Its semantics are defined in [Connection Phases](#connection-phases) and [Contents](Contents).
 
 It *is* a violation of the subprotocol to:
 - Miss a mandatory top-level field.
