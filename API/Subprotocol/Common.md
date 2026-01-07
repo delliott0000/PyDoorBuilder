@@ -25,7 +25,9 @@ Please note that while UUIDs should ideally be unique within the scope of the We
 # Message Structure
 Each message must be a text frame that can be parsed into a valid JSON object.
 
-Below is a list of top-level fields and their corresponding types and enumerations for each message type. Each field is mandatory unless `None` is listed as an allowed type, in which case that field is optional. Omitting an optional field should be interpreted in the same way as an explicit `None` for that field.
+Below is a list of top-level fields and their corresponding types and enumerations for each message type.
+
+Each field is mandatory unless `None` is listed as an allowed type, in which case that field is optional. Omitting an optional field should be interpreted in the same way as an explicit `None` for that field.
 
 `Event` fields:
 ```py
@@ -48,15 +50,17 @@ Below is a list of top-level fields and their corresponding types and enumeratio
 }
 ```
 
+...
+
 It *is* a violation of the subprotocol to:
 - Miss a mandatory top-level field.
 - Supply a value of an incorrect type.
 - Supply a value that is not a member of the field's designated enumeration.
-- ...
+- Send an `Event` with `"status": "fatal"`.
 
 It *is not* a violation of the subprotocol to:
 - Supply an undocumented top-level field. The receiving peer can safely ignore this.
-- ...
+- Send bad payload-level data. The receiving peer can handle this by sending back an `Event` with `"status": "error"` or `"status": "fatal"`.
 
 # Connection Phases
 Each connection is divided into two application-level phases; the handshake phase and the messaging phase.
