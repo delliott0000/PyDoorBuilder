@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPConflict, WebSocketResponse
 
-from Common import log
+from Common import WSCloseCode, log
 
 from .base_service import BaseService
 from .decorators import (
@@ -47,8 +47,8 @@ class BaseWebSocketService(BaseService, ABC):
         response = token.session.connections.pop(token, None)
 
         try:
-            # TODO: sort this out
-            await response.close()
+            code = response.close_code or WSCloseCode.OK
+            await response.close(code=code)
             log(
                 f"Closed WebSocket for {token.session.user}. "
                 f"Received code {response.close_code}. (Token ID: {token.id})"
