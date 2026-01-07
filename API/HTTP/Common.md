@@ -23,7 +23,7 @@ Before we can jump straight in, we must first define a few things, and consider 
 
 # Models
 With all of this in mind, we will organise the functionality of the server into the following models. Each bullet point includes a JSON-like representation of the model that it describes. Fields marked `ISO 8601` follow the format `%Y-%m-%dT%H:%M:%S.%f%z`.
-- **User** - See [Definitions](Common.md#definitions).
+- **User** - See [Definitions](#definitions).
 ```py
 {
     "id": int,
@@ -35,13 +35,13 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 # Omitted the "teams" field; this is not relevant here.
 ```
-- **State** - See [Definitions](Common.md#definitions). This is stored by the server mainly to prevent loss of progress.
+- **State** - See [Definitions](#definitions). This is stored by the server mainly to prevent loss of progress.
 ```py
 {
 }
 # TODO: Define fields and types.
 ```
-- **Resource** - See [Definitions](Common.md#definitions). Different `Resource` types will implement their own fields. `Resource` fields also depend on the context of the request. Every `Resource` is owned by a `User`; the owner might not be the `User` whose `Session` has temporarily acquired the `Resource`.
+- **Resource** - See [Definitions](#definitions). Different `Resource` types will implement their own fields. `Resource` fields also depend on the context of the request. Every `Resource` is owned by a `User`; the owner might not be the `User` whose `Session` has temporarily acquired the `Resource`.
 ```py
 {
     "id": int,
@@ -49,7 +49,7 @@ With all of this in mind, we will organise the functionality of the server into 
 }
 # All resources must include these fields as a bare minimum.
 ```
-- **Session** - See [Definitions](Common.md#definitions). Each `Session` is associated with a `User` (many-to-one), a `State` (one-to-one) and the `Resource` that it currently has acquired (one-to-one).
+- **Session** - See [Definitions](#definitions). Each `Session` is associated with a `User` (many-to-one), a `State` (one-to-one) and the `Resource` that it currently has acquired (one-to-one).
 ```py
 {
     "id": str,
