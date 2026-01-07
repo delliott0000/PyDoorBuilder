@@ -19,7 +19,6 @@ from .decorators import (
 )
 
 if TYPE_CHECKING:
-    from aiohttp import WSMessage
     from aiohttp.web import Request
 
     from Common import Token
@@ -58,6 +57,18 @@ class BaseWebSocketService(BaseService, ABC):
         except Exception as error:
             log(f"Failed to close WebSocket - {type(error).__name__}.", ERROR)
 
+    async def serve_ws(self, request: Request, /) -> WebSocketResponse:
+        token = self.token_from_request(request)
+        response = await self.prepare_ws(request, token)
+
+        try:
+            ...
+
+        finally:
+            await self.cleanup_ws(token)
+
+        return response
+
 
 class UserWebSocketService(BaseWebSocketService):
     async def task_coro(self) -> None:
@@ -67,18 +78,8 @@ class UserWebSocketService(BaseWebSocketService):
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.Token)
     @user_only
     @validate_access
-    async def serve_ws(self, request: Request, /) -> WebSocketResponse:
-        token = self.token_from_request(request)
-        response = await self.prepare_ws(request, token)
-
-        try:
-            async for _ in response:
-                _: WSMessage
-
-        finally:
-            await self.cleanup_ws(token)
-
-        return response
+    async def ws_user(self, request: Request, /) -> WebSocketResponse:
+        return await self.serve_ws(request)
 
 
 class AutopilotWebSocketService(BaseWebSocketService):
@@ -89,15 +90,5 @@ class AutopilotWebSocketService(BaseWebSocketService):
     @ratelimit(limit=10, interval=60, bucket_type=BucketType.Token)
     @autopilot_only
     @validate_access
-    async def serve_ws(self, request: Request, /) -> WebSocketResponse:
-        token = self.token_from_request(request)
-        response = await self.prepare_ws(request, token)
-
-        try:
-            async for _ in response:
-                _: WSMessage
-
-        finally:
-            await self.cleanup_ws(token)
-
-        return response
+    async def ws_autopilot(self, request: Request, /) -> WebSocketResponse:
+        return await self.serve_ws(request)
