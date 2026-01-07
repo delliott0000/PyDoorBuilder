@@ -81,6 +81,7 @@ If and only if a peer violates the subprotocol, then the other peer must immedia
 Close codes and their corresponding failure scenarios:
 - **4001** - A message is not a text frame.
 - **4002** - A message cannot be parsed into a valid JSON object.
+- **4003** - A message is neither an `Event` nor an `Ack`.
 
 Not part of the subprotocol per se, but still application-specific:
 - **4000** - Sent by the server when the `Token` that was used to open the WebSocket connection is no longer valid.
