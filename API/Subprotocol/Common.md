@@ -37,7 +37,7 @@ Each field is mandatory unless `None` is listed as an allowed type, in which cas
     "sent_at": str,  # ISO 8601
     "status": str,  # Enum ["ok", "error", "fatal"]
     "reason": str | None,  # For logging and traceback
-    "payload": dict[str, Any]  # Required, but may be empty
+    "payload": dict[str, Any]  # Actual data
 }
 ```
 
