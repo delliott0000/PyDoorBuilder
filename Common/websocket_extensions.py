@@ -11,3 +11,4 @@ class CustomWSCloseCode(IntEnum):
     InvalidFrameType   = 4001
     InvalidJSON        = 4002
     InvalidMessageType = 4003
+# fmt: on
