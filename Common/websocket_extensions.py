@@ -1,8 +1,6 @@
 from enum import IntEnum
 
-from aiohttp import WSCloseCode
-
-__all__ = ("WSCloseCode", "CustomWSCloseCode")
+__all__ = ("CustomWSCloseCode",)
 
 
 # fmt: off

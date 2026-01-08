@@ -4,9 +4,10 @@ from asyncio import Runner, gather
 from contextlib import AsyncExitStack
 from typing import TYPE_CHECKING
 
+from aiohttp import WSCloseCode
 from aiohttp.web import Application, AppRunner, TCPSite
 
-from Common import WSCloseCode, log
+from Common import log
 
 from .auth_service import AuthService
 from .manager import AutopilotManager

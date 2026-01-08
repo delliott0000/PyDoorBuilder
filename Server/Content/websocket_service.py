@@ -4,9 +4,10 @@ from abc import ABC
 from logging import ERROR
 from typing import TYPE_CHECKING
 
+from aiohttp import WSCloseCode
 from aiohttp.web import HTTPConflict, WebSocketResponse
 
-from Common import WSCloseCode, log
+from Common import log
 
 from .base_service import BaseService
 from .decorators import (
