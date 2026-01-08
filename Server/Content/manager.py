@@ -4,9 +4,7 @@ from asyncio import Condition
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from aiohttp.web import WebSocketResponse
-
-    from Common import Token
+    from Common import CustomWSResponse, Token
 
     from .server import Server
 
@@ -24,7 +22,7 @@ class AutopilotInstance:
         return f"Autopilot {self.__token.session.user} (Token ID: {self.__token.id})"
 
     @property
-    def ws(self) -> WebSocketResponse:
+    def ws(self) -> CustomWSResponse:
         ws = self.__token.session.connections.get(self.__token)
         if ws is None or ws.closed:
             raise RuntimeError(f"{self} is not connected.")

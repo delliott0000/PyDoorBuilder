@@ -1,6 +1,8 @@
 from enum import IntEnum
 
-__all__ = ("CustomWSCloseCode",)
+from aiohttp.web import WebSocketResponse
+
+__all__ = ("CustomWSCloseCode", "CustomWSResponse")
 
 
 # fmt: off
@@ -10,3 +12,6 @@ class CustomWSCloseCode(IntEnum):
     InvalidJSON        = 4002
     InvalidMessageType = 4003
 # fmt: on
+
+
+class CustomWSResponse(WebSocketResponse): ...

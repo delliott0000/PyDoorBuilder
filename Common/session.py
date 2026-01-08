@@ -11,7 +11,7 @@ from .utils import log
 if TYPE_CHECKING:
     from typing import Any
 
-    from aiohttp.web import WebSocketResponse
+    from Common import CustomWSResponse
 
     from .resource import Resource
     from .token import Token
@@ -58,7 +58,7 @@ class Session(ComparesIDMixin, ComparesIDABC):
         return self._resource is not None
 
     @property
-    def connections(self) -> dict[Token, WebSocketResponse]:
+    def connections(self) -> dict[Token, CustomWSResponse]:
         return self._connections
 
     @property
