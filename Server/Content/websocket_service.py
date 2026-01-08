@@ -19,6 +19,7 @@ from .decorators import (
 )
 
 if TYPE_CHECKING:
+    from aiohttp import WSMessage
     from aiohttp.web import Request
 
     from Common import Token
@@ -62,12 +63,19 @@ class BaseWebSocketService(BaseService, ABC):
         response = await self.prepare_ws(request, token)
 
         try:
-            ...
+            async for message in response:
+                # TODO: per-message rate limiting
+
+                await self.process_message(response, message)  # noqa
 
         finally:
             await self.cleanup_ws(token)
 
         return response
+
+    async def process_message(
+        self, response: WebSocketResponse, message: WSMessage, /
+    ) -> None: ...
 
 
 class UserWebSocketService(BaseWebSocketService):
