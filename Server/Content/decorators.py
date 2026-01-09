@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from enum import Enum
-from time import time
 from typing import TYPE_CHECKING
 
 from aiohttp.web import HTTPForbidden, HTTPTooManyRequests
 
-from Common import log
+from Common import check_ratelimit, log
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
@@ -68,20 +67,19 @@ def ratelimit(*, limit: int, interval: float, bucket_type: BucketType) -> RespDe
         async def wrapper(service: BaseService, request: Request, /) -> RespType:
             source = bucket_type.get_source(service, request)
 
-            now = time()
             meta = ensure_meta(wrapper)
             hits = meta[k1][k2].get(source, ())
-            hits = [hit for hit in hits if hit + interval > now]
 
-            if len(hits) >= limit:
+            try:
+                recent_hits = check_ratelimit(hits, limit=limit, interval=interval)
+            except RuntimeError:
                 raise HTTPTooManyRequests(
                     reason="Too many requests", headers={"Retry-After": str(interval)}
                 )
 
-            hits.append(now)
-            meta[k1][k2][source] = hits
+            meta[k1][k2][source] = recent_hits
 
-            if len(hits) >= limit:
+            if len(recent_hits) == limit:
                 method, endpoint = service.decode_route_name(request.match_info.route.name)
                 log(
                     f"{method.upper()} {endpoint} "

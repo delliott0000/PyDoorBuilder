@@ -5,6 +5,7 @@ from logging import DEBUG, ERROR, INFO, WARNING, basicConfig, getLogger
 from os import makedirs
 from pathlib import Path
 from sys import exc_info
+from time import time
 from typing import TYPE_CHECKING
 
 from bcrypt import checkpw, gensalt, hashpw
@@ -24,6 +25,7 @@ __all__ = (
     "check_password",
     "encrypt_password",
     "setup_logging",
+    "check_ratelimit",
     "log",
     "to_json",
 )
@@ -69,6 +71,19 @@ def setup_logging(file: str, level: int = DEBUG, /) -> None:
         level=level,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
+
+
+def check_ratelimit(hits: list[float], /, *, limit: int, interval: float) -> list[float]:
+    current_time = time()
+
+    recent_hits = [hit for hit in hits if hit + interval > current_time]
+
+    if len(recent_hits) >= limit:
+        raise RuntimeError("Ratelimit exceeded.")
+
+    recent_hits.append(current_time)
+
+    return recent_hits
 
 
 def log(message: str, level: int = INFO, /) -> None:
