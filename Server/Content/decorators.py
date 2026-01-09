@@ -84,7 +84,8 @@ def ratelimit(*, limit: int, interval: float, bucket_type: BucketType) -> RespDe
             if len(hits) >= limit:
                 method, endpoint = service.decode_route_name(request.match_info.route.name)
                 log(
-                    f"{method.upper()} {endpoint} " f"has hit the {bucket_type.name} ratelimit."
+                    f"{method.upper()} {endpoint} "
+                    f"has reached the {bucket_type.name} ratelimit."
                 )
 
             return await func(service, request)
