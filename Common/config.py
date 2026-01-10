@@ -60,7 +60,7 @@ class ServerAPIConfig:
     task_interval: float
     ws_heartbeat: float
     ws_max_message_size: int
-    resource_grace: int
+    resource_grace: float
 
 
 config_file = Path(__file__).parent.parent / "config.toml"

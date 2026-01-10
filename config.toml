@@ -13,7 +13,7 @@ max_retry_after = 60.0
 handle_backoffs = true
 backoff_factor = 1.5
 backoff_start = 1.0
-backoff_cap = 20
+backoff_cap = 20.0
 
 [postgres]
 host = ""
@@ -26,13 +26,13 @@ max_pool_size = 5
 host = "0.0.0.0"
 port = 8080
 proxy = false
-access_time = 900
-refresh_time = 3600
+access_time = 900.0
+refresh_time = 3600.0
 max_tokens_per_user = 5
-task_interval = 5
-ws_heartbeat = 5
+task_interval = 5.0
+ws_heartbeat = 5.0
 ws_max_message_size = 16  # In kilobytes
-resource_grace = 300
+resource_grace = 300.0
 
 [server.postgres]
 user = ""
