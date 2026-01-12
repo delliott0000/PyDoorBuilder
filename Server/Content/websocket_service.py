@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC
-from logging import ERROR
 from typing import TYPE_CHECKING
 
 from aiohttp import WSCloseCode
@@ -50,18 +49,15 @@ class BaseWebSocketService(BaseService, ABC):
 
     async def cleanup_ws(self, token: Token, /) -> None:
         response = token.session.connections.pop(token, None)
+        if response is None:
+            return
 
-        try:
-            code = response.close_code or WSCloseCode.OK
-            await response.close(code=code)
-            log(
-                f"Closed WebSocket for {token.session.user}. "
-                f"Received code {response.close_code}. (Token ID: {token.id})"
-            )
-        except AttributeError:
-            pass
-        except Exception as error:
-            log(f"Failed to close WebSocket - {type(error).__name__}.", ERROR)
+        code = response.close_code or WSCloseCode.OK
+        await response.close(code=code)
+        log(
+            f"Closed WebSocket for {token.session.user}. "
+            f"Received code {response.close_code}. (Token ID: {token.id})"
+        )
 
     async def serve_ws(self, request: Request, /) -> CustomWSResponse:
         token = self.token_from_request(request)
