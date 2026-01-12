@@ -1,6 +1,12 @@
+from __future__ import annotations
+
 from enum import IntEnum
+from typing import TYPE_CHECKING
 
 from aiohttp.web import WebSocketResponse
+
+if TYPE_CHECKING:
+    from typing import Any
 
 __all__ = ("CustomWSCloseCode", "CustomWSResponse")
 
@@ -14,4 +20,15 @@ class CustomWSCloseCode(IntEnum):
 # fmt: on
 
 
-class CustomWSResponse(WebSocketResponse): ...
+class CustomWSResponse(WebSocketResponse):
+    def __init__(
+        self,
+        *args: Any,
+        limit: int,
+        interval: float,
+        **kwargs: Any,
+    ):
+        super().__init__(*args, **kwargs)
+        self.__limit = limit
+        self.__interval = interval
+        self.__hits = []
