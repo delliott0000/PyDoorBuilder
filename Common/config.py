@@ -60,6 +60,8 @@ class ServerAPIConfig:
     task_interval: float
     ws_heartbeat: float
     ws_max_message_size: int
+    ws_message_limit: int
+    ws_message_interval: float
     resource_grace: float
 
 

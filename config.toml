@@ -32,6 +32,8 @@ max_tokens_per_user = 5
 task_interval = 5.0
 ws_heartbeat = 5.0
 ws_max_message_size = 16  # In kilobytes
+ws_message_limit = 10
+ws_message_interval = 5.0
 resource_grace = 300.0
 
 [server.postgres]
