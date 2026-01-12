@@ -65,8 +65,6 @@ class BaseWebSocketService(BaseService, ABC):
 
         try:
             async for message in response:
-                # TODO: per-message rate limiting
-
                 await self.process_message(response, message)  # noqa
 
         finally:
