@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import TYPE_CHECKING
 
-from aiohttp import WSCloseCode
+from aiohttp import WSCloseCode, WSMsgType
 from aiohttp.web import WebSocketResponse
 
 from .utils import check_ratelimit
@@ -28,12 +28,11 @@ class CustomWSCloseCode(IntEnum):
 class CustomWSResponse(WebSocketResponse):
     def __init__(
         self,
-        *args: Any,
         limit: int,
         interval: float,
         **kwargs: Any,
     ):
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
         self.__limit = limit
         self.__interval = interval
         self.__hits = []
@@ -46,7 +45,13 @@ class CustomWSResponse(WebSocketResponse):
                 self.__hits, limit=self.__limit, interval=self.__interval
             )
         except RuntimeError:
-            await self.close(code=WSCloseCode.POLICY_VIOLATION)
-            raise StopAsyncIteration
+            await self.__close_and_break__(code=WSCloseCode.POLICY_VIOLATION)
+
+        if message.type != WSMsgType.TEXT:
+            await self.__close_and_break__(code=CustomWSCloseCode.InvalidFrameType)
 
         return message
+
+    async def __close_and_break__(self, **kwargs: Any) -> None:
+        await self.close(**kwargs)
+        raise StopAsyncIteration
