@@ -28,6 +28,7 @@ class CustomWSCloseCode(IntEnum):
 class CustomWSResponse(WebSocketResponse):
     def __init__(
         self,
+        *,
         limit: int,
         interval: float,
         **kwargs: Any,
