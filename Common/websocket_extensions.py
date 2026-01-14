@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from json import JSONDecodeError
 from typing import TYPE_CHECKING
 
 from aiohttp import ClientWebSocketResponse, WSCloseCode, WSMsgType
@@ -57,6 +58,14 @@ class WSResponseMixin:
 
         if message.type != WSMsgType.TEXT:
             await self.__close_and_break__(code=CustomWSCloseCode.InvalidFrameType)
+
+        try:
+            message.json()
+        except JSONDecodeError:
+            await self.__close_and_break__(code=CustomWSCloseCode.InvalidJSON)
+
+        # TODO: build a custom message object from the JSON object
+        # TODO: and process/return that instead of the aiohttp object
 
         return message
 
