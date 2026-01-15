@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from aiohttp import WSMessage
 
-__all__ = ("CustomWSCloseCode", "CustomWSResponse", "CustomClientWSResponse")
+__all__ = ("CustomWSCloseCode", "WSResponseMixin", "CustomWSResponse", "CustomClientWSResponse")
 
 
 # fmt: off
