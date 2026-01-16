@@ -19,10 +19,9 @@ from .decorators import (
 )
 
 if TYPE_CHECKING:
-    from aiohttp import WSMessage
     from aiohttp.web import Request
 
-    from Common import Token
+    from Common import CustomWSMessage, Token
 
 __all__ = ("BaseWebSocketService", "UserWebSocketService", "AutopilotWebSocketService")
 
@@ -73,7 +72,12 @@ class BaseWebSocketService(BaseService, ABC):
 
         return response
 
-    async def process_message(self, response: CustomWSResponse, message: WSMessage, /) -> None:
+    async def process_message(
+        self,
+        response: CustomWSResponse,
+        message: CustomWSMessage,
+        /,
+    ) -> None:
         pass
 
 

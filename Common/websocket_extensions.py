@@ -14,8 +14,6 @@ if TYPE_CHECKING:
     from datetime import datetime
     from typing import Any
 
-    from aiohttp import WSMessage
-
     Json = dict[str, Any]
 
 __all__ = (
@@ -100,7 +98,7 @@ class WSResponseMixin:
         self.__interval = interval
         self.__hits = []
 
-    async def __anext__(self) -> WSMessage:
+    async def __anext__(self) -> WSEvent | WSAck:
         message = await super().__anext__()  # noqa
 
         if self.__ratelimited:
@@ -115,14 +113,20 @@ class WSResponseMixin:
             await self.__close_and_break__(code=CustomWSCloseCode.InvalidFrameType)
 
         try:
-            message.json()
+            json = message.json()
         except JSONDecodeError:
             await self.__close_and_break__(code=CustomWSCloseCode.InvalidJSON)
 
-        # TODO: build a custom message object from the JSON object
-        # TODO: and process/return that instead of the aiohttp object
+        try:
+            custom_message = custom_ws_message_factory(json)  # noqa
+        except KeyError:
+            await self.__close_and_break__(code=CustomWSCloseCode.MissingField)
+        except TypeError:
+            await self.__close_and_break__(code=CustomWSCloseCode.InvalidType)
+        except ValueError:
+            await self.__close_and_break__(code=CustomWSCloseCode.InvalidValue)
 
-        return message
+        return custom_message  # noqa
 
     async def __close_and_break__(self, **kwargs: Any) -> None:
         await self.close(**kwargs)  # noqa
