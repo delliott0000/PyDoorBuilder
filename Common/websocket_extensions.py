@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import IntEnum, StrEnum
+from enum import IntEnum
 from json import JSONDecodeError
 from typing import TYPE_CHECKING
 
@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
 __all__ = (
     "CustomWSCloseCode",
-    "CustomWSMessageType",
     "WSResponseMixin",
     "CustomWSResponse",
     "CustomClientWSResponse",
@@ -29,11 +28,6 @@ class CustomWSCloseCode(IntEnum):
     InvalidFrameType   = 4001
     InvalidJSON        = 4002
     InvalidMessageType = 4003
-
-
-class CustomWSMessageType(StrEnum):
-    Event = "event"
-    Ack   = "ack"
 # fmt: on
 
 
