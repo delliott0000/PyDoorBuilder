@@ -64,7 +64,7 @@ The following rules apply to top-level and payload-level fields.
 It *is* a violation of the subprotocol to:
 - Miss a mandatory field.
 - Supply a value of an incorrect type.
-- Supply a value that is not a member of the field's designated enumeration.
+- Supply a value that is not a member of the field's designated enumeration or is otherwise structurally invalid. (For instance, ISO 8601 strings.)
 - Send an `Event` with `"status": "fatal"`.
 
 It *is not* a violation of the subprotocol to:
@@ -81,6 +81,9 @@ If and only if a peer violates the subprotocol, then the other peer must immedia
 Close codes and their corresponding failure scenarios:
 - **4001** - A message is not a text frame.
 - **4002** - A message cannot be parsed into a valid JSON object.
+- **4003** - A message is missing a mandatory field.
+- **4004** - A message supplies a value of an incorrect type.
+- **4005** - A message supplies a value that is not a member of the field's designated enumeration or is otherwise structurally invalid.
 
 Not part of the subprotocol per se, but still application-specific:
 - **4000** - Sent by the server when the `Token` that was used to open the WebSocket connection is no longer valid.
