@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     Json = dict[str, Any]
 
 __all__ = (
+    "custom_ws_message_factory",
     "CustomWSMessageType",
     "WSEventStatus",
     "CustomWSCloseCode",
@@ -29,6 +30,13 @@ __all__ = (
     "CustomWSResponse",
     "CustomClientWSResponse",
 )
+
+
+def custom_ws_message_factory(json: Json, /) -> WSEvent | WSAck:
+    message_type = CustomWSMessageType(json["type"])
+    mapping = {CustomWSMessageType.Event: WSEvent, CustomWSMessageType.Ack: WSAck}
+    cls = mapping[message_type]
+    return cls(json)
 
 
 # fmt: off
