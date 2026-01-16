@@ -7,15 +7,22 @@ from typing import TYPE_CHECKING
 from aiohttp import ClientWebSocketResponse, WSCloseCode, WSMsgType
 from aiohttp.web import WebSocketResponse
 
-from .utils import check_ratelimit
+from .bases import ComparesIDABC, ComparesIDMixin
+from .utils import check_ratelimit, decode_datetime
 
 if TYPE_CHECKING:
+    from datetime import datetime
     from typing import Any
 
     from aiohttp import WSMessage
 
+    Json = dict[str, Any]
+
 __all__ = (
     "CustomWSCloseCode",
+    "CustomWSMessage",
+    "WSEvent",
+    "WSAck",
     "WSResponseMixin",
     "CustomWSResponse",
     "CustomClientWSResponse",
@@ -27,8 +34,27 @@ class CustomWSCloseCode(IntEnum):
     TokenExpired       = 4000
     InvalidFrameType   = 4001
     InvalidJSON        = 4002
-    InvalidMessageType = 4003
 # fmt: on
+
+
+class CustomWSMessage(ComparesIDMixin, ComparesIDABC):
+    def __init__(self, json: Json, /):
+        self._id = json["id"]
+        self._sent_at = decode_datetime(json["sent_at"])
+
+    @property
+    def id(self) -> Any:
+        return self._id
+
+    @property
+    def sent_at(self) -> datetime:
+        return self._sent_at
+
+
+class WSEvent(CustomWSMessage): ...
+
+
+class WSAck(CustomWSMessage): ...
 
 
 class WSResponseMixin:
