@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 from bcrypt import checkpw, gensalt, hashpw
 
 if TYPE_CHECKING:
+    from enum import StrEnum
     from typing import Any
 
     from aiohttp import ClientResponse
@@ -27,6 +28,7 @@ __all__ = (
     "setup_logging",
     "check_ratelimit",
     "log",
+    "verify_enums",
     "to_json",
 )
 
@@ -89,6 +91,11 @@ def check_ratelimit(hits: list[float], /, *, limit: int, interval: float) -> lis
 def log(message: str, level: int = INFO, /) -> None:
     with_traceback = exc_info()[0] is not None and level >= ERROR
     _logger.log(level, message, exc_info=with_traceback)
+
+
+def verify_enums(data: Json, enums: dict[str, type[StrEnum]], /) -> None:
+    for key, enum in enums.items():
+        enum(data[key])
 
 
 async def to_json(r: Request | ClientResponse, /, *, strict: bool = False) -> Json:
