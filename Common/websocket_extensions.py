@@ -30,7 +30,7 @@ __all__ = (
 )
 
 
-def custom_ws_message_factory(json: Json, /) -> WSEvent | WSAck:
+def custom_ws_message_factory(json: Json, /) -> CustomWSMessage:
     message_type = CustomWSMessageType(json["type"])
     mapping = {CustomWSMessageType.Event: WSEvent, CustomWSMessageType.Ack: WSAck}
     cls = mapping[message_type]
@@ -76,7 +76,8 @@ class CustomWSMessage(ComparesIDMixin, ComparesIDABC):
 class WSEvent(CustomWSMessage): ...
 
 
-class WSAck(CustomWSMessage): ...
+class WSAck(CustomWSMessage):
+    pass
 
 
 class WSResponseMixin:
@@ -98,7 +99,7 @@ class WSResponseMixin:
         self.__interval = interval
         self.__hits = []
 
-    async def __anext__(self) -> WSEvent | WSAck:
+    async def __anext__(self) -> CustomWSMessage:
         message = await super().__anext__()  # noqa
 
         if self.__ratelimited:
