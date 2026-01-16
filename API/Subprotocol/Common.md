@@ -83,7 +83,7 @@ Close codes and their corresponding failure scenarios:
 - **4002** - A message cannot be parsed into a valid JSON object.
 - **4003** - A message is missing a mandatory field.
 - **4004** - A message supplies a value of an incorrect type.
-- **4005** - A message supplies a value that is not a member of the field's designated enumeration or is otherwise structurally invalid.
+- **4005** - A message supplies a value that is not a member of the field's designated enumeration or is otherwise structurally invalid. (This may take precendence over type errors due to implementation details.)
 
 Not part of the subprotocol per se, but still application-specific:
 - **4000** - Sent by the server when the `Token` that was used to open the WebSocket connection is no longer valid.
