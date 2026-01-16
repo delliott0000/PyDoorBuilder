@@ -26,7 +26,7 @@ class HTTPException(Exception):
     def __init__(self, response: ClientResponse, data: Json, /):
         super().__init__(f"{response.status} {response.reason}")
         self.response: ClientResponse = response
-        self.data: Json = dict(data)
+        self.data: Json = data
 
 
 class ValidationError(Exception):
