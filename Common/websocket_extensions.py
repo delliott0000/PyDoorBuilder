@@ -47,6 +47,9 @@ class CustomWSCloseCode(IntEnum):
     TokenExpired       = 4000
     InvalidFrameType   = 4001
     InvalidJSON        = 4002
+    MissingField       = 4003
+    InvalidType        = 4004
+    InvalidValue       = 4005
 # fmt: on
 
 
